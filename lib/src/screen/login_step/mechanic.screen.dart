@@ -9,6 +9,7 @@ import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
+import 'package:laundromats/src/utils/shared_preferences_util.dart';
 
 class MechanicScreen extends ConsumerStatefulWidget {
   const MechanicScreen({super.key});
@@ -44,20 +45,32 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
     return false;
   }
 
-  void _onNextClicked() {
+  void _onNextClicked() async {
     if (_experInValue.text.isEmpty || _businessValue.text.isEmpty) {
       _showErrorDialog();
     } else {
       GlobalVariable.userExpertIn = _experInValue.text;
       GlobalVariable.userbusinessTime = _businessValue.text;
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => const HomeScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
+
+      await SharedPreferencesUtil.saveUserDetails(
+        userName: GlobalVariable.userName!,
+        userEmail: GlobalVariable.userEmail!,
+        userExpertIn: GlobalVariable.userExpertIn!,
+        userBusinessTime: GlobalVariable.userbusinessTime!,
+        userLaundromatsCount: " ",
       );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                const HomeScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
     }
   }
 

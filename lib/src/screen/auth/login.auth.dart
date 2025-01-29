@@ -67,6 +67,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _signInFacebook(BuildContext context) async {
+    final navigator = Navigator.of(context);
+
+    try {
+      var user = await authService.signInWithFacebook();
+      if (user != null) {
+        logger.i("Facebook Login Success: ${user.displayName}");
+        logger.i("Email: ${user.email}");
+        GlobalVariable.userName = user.displayName;
+        GlobalVariable.userEmail = user.email;
+
+        navigator.pushReplacement(
+          MaterialPageRoute(builder: (context) => const CategoryScreen()),
+        );
+      }
+    } catch (e) {
+      logger.e("Facebook Login Failed: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isKeyboardVisible == true) {
@@ -179,7 +199,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 fullColor: kColorPrimary,
                                 icon: true,
                                 size: false,
-                                onPressed: () {},
+                                onPressed: () {
+                                  _signInFacebook(context);
+                                },
                               ),
                             ],
                           ))
