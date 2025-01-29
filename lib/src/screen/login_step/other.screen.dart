@@ -1,0 +1,288 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laundromats/src/common/header.widget.dart';
+import 'package:laundromats/src/common/progress.widget.dart';
+import 'package:laundromats/src/constants/app_button.dart';
+import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/home/home.screen.dart';
+import 'package:laundromats/src/screen/login_step/category.screen.dart';
+import 'package:laundromats/src/translate/en.dart';
+import 'package:laundromats/src/utils/index.dart';
+
+class OtherScreen extends ConsumerStatefulWidget {
+  const OtherScreen({super.key});
+
+  @override
+  ConsumerState<OtherScreen> createState() => _OtherScreenState();
+}
+
+class _OtherScreenState extends ConsumerState<OtherScreen> {
+  double screenHeight = 0;
+  double keyboardHeight = 0;
+  int currentStep = 1;
+  final bool _isKeyboardVisible = false;
+  final _experInValue = TextEditingController();
+  final _businessValue = TextEditingController();
+  final _howLaundromatsValue = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  bool allowRevert = true;
+
+  Future<bool> _onWillPop() async {
+    if (!allowRevert) {
+      return false;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isKeyboardVisible == true) {
+      screenHeight = MediaQuery.of(context).size.height;
+    } else {
+      screenHeight = 800;
+      keyboardHeight = 0;
+    }
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: SizedBox.expand(
+          child: SingleChildScrollView(
+            child: FocusScope(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: kColorWhite
+                ),
+                height: vhh(context, 100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const HeaderWidget(role: false,),
+
+                    SizedBox(height: vMin(context, 10),),
+
+                    Text(
+                      letGetStarted.toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 30, fontFamily: 'Onset', fontWeight: FontWeight.bold, color:kColorSecondary),
+                    ),
+
+                    SizedBox(height: vMin(context, 1),),
+
+                    Text(
+                      letGetStartedDescription.toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Onset-Regular', color:kColorSecondary),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.all(vMin(context, 5)),
+                      child: ProgressIndicatorWidget(
+                        currentStep: currentStep,
+                        activeColor: kColorPrimary,
+                        inactiveColor: kColorSecondary.withOpacity(0.5),
+                      ),
+                    ),
+
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(vMin(context, 5)),
+                        child: Container(
+                          padding: EdgeInsets.all(vMin(context, 5)),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: kColorPrimary, width: 1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(height: vMin(context, 5),),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    experIn.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'Onset-Regular', color:kColorSecondary),
+                                  ),
+                                  SizedBox(height: vMin(context, 1),),
+
+                                  SizedBox(
+                                    width: vw(context, 40),
+                                    height: vh(context, 5),
+                                    child: TextField(
+                                      controller: _experInValue,
+                                      keyboardType: TextInputType.name,
+                                      autocorrect: false,
+                                      cursorColor: Colors.grey,
+                                      decoration: const InputDecoration(
+                                        floatingLabelBehavior:  FloatingLabelBehavior.always,
+                                        enabledBorder: kEnableBorder,
+                                        focusedBorder: kFocusBorder,
+                                        hintStyle: TextStyle(
+                                            fontSize: 10.0,
+                                            color: kColorInputBorder),
+                                        filled: false,
+                                        disabledBorder: InputBorder.none,
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 5.0, horizontal: 10),
+                                        counterText: '',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(height: vMin(context, 2),),
+
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    businessName.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'Onset-Regular', color:kColorSecondary),
+                                  ),
+                                  SizedBox(height: vMin(context, 1),),
+
+                                  SizedBox(
+                                    width: vw(context, 40),
+                                    height: vh(context, 5),
+                                    child: TextField(
+                                      controller: _businessValue,
+                                      keyboardType: TextInputType.name,
+                                      autocorrect: false,
+                                      cursorColor: Colors.grey,
+                                      decoration: const InputDecoration(
+                                        floatingLabelBehavior:  FloatingLabelBehavior.always,
+                                        enabledBorder: kEnableBorder,
+                                        focusedBorder: kFocusBorder,
+                                        hintStyle: TextStyle(
+                                            fontSize: 10.0,
+                                            color: kColorInputBorder),
+                                        filled: false,
+                                        disabledBorder: InputBorder.none,
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 5.0, horizontal: 10),
+                                        counterText: '',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              SizedBox(height: vMin(context, 2),),
+
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    howLaundromats.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'Onset-Regular', color:kColorSecondary),
+                                  ),
+                                  SizedBox(height: vMin(context, 1),),
+
+                                  SizedBox(
+                                    width: vw(context, 40),
+                                    height: vh(context, 5),
+                                    child: TextField(
+                                      controller: _howLaundromatsValue,
+                                      keyboardType: TextInputType.name,
+                                      autocorrect: false,
+                                      cursorColor: Colors.grey,
+                                      decoration: const InputDecoration(
+                                        floatingLabelBehavior:  FloatingLabelBehavior.always,
+                                        enabledBorder: kEnableBorder,
+                                        focusedBorder: kFocusBorder,
+                                        hintStyle: TextStyle(
+                                            fontSize: 10.0,
+                                            color: kColorInputBorder),
+                                        filled: false,
+                                        disabledBorder: InputBorder.none,
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 5.0, horizontal: 10),
+                                        counterText: '',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            
+                              SizedBox(height: vMin(context, 8)),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: vMin(context, 20),
+                                    child: ButtonWidget(
+                                      btnType: ButtonWidgetType.backBtn,
+                                      borderColor: kColorPrimary,
+                                      textColor: kColorWhite,
+                                      fullColor: kColorPrimary,
+                                      size: false,
+                                      icon: true,
+                                      onPressed: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1, animation2) =>
+                                              const CategoryScreen(),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration: Duration.zero,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: vMin(context, 20),
+                                    child: ButtonWidget(
+                                      btnType: ButtonWidgetType.nextBtn,
+                                      borderColor: kColorPrimary,
+                                      textColor: kColorWhite,
+                                      fullColor: kColorPrimary,
+                                      size: false,
+                                      icon: true,
+                                      onPressed: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation1, animation2) =>
+                                              const HomeScreen(),
+                                            transitionDuration: Duration.zero,
+                                            reverseTransitionDuration: Duration.zero,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]
+                ),
+              ),
+            ),
+          )
+        ),
+      )
+    );
+  }
+}

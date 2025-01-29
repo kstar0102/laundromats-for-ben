@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "472459525234",
+    "project_id": "laundromats-1c731",
+    "storage_bucket": "laundromats-1c731.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472459525234:android:91977abcd29cfa8ba816eb",
+        "android_client_info": {
+          "package_name": "com.app.laundromats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472459525234-duv32j68gommcd778jl2ea1q7mmqn4io.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.laundromats",
+            "certificate_hash": "527278322793e0a64641aa037202d66c443ae879"
+          }
+        },
+        {
+          "client_id": "472459525234-p4fgse3dv3kmfpnj1tiohotgvi4fqdnb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.laundromats",
+            "certificate_hash": "07f8b997dc2dfa1e62f2e97b1df467e4bc4e9bf7"
+          }
+        },
+        {
+          "client_id": "472459525234-cj1q8vdmhtiemfmq2s2gothh62tvpmh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzR_UuSLe66_dp-Qd-GeugBtK5--2a6Rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472459525234-cj1q8vdmhtiemfmq2s2gothh62tvpmh6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "472459525234-mvq5km2hdkfddkhaqc86ik7aem3j84vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.laundromats"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
