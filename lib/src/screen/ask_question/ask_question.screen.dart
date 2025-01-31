@@ -11,6 +11,8 @@ import 'package:laundromats/src/utils/index.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 class AskQuestionScreen extends ConsumerStatefulWidget {
   const AskQuestionScreen({
@@ -26,14 +28,40 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
   double keyboardHeight = 0;
   final int _currentIndex = 2;
   final bool _isKeyboardVisible = false;
-  final _searchValue = TextEditingController();
+
+  final List<String> yearList =
+      List.generate(50, (index) => (DateTime.now().year - index).toString());
+
+  final _questionValue = TextEditingController();
+  final _brandValue = TextEditingController();
+  final _serialNumberValue = TextEditingController();
+  final _poundValue = TextEditingController();
+  final _yearValue = TextEditingController();
+  final _categoryValue = TextEditingController();
+  String? uploadedImageUrl;
+  String? uploadedFileUrl;
+
+  File? localImageFile;
   final logger = Logger();
 
-  String? uploadedImageUrl;
+  final List<String> categoryList = [
+    'Washers',
+    'Dryers',
+    'Wash and Fold',
+    'Start a Laundromat',
+    'POS Systems',
+    'Card Machines',
+    'Heat and Air',
+    'Plumbing',
+    'Electrical',
+    'Wash-Dry-Fold Business Launch',
+  ];
 
   @override
   void initState() {
     super.initState();
+    _yearValue.text =
+        DateTime.now().year.toString(); // Set default to current year
   }
 
   @override
@@ -53,16 +81,69 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
   void _pickFile(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: ['pdf'], // Limit to PDF files
     );
 
     if (result != null) {
-      final file = result.files.first;
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('File selected: ${file.name}')),
+      final file = File(result.files.single.path!);
+      final fileName = result.files.single.name;
+
+      // Show loading dialog
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       );
+
+      try {
+        // Upload the file using AuthService
+        AuthService authService = AuthService();
+        final uploadResult =
+            await authService.uploadFile(file, fileName, "application/pdf");
+
+        // Close loading dialog
+        // ignore: use_build_context_synchronously
+        if (mounted) Navigator.pop(context);
+
+        if (uploadResult['success'] == true) {
+          // Set the uploaded file URL
+          setState(() {
+            uploadedFileUrl = uploadResult['data']['url'];
+          });
+
+          // Show success message
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File uploaded successfully!')),
+          );
+          logger.i('Uploaded File URL: $uploadedFileUrl');
+        } else {
+          // Handle failed upload
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Failed to upload file: ${uploadResult['message']}')),
+          );
+          logger.e('Upload failed: ${uploadResult['message']}');
+        }
+      } catch (error) {
+        // Handle exceptions
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context); // Close dialog on error
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading file: $error')),
+        );
+        logger.e('Error: $error');
+      }
     } else {
+      // User canceled file selection
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No file selected.')),
@@ -94,7 +175,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
 
       // Call the upload function from AuthService
       AuthService authService = AuthService();
-      final result = await authService.uploadFile(file, fileName);
+      final result = await authService.uploadFile(file, fileName, "image");
 
       // Close loading dialog
       // ignore: use_build_context_synchronously
@@ -107,6 +188,13 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
           const SnackBar(content: Text('Upload successful!')),
         );
         uploadedImageUrl = result['data']['url'];
+
+        // Save the local file to display before upload
+        setState(() {
+          localImageFile = file;
+          logger.i('Local Image File: ${localImageFile?.path}');
+        });
+
         logger.i(uploadedImageUrl);
       } else {
         // ignore: use_build_context_synchronously
@@ -120,6 +208,194 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No image selected.')),
+      );
+    }
+  }
+
+  Future<String?> _showYearPicker(BuildContext context) async {
+    return await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: vh(context, 50),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Select Year',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Onset-Regular',
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: yearList.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = yearList[index] == _yearValue.text;
+                    return ListTile(
+                      title: Text(
+                        yearList[index],
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Onset-Regular',
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? Colors.blue : Colors.black,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.blue,
+                            )
+                          : null,
+                      onTap: () {
+                        Navigator.pop(context,
+                            yearList[index]); // Return the selected year
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String?> _showCategoryPicker(BuildContext context) async {
+    return await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: vh(context, 50),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Select Category',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Onset-Regular',
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: categoryList.length,
+                  itemBuilder: (context, index) {
+                    final isSelected =
+                        _categoryValue.text == categoryList[index];
+                    return ListTile(
+                      title: Text(
+                        categoryList[index],
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Onset-Regular',
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? Colors.blue : Colors.black,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.blue,
+                            )
+                          : null,
+                      onTap: () {
+                        Navigator.pop(
+                            context,
+                            categoryList[
+                                index]); // Return the selected category
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _submitQuestion(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
+      // Call the API function and get the response
+      AuthService authService = AuthService();
+      final result = await authService.createQuestion(
+        question: _questionValue.text,
+        brand: _brandValue.text,
+        serialNumber: _serialNumberValue.text,
+        pounds: _poundValue.text,
+        year: _yearValue.text,
+        category: _categoryValue.text,
+        uploadedImageUrl: uploadedImageUrl, // Can be null
+        uploadedFileUrl: uploadedFileUrl, // Can be null
+      );
+
+      // Close the loading dialog
+      if (mounted) Navigator.pop(context);
+
+      if (result["success"]) {
+        // Success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Question created successfully!')),
+        );
+
+        // Clear form fields
+        setState(() {
+          _questionValue.clear();
+          _brandValue.clear();
+          _serialNumberValue.clear();
+          _poundValue.clear();
+          _yearValue.text = DateTime.now().year.toString();
+          _categoryValue.clear();
+          uploadedImageUrl = null; // Reset uploaded image
+          uploadedFileUrl = null; // Reset uploaded file
+          localImageFile = null;
+        });
+      } else {
+        // Validation error
+        if (result.containsKey("missingFields")) {
+          String missingFieldsMessage =
+              "Missing fields: ${result["missingFields"].join(', ')}";
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(missingFieldsMessage)),
+          );
+        } else {
+          // General error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result["message"])),
+          );
+        }
+      }
+    } catch (error) {
+      if (mounted) Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unexpected error: $error')),
       );
     }
   }
@@ -184,6 +460,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                             // Text Field
                             TextField(
                               maxLines: 3,
+                              controller: _questionValue,
                               decoration: InputDecoration(
                                 hintText: typeQuestionHere.toString(),
                                 hintStyle: const TextStyle(
@@ -237,7 +514,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               width: vw(context, 50),
                               height: vh(context, 5),
                               child: TextField(
-                                controller: _searchValue,
+                                controller: _brandValue,
                                 keyboardType: TextInputType.name,
                                 autocorrect: false,
                                 cursorColor: Colors.grey,
@@ -286,8 +563,8 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               width: vw(context, 50),
                               height: vh(context, 5),
                               child: TextField(
-                                controller: _searchValue,
-                                keyboardType: TextInputType.name,
+                                controller: _serialNumberValue,
+                                keyboardType: TextInputType.number,
                                 autocorrect: false,
                                 cursorColor: Colors.grey,
                                 decoration: InputDecoration(
@@ -335,8 +612,8 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               width: vw(context, 50),
                               height: vh(context, 5),
                               child: TextField(
-                                controller: _searchValue,
-                                keyboardType: TextInputType.name,
+                                controller: _poundValue,
+                                keyboardType: TextInputType.text,
                                 autocorrect: false,
                                 cursorColor: Colors.grey,
                                 decoration: InputDecoration(
@@ -384,24 +661,37 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               width: vw(context, 50),
                               height: vh(context, 5),
                               child: TextField(
-                                controller: _searchValue,
-                                keyboardType: TextInputType.name,
+                                controller: _yearValue,
+                                keyboardType:
+                                    TextInputType.none, // Disable keyboard
                                 autocorrect: false,
                                 cursorColor: Colors.grey,
-                                decoration: InputDecoration(
-                                  hintText: chooseYearList.toString(),
+                                readOnly:
+                                    true, // Make the TextField non-editable
+                                onTap: () async {
+                                  final selectedYear =
+                                      await _showYearPicker(context);
+                                  if (selectedYear != null) {
+                                    setState(() {
+                                      _yearValue.text = selectedYear;
+                                    });
+                                  }
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: 'Choose Year',
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.always,
                                   enabledBorder: kEnableBorder,
                                   focusedBorder: kFocusBorder,
-                                  hintStyle: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorLightGrey),
+                                  hintStyle: TextStyle(
+                                    fontSize: 14.0,
+                                    fontFamily: 'Onset-Regular',
+                                    color: kColorLightGrey,
+                                  ),
                                   filled: false,
                                   disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 10),
                                   counterText: '',
                                 ),
                               ),
@@ -433,24 +723,36 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               width: vw(context, 50),
                               height: vh(context, 5),
                               child: TextField(
-                                controller: _searchValue,
-                                keyboardType: TextInputType.name,
+                                controller: _categoryValue,
+                                keyboardType:
+                                    TextInputType.none, // Disable keyboard
                                 autocorrect: false,
                                 cursorColor: Colors.grey,
-                                decoration: InputDecoration(
-                                  hintText: chooseCategoryList.toString(),
+                                readOnly: true, // Prevent direct editing
+                                onTap: () async {
+                                  final selectedCategory =
+                                      await _showCategoryPicker(context);
+                                  if (selectedCategory != null) {
+                                    setState(() {
+                                      _categoryValue.text = selectedCategory;
+                                    });
+                                  }
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: 'Choose Category',
                                   floatingLabelBehavior:
                                       FloatingLabelBehavior.always,
                                   enabledBorder: kEnableBorder,
                                   focusedBorder: kFocusBorder,
-                                  hintStyle: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorLightGrey),
+                                  hintStyle: TextStyle(
+                                    fontSize: 14.0,
+                                    fontFamily: 'Onset-Regular',
+                                    color: kColorLightGrey,
+                                  ),
                                   filled: false,
                                   disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 10),
                                   counterText: '',
                                 ),
                               ),
@@ -478,47 +780,86 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                             ),
                             const SizedBox(height: 8.0),
                             SizedBox(
-                                width: vw(context, 50),
-                                height: vh(context, 20),
-                                child: GestureDetector(
-                                  onTap: () => _pickFile(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: kColorInputBorder, width: 1),
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.file_present,
-                                          size: 40,
-                                          color: Colors.grey.withOpacity(0.7),
-                                        ),
-                                        SizedBox(height: vMin(context, 2)),
-                                        Text(
-                                          clickUploadFile.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorInputBorder,
-                                          ),
-                                        ),
-                                        SizedBox(height: vMin(context, 1)),
-                                        Text(
-                                          pdfSize.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorInputBorder,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                              width: vw(context, 50),
+                              height: vh(context, 20),
+                              child: GestureDetector(
+                                onTap: () => _pickFile(
+                                    context), // Trigger the file picker
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: kColorInputBorder, width: 1),
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
-                                )),
+                                  child: uploadedFileUrl != null
+                                      ? Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.file_present,
+                                              size: 40,
+                                              color: Colors.green.withOpacity(
+                                                  0.7), // Success color
+                                            ),
+                                            SizedBox(height: vMin(context, 2)),
+                                            const Text(
+                                              "File Uploaded Successfully!",
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Onset-Regular',
+                                                color: Colors.green,
+                                              ),
+                                            ),
+                                            SizedBox(height: vMin(context, 1)),
+                                            Text(
+                                              uploadedFileUrl!
+                                                  .split('/')
+                                                  .last, // Extract file name from URL
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'Onset-Regular',
+                                                color: kColorInputBorder,
+                                              ),
+                                              overflow: TextOverflow
+                                                  .ellipsis, // Truncate long file names
+                                              maxLines: 1,
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.file_present,
+                                              size: 40,
+                                              color:
+                                                  Colors.grey.withOpacity(0.7),
+                                            ),
+                                            SizedBox(height: vMin(context, 2)),
+                                            Text(
+                                              clickUploadFile.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Onset-Regular',
+                                                color: kColorInputBorder,
+                                              ),
+                                            ),
+                                            SizedBox(height: vMin(context, 1)),
+                                            Text(
+                                              pdfSize.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'Onset-Regular',
+                                                color: kColorInputBorder,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -541,121 +882,97 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               ],
                             ),
                             const SizedBox(height: 8.0),
-                            // SizedBox(
-                            //     width: vw(context, 50),
-                            //     height: vh(context, 20),
-                            //     child: GestureDetector(
-                            //       onTap: () => _pickImage(context),
-                            //       child: Container(
-                            //         decoration: BoxDecoration(
-                            //           border: Border.all(
-                            //               color: kColorInputBorder, width: 1),
-                            //           borderRadius: BorderRadius.circular(8.0),
-                            //         ),
-                            //         child: Column(
-                            //           mainAxisAlignment:
-                            //               MainAxisAlignment.center,
-                            //           children: [
-                            //             Icon(
-                            //               Icons.image,
-                            //               size: 40,
-                            //               color: Colors.grey.withOpacity(0.7),
-                            //             ),
-                            //             SizedBox(height: vMin(context, 2)),
-                            //             Text(
-                            //               clickUploadImage.toString(),
-                            //               style: const TextStyle(
-                            //                 fontSize: 16,
-                            //                 fontFamily: 'Onset-Regular',
-                            //                 color: kColorInputBorder,
-                            //               ),
-                            //             ),
-                            //             SizedBox(height: vMin(context, 1)),
-                            //             Text(
-                            //               imageSize.toString(),
-                            //               style: const TextStyle(
-                            //                 fontSize: 14,
-                            //                 fontFamily: 'Onset-Regular',
-                            //                 color: kColorInputBorder,
-                            //               ),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //       ),
-                            //     )),
                             SizedBox(
                               width: vw(context, 50),
                               height: vh(context, 20),
                               child: GestureDetector(
-                                onTap: () => _pickImage(context),
+                                onTap: () => _pickImage(
+                                    context), // Call the pick image function
                                 child: Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                         color: kColorInputBorder, width: 1),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
-                                  child: uploadedImageUrl != null
+                                  child: localImageFile !=
+                                          null // Display local image if available
                                       ? ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(8.0),
-                                          child: Image.network(
-                                            uploadedImageUrl!,
+                                          child: Image.file(
+                                            localImageFile!,
                                             width: double.infinity,
                                             height: double.infinity,
-                                            fit: BoxFit.cover,
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
-                                              if (loadingProgress == null)
-                                                return child;
-                                              return const Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              );
-                                            },
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              logger.e(
-                                                  'Error loading image: $error');
-                                              return const Center(
-                                                child: Icon(Icons.error,
-                                                    color: Colors.red),
-                                              );
-                                            },
+                                            fit: BoxFit.fill,
                                           ),
                                         )
-                                      : Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.image,
-                                              size: 40,
-                                              color:
-                                                  Colors.grey.withOpacity(0.7),
-                                            ),
-                                            SizedBox(height: vMin(context, 2)),
-                                            Text(
-                                              clickUploadImage.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorInputBorder,
+                                      : uploadedImageUrl !=
+                                              null // Display uploaded image URL if available
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.network(
+                                                uploadedImageUrl!,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.cover,
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null)
+                                                    return child;
+                                                  return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  );
+                                                },
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  logger.e(
+                                                      'Error loading image: $error');
+                                                  return const Center(
+                                                    child: Icon(Icons.error,
+                                                        color: Colors.red),
+                                                  );
+                                                },
                                               ),
+                                            )
+                                          : Column(
+                                              // Placeholder UI for when no image is selected
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.image,
+                                                  size: 40,
+                                                  color: Colors.grey
+                                                      // ignore: deprecated_member_use
+                                                      .withOpacity(0.7),
+                                                ),
+                                                SizedBox(
+                                                    height: vMin(context, 2)),
+                                                Text(
+                                                  clickUploadImage.toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily: 'Onset-Regular',
+                                                    color: kColorInputBorder,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    height: vMin(context, 1)),
+                                                Text(
+                                                  imageSize.toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily: 'Onset-Regular',
+                                                    color: kColorInputBorder,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            SizedBox(height: vMin(context, 1)),
-                                            Text(
-                                              imageSize.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorInputBorder,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                 ),
                               ),
-                            ),
+                            )
                           ],
                         ),
                       ),
@@ -670,7 +987,9 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                               fullColor: kColorPrimary,
                               size: false,
                               icon: true,
-                              onPressed: () {},
+                              onPressed: () {
+                                _submitQuestion(context);
+                              },
                             ),
                           )),
                       Padding(
@@ -696,14 +1015,33 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                       color: kColorSecondary,
                                     ),
                                   ),
-                                  const TextSpan(
+                                  TextSpan(
                                     text: 'manualslib.com',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
-                                      color: kColorPrimary,
                                       fontFamily: 'Onset-Regular',
+                                      color: kColorPrimary,
                                       decoration: TextDecoration.underline,
                                     ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () async {
+                                        final Uri url =
+                                            Uri.parse('https://manualslib.com');
+
+                                        // Try launching the URL
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Could not open the URL.')),
+                                          );
+                                        }
+                                      },
                                   ),
                                 ],
                               ),

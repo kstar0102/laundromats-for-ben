@@ -1,6 +1,8 @@
 const String appName = "Laundromats";
-const String loginHeaderTitle = "Successful Laundromat Owners Don't Spend Hours Researching...";
-const String loginDescriptionContent = "Let our intelligent AI platform answer your machine and laundromat business questions along with our community chiming in on various solutions.";
+const String loginHeaderTitle =
+    "Successful Laundromat Owners Don't Spend Hours Researching...";
+const String loginDescriptionContent =
+    "Let our intelligent AI platform answer your machine and laundromat business questions along with our community chiming in on various solutions.";
 const String adsName = "1 month money back guarantee!";
 const String googleLogin = "Sign-up with Google";
 const String facebookLogin = "Sign-up with Facebook";
@@ -9,15 +11,16 @@ const String letGetStartedDescription = "Tell us little about your self";
 const String roleName = "What is your role";
 const String nextBtn = "Next";
 const String backBtn = "Back";
-const String mechanic="Mechanic";
+const String mechanic = "Mechanic";
 const String owner = "Owner";
-const String other= "Other";
-const String experIn= "What are you an expert in";
-const String businessName= "How long have you been in business?";
-const String howLaundromats= "How many laundromats do they have?";
+const String other = "Other";
+const String experIn = "What are you an expert in";
+const String businessName = "How long have you been in business?";
+const String howLaundromats = "How many laundromats do they have?";
 const String getPremium = "Get Premium";
 const String welcomeBack = "Welcome back,";
-const String findAnswer = "Find answers to your technical questions and help others answer theirs.";
+const String findAnswer =
+    "Find answers to your technical questions and help others answer theirs.";
 const String trendingQuestions = "Trending Questions";
 const String seeAllAnsersBtn = "See all answers";
 const String myQuestions = "My Questions";
@@ -45,7 +48,8 @@ const String typeQuestionHere = "Type Question here...";
 const String brand = "Brand";
 const String typeBrandHere = "Type Brand here...";
 const String serialNumber = "Serial number";
-const String typeSerialNumberHere = "Type serial number for the machine here...";
+const String typeSerialNumberHere =
+    "Type serial number for the machine here...";
 const String pounds = "Pounds";
 const String typePoundsHere = "Type Pounds here...";
 const String chooseYear = "Choose year";
@@ -71,7 +75,8 @@ const String comments = "Comments";
 const String getThe = "Get The ";
 const String premium = "Premium ";
 const String experience = "Experience";
-const String subscriptionDescription = "Choose a plan that fits your needs, whether it's monthly flexibility or the savings of a yearly subscription";
+const String subscriptionDescription =
+    "Choose a plan that fits your needs, whether it's monthly flexibility or the savings of a yearly subscription";
 const String billedMonthly = "Billed Monthly";
 const String billedAnnully = "Billed Annully";
 const String subscriptionCardDetail = "per user/month, billed annually";
@@ -79,10 +84,11 @@ const String mockDataTitle = "Lorem ipsum dolor sit amet";
 const String getStarted = "Get Started";
 const String basic = "Basic";
 const String pro = "Pro";
-const String goPrimium= "Go Premium";
-const String goPrimiumDescription = "Enjoying the free experience so far? What are you waiting for? Come join us, Go premium and get unlimited features.";
+const String goPrimium = "Go Premium";
+const String goPrimiumDescription =
+    "Enjoying the free experience so far? What are you waiting for? Come join us, Go premium and get unlimited features.";
 const String continueTitle = "Continue";
-const String filterByCategory = "Filter by categor";
+const String filterByCategory = "Filter by category";
 const String filter = "Filter";
 const String selectAll = "Select All";
 const String disSelectAll = "Deselect All";

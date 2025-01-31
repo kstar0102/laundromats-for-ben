@@ -12,7 +12,7 @@ class AuthService {
 
   final logger = Logger();
 
-  final String baseUrl = 'http://192.168.141.105:5000/api/auth';
+  final String baseUrl = 'http://192.168.141.105:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<User?> signInWithGoogle() async {
@@ -77,7 +77,7 @@ class AuthService {
     required String roleBusinessTime,
     required String roleLaundromatsCount,
   }) async {
-    final Uri url = Uri.parse('$baseUrl/signup');
+    final Uri url = Uri.parse('$baseUrl/auth/signup');
 
     Map<String, String> requestData = {
       "name": name,
@@ -109,7 +109,8 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> uploadFile(File file, String fileName) async {
+  Future<Map<String, dynamic>> uploadFile(
+      File file, String fileName, String type) async {
     try {
       // Read the file as bytes and encode it to base64
       final bytes = await file.readAsBytes();
@@ -118,7 +119,7 @@ class AuthService {
       // Prepare the JSON payload
       final payload = {
         "file": {
-          "type": "image", // Adjust if there are other types
+          "type": type, // Adjust if there are other types
           "name": fileName,
           "content": base64Content,
         },
@@ -139,6 +140,63 @@ class AuthService {
       }
     } catch (e) {
       return {"success": false, "message": e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> createQuestion({
+    required String question,
+    required String brand,
+    required String serialNumber,
+    required String pounds,
+    required String year,
+    required String category,
+    String? uploadedImageUrl, // Nullable
+    String? uploadedFileUrl, // Nullable
+  }) async {
+    String apiUrl = '$baseUrl/question/createquestion';
+
+    // Prepare request body
+    final Map<String, dynamic> requestBody = {
+      "question": question,
+      "brand": brand,
+      "serial_number": serialNumber,
+      "pounds": pounds,
+      "year": year,
+      "category": category,
+      "image": "",
+      "file": ""
+    };
+
+    // Only include file/image if they are not null
+    if (uploadedImageUrl != null) requestBody["image"] = uploadedImageUrl;
+    if (uploadedFileUrl != null) requestBody["file"] = uploadedFileUrl;
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      final jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        return {"success": true, "message": "Question created successfully"};
+      } else if (response.statusCode == 400 &&
+          jsonResponse.containsKey("missingFields")) {
+        return {
+          "success": false,
+          "message": "Validation error",
+          "missingFields": List<String>.from(jsonResponse["missingFields"])
+        };
+      } else {
+        return {
+          "success": false,
+          "message": jsonResponse['message'] ?? "Unknown error occurred"
+        };
+      }
+    } catch (error) {
+      return {"success": false, "message": "Failed to create question: $error"};
     }
   }
 }

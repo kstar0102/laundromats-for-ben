@@ -37,6 +37,9 @@ dependencies:
   google_sign_in: ^6.2.2
   flutter_facebook_auth: ^7.1.1
   logger: ^2.0.0
+  pdf_render: ^1.4.12
+  url_launcher: ^6.1.10
+
 
 dev_dependencies:
   flutter_test:
