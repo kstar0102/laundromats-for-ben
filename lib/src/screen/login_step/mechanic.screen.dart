@@ -6,10 +6,12 @@ import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
+import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:laundromats/src/utils/shared_preferences_util.dart';
+import 'package:logger/logger.dart';
 
 class MechanicScreen extends ConsumerStatefulWidget {
   const MechanicScreen({super.key});
@@ -25,6 +27,7 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
   final bool _isKeyboardVisible = false;
   final _experInValue = TextEditingController();
   final _businessValue = TextEditingController();
+  final logger = Logger();
 
   @override
   void initState() {
@@ -47,41 +50,58 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
 
   void _onNextClicked() async {
     if (_experInValue.text.isEmpty || _businessValue.text.isEmpty) {
-      _showErrorDialog();
+      _showErrorDialog(
+          "Please fill in all the required fields before proceeding.");
     } else {
       GlobalVariable.userExpertIn = _experInValue.text;
       GlobalVariable.userbusinessTime = _businessValue.text;
 
-      await SharedPreferencesUtil.saveUserDetails(
-        userName: GlobalVariable.userName!,
-        userEmail: GlobalVariable.userEmail!,
-        userExpertIn: GlobalVariable.userExpertIn!,
-        userBusinessTime: GlobalVariable.userbusinessTime!,
-        userLaundromatsCount: " ",
+      AuthService authService = AuthService();
+
+      final result = await authService.signup(
+        name: GlobalVariable.userName ?? "",
+        email: GlobalVariable.userEmail ?? "",
+        password: "123123", // Replace with actual password logic
+        role: "Mechanic",
+        roleExpertIn: GlobalVariable.userExpertIn!,
+        roleBusinessTime: GlobalVariable.userbusinessTime!,
+        roleLaundromatsCount: " ", // Add relevant value
       );
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                const HomeScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
+      if (result['success'] == true) {
+        await SharedPreferencesUtil.saveUserDetails(
+          userName: GlobalVariable.userName!,
+          userEmail: GlobalVariable.userEmail!,
+          userExpertIn: GlobalVariable.userExpertIn!,
+          userBusinessTime: GlobalVariable.userbusinessTime!,
+          userLaundromatsCount: " ",
         );
+
+        if (mounted) {
+          // Navigate to HomeScreen
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) =>
+                  const HomeScreen(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        }
+      } else {
+        _showErrorDialog(result['message']);
       }
     }
   }
 
-  void _showErrorDialog() {
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Missing Information"),
-          content: const Text(
-              "Please fill in all the required fields before proceeding."),
+          content: Text(message),
           actions: [
             TextButton(
               onPressed: () {

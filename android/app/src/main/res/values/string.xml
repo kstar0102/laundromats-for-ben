@@ -1,1 +1,5 @@
-<string name="default_web_client_id">414767726831-bi7274hvrs6ntjacg68p9p91rp56qbm4.apps.googleusercontent.com</string>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id">414767726831-bi7274hvrs6ntjacg68p9p91rp56qbm4.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">414767726831</string>
+</resources>

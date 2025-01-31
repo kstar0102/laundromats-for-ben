@@ -1,10 +1,12 @@
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/auth/login.auth.dart';
+import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logger/logger.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +15,8 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  final logger = Logger();
+
   @override
   void initState() {
     super.initState();
@@ -21,13 +25,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   void getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? myId = prefs.getString('uId');
+    String? myId = prefs.getString('userName');
+    logger.i('user id : $myId');
+
+    if (myId == null || myId.isEmpty) {}
 
     Future.delayed(const Duration(seconds: 3), () {
-      if(myId == null || myId.isEmpty) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
-        ));
+      if (myId == null || myId.isEmpty) {
+        if (mounted) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginScreen(),
+              ));
+        }
+      } else {
+        if (mounted) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ));
+        }
       }
     });
   }
@@ -36,16 +55,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox.expand(
         child: FocusScope(
           child: Container(
-            decoration: const BoxDecoration(
-              color: kColorWhite
-            ),
-            child:  Column(
+            decoration: const BoxDecoration(color: kColorWhite),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 SizedBox(height: vh(context, 30)),
@@ -59,7 +77,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   height: vh(context, 30),
                   child: Text(
                     appName.toString(),
-                    style: const TextStyle(fontSize: 40, fontFamily: 'Onset', fontWeight: FontWeight.bold, color:kColorPrimary),
+                    style: const TextStyle(
+                        fontSize: 40,
+                        fontFamily: 'Onset',
+                        fontWeight: FontWeight.bold,
+                        color: kColorPrimary),
                   ),
                 )
               ],
