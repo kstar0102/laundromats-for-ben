@@ -11,6 +11,7 @@ import 'package:laundromats/src/utils/index.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
 
@@ -57,6 +58,8 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
     'Wash-Dry-Fold Business Launch',
   ];
 
+  final List<String> _selectedTags = [];
+
   @override
   void initState() {
     super.initState();
@@ -76,6 +79,47 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
       return false;
     }
     return false;
+  }
+
+  void _showTagDropdown() async {
+    final List<String> availableTags = [
+      "New",
+      "Barrel",
+      "Noise",
+      "Washer",
+      "Dryer",
+      "Steam",
+      "Repair",
+    ].where((tag) => !_selectedTags.contains(tag)).toList();
+
+    final String? selectedTag = await showModalBottomSheet<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView.builder(
+          itemCount: availableTags.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(availableTags[index]),
+              onTap: () {
+                Navigator.pop(context, availableTags[index]);
+              },
+            );
+          },
+        );
+      },
+    );
+
+    if (selectedTag != null) {
+      setState(() {
+        if (_selectedTags.length < 4) {
+          _selectedTags.add(selectedTag);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('You can select up to 4 tags only.')),
+          );
+        }
+      });
+    }
   }
 
   void _pickFile(BuildContext context) async {
@@ -342,15 +386,22 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
         },
       );
 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? myId = prefs.getString('userId');
+
+      String selectedTagsAsString = _selectedTags.join(', ');
+
       // Call the API function and get the response
       AuthService authService = AuthService();
       final result = await authService.createQuestion(
+        userId: myId!,
         question: _questionValue.text,
         brand: _brandValue.text,
         serialNumber: _serialNumberValue.text,
         pounds: _poundValue.text,
         year: _yearValue.text,
         category: _categoryValue.text,
+        tags: selectedTagsAsString,
         uploadedImageUrl: uploadedImageUrl, // Can be null
         uploadedFileUrl: uploadedFileUrl, // Can be null
       );
@@ -372,6 +423,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
           _poundValue.clear();
           _yearValue.text = DateTime.now().year.toString();
           _categoryValue.clear();
+          _selectedTags.clear();
           uploadedImageUrl = null; // Reset uploaded image
           uploadedFileUrl = null; // Reset uploaded file
           localImageFile = null;
@@ -381,22 +433,27 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
         if (result.containsKey("missingFields")) {
           String missingFieldsMessage =
               "Missing fields: ${result["missingFields"].join(', ')}";
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(missingFieldsMessage)),
           );
         } else {
           // General error message
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(result["message"])),
           );
         }
       }
     } catch (error) {
+      // ignore: use_build_context_synchronously
       if (mounted) Navigator.pop(context);
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unexpected error: $error')),
       );
+      logger.i('Unexpected error: $error');
     }
   }
 
@@ -754,6 +811,134 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                   contentPadding:
                                       EdgeInsets.symmetric(horizontal: 10),
                                   counterText: '',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(vMin(context, 4)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header with Text
+                            const Row(
+                              children: [
+                                Text(
+                                  "Tags",
+                                  style: TextStyle(
+                                    fontFamily: 'Onset-Regular',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: kColorSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+                            // GestureDetector Container for Tag Selection
+                            GestureDetector(
+                              onTap:
+                                  _showTagDropdown, // Function to open dropdown for tag selection
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical:
+                                        0), // Adjust padding for text alignment
+                                width: vw(context,
+                                    50), // Same width as the text field
+                                height: vh(context,
+                                    6.5), // Adjust height for better layout
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: kColorInputBorder),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .center, // Vertically center content
+                                  children: [
+                                    if (_selectedTags.isEmpty)
+                                      const Expanded(
+                                        child: Text(
+                                          "Click to select tags...", // Placeholder text
+                                          style: TextStyle(
+                                            color:
+                                                kColorLightGrey, // Light grey color for placeholder
+                                            fontSize: 15, // Adjust font size
+                                          ),
+                                        ),
+                                      ),
+                                    if (_selectedTags.isNotEmpty)
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis
+                                              .vertical, // Allow vertical scrolling if needed
+                                          child: Wrap(
+                                            spacing:
+                                                3.0, // Adjust horizontal spacing between tags
+                                            runSpacing:
+                                                2.0, // Adjust vertical spacing between rows
+                                            children: [
+                                              // Render selected tags as Chips
+                                              for (String tag in _selectedTags)
+                                                Chip(
+                                                  label: RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        const TextSpan(
+                                                          text: '# ',
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                13, // Adjust font size
+                                                            color: Colors
+                                                                .green, // Green color for #
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: tag,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize:
+                                                                12, // Adjust font size
+                                                            color: Colors
+                                                                .black, // Black color for the text
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  backgroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0), // Rounded corners
+                                                    side: const BorderSide(
+                                                        color: Colors
+                                                            .green), // Green border
+                                                  ),
+                                                  deleteIcon: const Icon(
+                                                    Icons.close,
+                                                    size:
+                                                        15, // Adjust delete icon size
+                                                    color: Colors
+                                                        .green, // Green color for delete icon
+                                                  ),
+                                                  onDeleted: () {
+                                                    setState(() {
+                                                      _selectedTags.remove(
+                                                          tag); // Remove tag on delete
+                                                    });
+                                                  },
+                                                  materialTapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap, // Reduce tap area
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ),

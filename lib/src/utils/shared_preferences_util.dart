@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPreferencesUtil {
   // Save user details to SharedPreferences
   static Future<void> saveUserDetails({
+    required String userId,
     required String userName,
     required String userEmail,
     required String userExpertIn,
@@ -11,6 +12,7 @@ class SharedPreferencesUtil {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
+    await prefs.setString('userId', userId);
     await prefs.setString('userName', userName);
     await prefs.setString('userEmail', userEmail);
     await prefs.setString('userExpertIn', userExpertIn);
@@ -23,6 +25,7 @@ class SharedPreferencesUtil {
     final prefs = await SharedPreferences.getInstance();
 
     return {
+      'userId': prefs.getString('userId'),
       'userName': prefs.getString('userName'),
       'userEmail': prefs.getString('userEmail'),
       'userExpertIn': prefs.getString('userExpertIn'),

@@ -97,7 +97,12 @@ class AuthService {
       );
 
       if (response.statusCode == 201) {
-        return {"success": true, "data": jsonDecode(response.body)};
+        final responseData = jsonDecode(response.body);
+        return {
+          "success": true,
+          "data": jsonDecode(response.body),
+          "userId": responseData["userId"]
+        };
       } else {
         return {
           "success": false,
@@ -144,12 +149,14 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> createQuestion({
+    required String userId,
     required String question,
     required String brand,
     required String serialNumber,
     required String pounds,
     required String year,
     required String category,
+    required String tags,
     String? uploadedImageUrl, // Nullable
     String? uploadedFileUrl, // Nullable
   }) async {
@@ -157,12 +164,14 @@ class AuthService {
 
     // Prepare request body
     final Map<String, dynamic> requestBody = {
+      "userID": userId,
       "question": question,
       "brand": brand,
       "serial_number": serialNumber,
       "pounds": pounds,
       "year": year,
       "category": category,
+      "tags": tags,
       "image": "",
       "file": ""
     };

@@ -25,7 +25,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   void getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? myId = prefs.getString('userName');
+    String? myId = prefs.getString('userId');
     logger.i('user id : $myId');
 
     if (myId == null || myId.isEmpty) {}

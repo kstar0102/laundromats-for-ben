@@ -73,6 +73,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
 
       if (result['success'] == true) {
         await SharedPreferencesUtil.saveUserDetails(
+          userId: result['userId'],
           userName: GlobalVariable.userName!,
           userEmail: GlobalVariable.userEmail!,
           userExpertIn: GlobalVariable.userExpertIn!,
