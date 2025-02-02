@@ -4,9 +4,11 @@ import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
+import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logger/logger.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({
@@ -23,6 +25,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final int _currentIndex = 0;
   final bool _isKeyboardVisible = false;
   String? userName;
+  List<dynamic> questions = [];
+
+  final logger = Logger();
 
   @override
   void initState() {
@@ -37,11 +42,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   bool allowRevert = true;
 
-  void getData() async {
+  Future<void> getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString('userName') ?? "Guest"; // Fallback to "Guest"
     });
+
+    final authService = AuthService();
+    try {
+      final fetchedQuestions = await authService.fetchQuestionsWithAnswers();
+      final validQuestions = fetchedQuestions
+          .whereType<Map<String, dynamic>>() // Filters out non-map elements
+          .toList();
+
+      setState(() {
+        questions = validQuestions;
+      });
+    } catch (e) {
+      logger.i('Error fetching questions: $e');
+    }
   }
 
   Future<bool> _onWillPop() async {
@@ -169,10 +188,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             right: vMin(context, 4),
                             top: vMin(context, 2),
                           ),
-                          child: const Column(
+                          child: Column(
                             children: [
-                              HomeDataWidget(),
-                              HomeDataWidget(),
+                              questions.isNotEmpty
+                                  ? HomeDataWidget(
+                                      questions: questions
+                                          .cast<Map<String, dynamic>>())
+                                  : const Center(
+                                      child: CircularProgressIndicator()),
                             ],
                           )),
                     ]),
