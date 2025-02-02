@@ -254,4 +254,52 @@ class AuthService {
       throw Exception('Error updating like/dislike: $e');
     }
   }
+
+  Future<List<dynamic>> fetchUserQuestionsWithAnswers(int userId) async {
+    final url =
+        Uri.parse('$baseUrl/question/allquestionwithanswerbyid/$userId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['questions'];
+      } else {
+        throw Exception(
+            'Failed to fetch user questions: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching user questions: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> submitAnswer({
+    required int questionId,
+    required int userId,
+    required String answer,
+  }) async {
+    final url = Uri.parse('$baseUrl/question/createanswer');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'question_id': questionId,
+          'user_id': userId,
+          'answer': answer,
+          'isWho': 'user', // Define the answer type
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to submit answer: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error submitting answer: $e');
+    }
+  }
 }

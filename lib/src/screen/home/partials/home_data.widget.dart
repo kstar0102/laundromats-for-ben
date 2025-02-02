@@ -50,13 +50,62 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!initialized && widget.questions.isNotEmpty) {
+  void didUpdateWidget(HomeDataWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.questions != oldWidget.questions) {
       initializeData();
-    } else if (widget.questions.isEmpty) {
-      logger.w("No questions received in didChangeDependencies.");
+    }
+  }
+
+  Future<void> submitAnswer(int questionId, int userID) async {
+    String answerText = answerControllers[questionId]?.text.trim() ?? "";
+
+    if (answerText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Answer cannot be empty!"),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    try {
+      final authService = AuthService();
+      final response = await authService.submitAnswer(
+        questionId: questionId,
+        userId: userID, // Replace with actual logged-in user ID
+        answer: answerText,
+      );
+
+      if (response["created"] == true) {
+        setState(() {
+          widget.questions
+              .firstWhere((q) => q["question_id"] == questionId)["answers"]
+              .add({
+            "answer_id": response["answer_id"],
+            "answer": answerText,
+            "user_id": 12, // Replace with actual user ID
+            "user_name": "Current User", // Replace with logged-in user's name
+            "created_at": DateTime.now().toIso8601String(),
+          });
+          answerControllers[questionId]?.clear();
+          answerInputVisible.remove(questionId);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Answer submitted successfully!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(response["message"] ?? "Failed to submit answer!")),
+        );
+      }
+    } catch (e) {
+      print("Error submitting answer: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: Unable to submit answer.")),
+      );
     }
   }
 
@@ -378,16 +427,18 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: ElevatedButton(
-                        onPressed: () => {},
+                        onPressed: () => submitAnswer(question["question_id"],
+                            question['user']['user_id']),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kColorPrimary,
                           padding: EdgeInsets.symmetric(
                               horizontal: vMin(context, 5),
-                              vertical: vMin(context, 2)),
+                              vertical: vMin(context, 1)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                                 7), // Custom Border Radius
                           ),
+                          minimumSize: Size(0, vMin(context, 7)),
                         ),
                         child: const Text(
                           "Submit Answer",

@@ -9,7 +9,8 @@ class QuestionsDataWidget extends ConsumerStatefulWidget {
   const QuestionsDataWidget({super.key});
 
   @override
-  ConsumerState<QuestionsDataWidget> createState() => _QuestionsDataWidgetState();
+  ConsumerState<QuestionsDataWidget> createState() =>
+      _QuestionsDataWidgetState();
 }
 
 class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
@@ -35,7 +36,7 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
           ),
           child: Card(
             elevation: 0,
-            color: kColorWhite, 
+            color: kColorWhite,
             child: Padding(
               padding: const EdgeInsets.all(5.0),
               child: Column(
@@ -80,7 +81,11 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
 
                   const Text(
                     "I have a Speed Queen dryer double stack from 2017 that is making a scraping noise when I turn it on, it sounds like it's coming from the barrel.",
-                    style: TextStyle(fontSize: 14, fontFamily: 'Onset-Normal', fontWeight: FontWeight.bold, color: kColorSecondary),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Onset-Normal',
+                        fontWeight: FontWeight.bold,
+                        color: kColorSecondary),
                   ),
                   SizedBox(height: vMin(context, 1)),
 
@@ -91,7 +96,8 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: () {},
-                        icon: Image.asset("assets/images/icons/solar-linear.png"),
+                        icon:
+                            Image.asset("assets/images/icons/solar-linear.png"),
                         label: const Text(
                           "New",
                           style: TextStyle(
@@ -106,13 +112,15 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 3),
                           minimumSize: const Size(0, 24),
                         ),
                       ),
                       OutlinedButton.icon(
                         onPressed: () {},
-                        icon: Image.asset("assets/images/icons/solar-linear.png"),
+                        icon:
+                            Image.asset("assets/images/icons/solar-linear.png"),
                         label: const Text(
                           "Barrel",
                           style: TextStyle(
@@ -127,7 +135,8 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 3),
                           minimumSize: const Size(0, 24),
                         ),
                       ),
@@ -180,36 +189,46 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
                     children: [
                       InkWell(
                         onTap: () {},
-                        child: Image.asset("assets/images/icons/chat-message.png"),
+                        child:
+                            Image.asset("assets/images/icons/chat-message.png"),
                       ),
                       SizedBox(width: vMin(context, 1)),
-                      const Text("8", style: TextStyle(
-                        fontFamily: 'Onset-Regular',
-                        fontSize: 12,
-                        color: kColorSecondary,
-                      ),),
+                      const Text(
+                        "8",
+                        style: TextStyle(
+                          fontFamily: 'Onset-Regular',
+                          fontSize: 12,
+                          color: kColorSecondary,
+                        ),
+                      ),
                       SizedBox(width: vMin(context, 4)),
                       InkWell(
                         onTap: () {},
                         child: Image.asset("assets/images/icons/like.png"),
                       ),
                       SizedBox(width: vMin(context, 1)),
-                      const Text("41", style: TextStyle(
-                        fontFamily: 'Onset-Regular',
-                        fontSize: 12,
-                        color: kColorSecondary,
-                      ),),
+                      const Text(
+                        "41",
+                        style: TextStyle(
+                          fontFamily: 'Onset-Regular',
+                          fontSize: 12,
+                          color: kColorSecondary,
+                        ),
+                      ),
                       SizedBox(width: vMin(context, 4)),
                       InkWell(
                         onTap: () {},
                         child: Image.asset("assets/images/icons/dislike.png"),
                       ),
                       SizedBox(width: vMin(context, 1)),
-                      const Text("2", style: TextStyle(
-                        fontFamily: 'Onset-Regular',
-                        fontSize: 12,
-                        color: kColorSecondary,
-                      ),),
+                      const Text(
+                        "2",
+                        style: TextStyle(
+                          fontFamily: 'Onset-Regular',
+                          fontSize: 12,
+                          color: kColorSecondary,
+                        ),
+                      ),
                       const Spacer(),
                       SizedBox(
                         width: vMin(context, 40),
@@ -224,7 +243,9 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
                             Navigator.pushReplacement(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => const QuestionDetailScreen(),
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        const QuestionDetailScreen(),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -239,7 +260,9 @@ class _QuestionsDataWidgetState extends ConsumerState<QuestionsDataWidget> {
             ),
           ),
         ),
-        SizedBox(height: vMin(context, 5),)
+        SizedBox(
+          height: vMin(context, 5),
+        )
       ],
     );
   }

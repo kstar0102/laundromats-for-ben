@@ -5,7 +5,7 @@ import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class FilterCategoryModal extends StatefulWidget {
-  const FilterCategoryModal({Key? key}) : super(key: key);
+  const FilterCategoryModal({super.key});
 
   @override
   State<FilterCategoryModal> createState() => _FilterCategoryModalState();
@@ -45,11 +45,14 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(padding: EdgeInsets.only(left: vMin(context, 3)),
+                Padding(
+                  padding: EdgeInsets.only(left: vMin(context, 3)),
                   child: Row(
                     children: [
                       Image.asset("assets/images/icons/filter.png"),
-                      SizedBox(width: vMin(context, 2),),
+                      SizedBox(
+                        width: vMin(context, 2),
+                      ),
                       Text(
                         filterByCategory.toString(),
                         style: const TextStyle(
@@ -62,8 +65,6 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
                     ],
                   ),
                 ),
-                
-                
                 IconButton(
                   icon: Image.asset("assets/images/icons/solar-close.png"),
                   onPressed: () {
@@ -114,49 +115,53 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
               }).toList(),
             ),
             const SizedBox(height: 16.0),
-            Padding(padding: EdgeInsets.all(vMin(context, 3)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: vMin(context, 28),
-                    child: ButtonWidget(
-                      btnType: selectedCategories.length == categories.length ? ButtonWidgetType.disSelectAllBtn : ButtonWidgetType.selectAllBtn,
-                      borderColor: kColorPrimary,
-                      textColor: kColorWhite,
-                      fullColor: kColorPrimary,
-                      size: false,
-                      icon: true,
-                      onPressed: () {
-                        setState(() {
-                          if (selectedCategories.length == categories.length) {
-                            selectedCategories.clear();
-                          } else {
-                            selectedCategories.addAll(categories);
-                          }
-                        });
-                      },
+            Padding(
+                padding: EdgeInsets.all(vMin(context, 3)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: vMin(context, 28),
+                      child: ButtonWidget(
+                        btnType: selectedCategories.length == categories.length
+                            ? ButtonWidgetType.disSelectAllBtn
+                            : ButtonWidgetType.selectAllBtn,
+                        borderColor: kColorPrimary,
+                        textColor: kColorWhite,
+                        fullColor: kColorPrimary,
+                        size: false,
+                        icon: true,
+                        onPressed: () {
+                          setState(() {
+                            if (selectedCategories.length ==
+                                categories.length) {
+                              selectedCategories.clear();
+                            } else {
+                              selectedCategories.addAll(categories);
+                            }
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                  SizedBox(width: vMin(context, 2),),
-                  SizedBox(
-                    width: vMin(context, 28),
-                    child: ButtonWidget(
-                      btnType: ButtonWidgetType.filterBtn,
-                      borderColor: kColorPrimary,
-                      textColor: kColorWhite,
-                      fullColor: kColorPrimary,
-                      size: false,
-                      icon: true,
-                      onPressed: () {
-                        Navigator.of(context).pop(selectedCategories);
-                      },
+                    SizedBox(
+                      width: vMin(context, 2),
                     ),
-                  ),
-                ],
-              )
-            )
-            
+                    SizedBox(
+                      width: vMin(context, 28),
+                      child: ButtonWidget(
+                        btnType: ButtonWidgetType.filterBtn,
+                        borderColor: kColorPrimary,
+                        textColor: kColorWhite,
+                        fullColor: kColorPrimary,
+                        size: false,
+                        icon: true,
+                        onPressed: () {
+                          Navigator.of(context).pop(selectedCategories);
+                        },
+                      ),
+                    ),
+                  ],
+                ))
           ],
         ),
       ),

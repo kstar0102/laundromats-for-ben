@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
-import 'package:laundromats/src/components/filter.category.dart';
 import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
+import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/screen/ask_question/ask_question.screen.dart';
-import 'package:laundromats/src/screen/questions/partials/questions_data.dart';
-import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logger/logger.dart';
+import 'package:laundromats/src/translate/en.dart';
+import 'package:laundromats/src/components/filter.category.dart';
 
 class QuestionScreen extends ConsumerStatefulWidget {
-  const QuestionScreen({super.key,});
+  const QuestionScreen({super.key});
 
   @override
   ConsumerState<QuestionScreen> createState() => _QuestionScreenState();
@@ -23,24 +26,62 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   final int _currentIndex = 3;
   final bool _isKeyboardVisible = false;
   final _searchValue = TextEditingController();
+  int? userId;
+  List<dynamic> questions = [];
+  Set<String> selectedCategories = {};
+
+  final logger = Logger();
 
   @override
   void initState() {
     super.initState();
+    getUserQuestions();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  Future<void> getUserQuestions() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userIdString = prefs.getString('userId');
 
-  bool allowRevert = true;
+    if (userIdString != null) {
+      int? parsedUserId = int.tryParse(userIdString);
 
-  Future<bool> _onWillPop() async {
-    if (!allowRevert) {
-      return false;
+      if (parsedUserId != null) {
+        setState(() {
+          userId = parsedUserId; // Ensure `setState` is updating properly
+        });
+
+        final authService = AuthService();
+        try {
+          if (userId != 0) {
+            final fetchedQuestions =
+                await authService.fetchUserQuestionsWithAnswers(userId!);
+
+            setState(() {
+              questions = fetchedQuestions;
+            });
+
+            // logger.i(questions);
+          } else {
+            logger.e('Invalid user ID: $userId');
+          }
+        } catch (e) {
+          logger.e('Error fetching user questions: $e');
+        }
+      }
     }
-    return false;
+  }
+
+  void _openFilterModal() async {
+    final selectedFilters = await showDialog<Set<String>>(
+      context: context,
+      builder: (context) => const FilterCategoryModal(),
+    );
+
+    if (selectedFilters != null) {
+      setState(() {
+        selectedCategories = selectedFilters; // ✅ Update selected categories
+      });
+    }
   }
 
   @override
@@ -51,8 +92,9 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
-    return  WillPopScope(
-      onWillPop: _onWillPop,
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: kColorWhite,
         resizeToAvoidBottomInset: true,
@@ -60,24 +102,24 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
           child: SingleChildScrollView(
             child: FocusScope(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: kColorWhite
-                ),
+                decoration: const BoxDecoration(color: kColorWhite),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     const HeaderWidget(role: true),
 
-                    Padding(padding: EdgeInsets.all(vMin(context, 4)),
+                    // Header Section
+                    Padding(
+                      padding: EdgeInsets.all(vMin(context, 4)),
                       child: SizedBox(
                         width: vww(context, 100),
-                        child:Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              myQuestions.toString(),
+                            const Text(
+                              "My Questions",
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Onset',
@@ -97,7 +139,9 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                   Navigator.pushReplacement(
                                     context,
                                     PageRouteBuilder(
-                                      pageBuilder: (context, animation1, animation2) => const AskQuestionScreen(),
+                                      pageBuilder:
+                                          (context, animation1, animation2) =>
+                                              const AskQuestionScreen(),
                                       transitionDuration: Duration.zero,
                                       reverseTransitionDuration: Duration.zero,
                                     ),
@@ -106,11 +150,15 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                               ),
                             ),
                           ],
-                        )
-                      )
+                        ),
+                      ),
                     ),
 
-                    Padding(padding: EdgeInsets.only(left: vMin(context, 4), right: vMin(context, 4), top: vMin(context, 2)),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2)),
                       child: Text(
                         allYourQuestions.toString(),
                         textAlign: TextAlign.left,
@@ -124,12 +172,16 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                       ),
                     ),
 
-                    Padding(padding: EdgeInsets.only(left: vMin(context, 4), right: vMin(context, 4), top: vMin(context, 2)),
-                      child: const Text(
-                        "9 $questions",
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2)),
+                      child: Text(
+                        "${questions.length} Questions",
                         textAlign: TextAlign.left,
                         softWrap: true,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontFamily: 'Onset-Regular',
                           color: kColorThird,
@@ -137,8 +189,11 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                       ),
                     ),
 
-
-                    Padding(padding: EdgeInsets.only(left: vMin(context, 4), right: vMin(context, 4), top: vMin(context, 2)),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -152,7 +207,8 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                               cursorColor: Colors.grey,
                               decoration: InputDecoration(
                                 hintText: search.toString(),
-                                floatingLabelBehavior:  FloatingLabelBehavior.always,
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
                                 enabledBorder: kEnableSearchBorder,
                                 focusedBorder: kFocusSearchBorder,
                                 hintStyle: const TextStyle(
@@ -161,46 +217,86 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                     color: kColorLightGrey),
                                 filled: false,
                                 disabledBorder: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 counterText: '',
                               ),
                             ),
                           ),
                           InkWell(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const FilterCategoryModal(),
-                              );
-                            },
-                            child: Image.asset('assets/images/icons/filter.png', fit: BoxFit.cover,)
-                          )
+                              onTap: _openFilterModal,
+                              child: Image.asset(
+                                'assets/images/icons/filter.png',
+                                fit: BoxFit.cover,
+                              ))
                         ],
                       ),
                     ),
 
+                    if (selectedCategories.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: vMin(context, 4),
+                            right: vMin(context, 4),
+                            top: vMin(context, 2)),
+                        child: Wrap(
+                          spacing: 6.0, // Horizontal space between tags
+                          runSpacing:
+                              0.0, // Reduced vertical space between rows
+                          children: selectedCategories.map((category) {
+                            return Chip(
+                              label: Text(
+                                category,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: kColorSecondary,
+                                ),
+                              ),
+                              backgroundColor: kColorWhite,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                side: const BorderSide(color: kColorPrimary),
+                              ),
+                              deleteIcon: const Icon(
+                                Icons.close,
+                                size: 15,
+                                color: kColorPrimary,
+                              ),
+                              onDeleted: () {
+                                setState(() {
+                                  selectedCategories.remove(category);
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+
+                    // Question List
                     Padding(
-                      padding: EdgeInsets.only(
-                        left: vMin(context, 4),
-                        right: vMin(context, 4),
-                        top: vMin(context, 2),
-                      ),
-                      child: const Column(
-                        children: [
-                          QuestionsDataWidget(),
-                          QuestionsDataWidget(),
-                        ],
-                      ) 
-                    ),
-
-                  ]
+                        padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2),
+                        ),
+                        child: Column(
+                          children: [
+                            questions.isNotEmpty
+                                ? HomeDataWidget(
+                                    questions:
+                                        questions.cast<Map<String, dynamic>>())
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                          ],
+                        )),
+                  ],
                 ),
               ),
             ),
-          )
+          ),
         ),
-        bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)
+        bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
       ),
     );
   }
