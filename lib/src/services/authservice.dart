@@ -302,4 +302,51 @@ class AuthService {
       throw Exception('Error submitting answer: $e');
     }
   }
+
+  Future<List<dynamic>> searchQuestions(
+      int userId, String search, List<String> categories) async {
+    final url = Uri.parse('$baseUrl/question/searchmyquestion');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "user_id": userId,
+          "search": search,
+          "categories": categories,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['questions'];
+      } else {
+        throw Exception('Failed to search questions: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error searching questions: $e');
+    }
+  }
+
+  Future<List<dynamic>> searchQuestionsAll(
+      String search, List<String> categories) async {
+    final url = Uri.parse('$baseUrl/question/searchquestion');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "search": search,
+          "categories": categories,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['questions'];
+      } else {
+        throw Exception('Failed to search questions: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error searching questions: $e');
+    }
+  }
 }

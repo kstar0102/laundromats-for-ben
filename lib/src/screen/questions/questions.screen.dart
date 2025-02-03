@@ -29,6 +29,7 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   int? userId;
   List<dynamic> questions = [];
   Set<String> selectedCategories = {};
+  bool isLoading = false;
 
   final logger = Logger();
 
@@ -80,6 +81,37 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
     if (selectedFilters != null) {
       setState(() {
         selectedCategories = selectedFilters; // ✅ Update selected categories
+      });
+    }
+  }
+
+  Future<void> searchQuestions() async {
+    if (userId == null) return;
+
+    setState(() {
+      questions = []; // Clear the list while searching
+      isLoading = true; // Show loading indicator
+    });
+
+    try {
+      final authService = AuthService();
+      final searchQuery = _searchValue.text.trim();
+      final List<String> categories = selectedCategories.toList();
+
+      final response = await authService.searchQuestions(
+        userId!,
+        searchQuery,
+        categories,
+      );
+
+      setState(() {
+        questions = response;
+        isLoading = false; // Hide loading indicator
+      });
+    } catch (e) {
+      logger.e('Error searching questions: $e');
+      setState(() {
+        isLoading = false; // Hide loading indicator on error
       });
     }
   }
@@ -204,7 +236,11 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                               controller: _searchValue,
                               keyboardType: TextInputType.name,
                               autocorrect: false,
-                              cursorColor: Colors.grey,
+                              cursorColor: kColorPrimary,
+                              onChanged: (value) {
+                                setState(
+                                    () {}); // Trigger UI update when text changes
+                              },
                               decoration: InputDecoration(
                                 hintText: search.toString(),
                                 floatingLabelBehavior:
@@ -212,14 +248,41 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                 enabledBorder: kEnableSearchBorder,
                                 focusedBorder: kFocusSearchBorder,
                                 hintStyle: const TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Onset-Regular',
-                                    color: kColorLightGrey),
+                                  fontSize: 14.0,
+                                  fontFamily: 'Onset-Regular',
+                                  color: kColorLightGrey,
+                                ),
                                 filled: false,
                                 disabledBorder: InputBorder.none,
                                 contentPadding:
                                     const EdgeInsets.symmetric(horizontal: 10),
                                 counterText: '',
+                                suffixIcon: _searchValue.text
+                                        .isNotEmpty // Show icons only when text exists
+                                    ? Row(
+                                        mainAxisSize: MainAxisSize
+                                            .min, // Adjusts to content size
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.close,
+                                                color: kColorPrimary),
+                                            onPressed: () {
+                                              setState(() {
+                                                _searchValue.clear();
+                                                getUserQuestions();
+                                                // Clear the text field
+                                              });
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.send,
+                                                color: kColorPrimary),
+                                            onPressed:
+                                                searchQuestions, // Call the search function
+                                          ),
+                                        ],
+                                      )
+                                    : null,
                               ),
                             ),
                           ),
@@ -228,7 +291,7 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                               child: Image.asset(
                                 'assets/images/icons/filter.png',
                                 fit: BoxFit.cover,
-                              ))
+                              )),
                         ],
                       ),
                     ),
@@ -275,21 +338,38 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
                     // Question List
                     Padding(
-                        padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2),
-                        ),
-                        child: Column(
-                          children: [
-                            questions.isNotEmpty
-                                ? HomeDataWidget(
-                                    questions:
-                                        questions.cast<Map<String, dynamic>>())
-                                : const Center(
-                                    child: CircularProgressIndicator()),
-                          ],
-                        )),
+                      padding: EdgeInsets.only(
+                        left: vMin(context, 4),
+                        right: vMin(context, 4),
+                        top: vMin(context, 2),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : questions.isNotEmpty
+                                  ? HomeDataWidget(
+                                      questions: questions
+                                          .cast<Map<String, dynamic>>(),
+                                    )
+                                  : const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "No questions found.",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: kColorSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

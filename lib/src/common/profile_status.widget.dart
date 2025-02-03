@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class ProfileStatusWidget extends StatelessWidget {
-  const ProfileStatusWidget({super.key});
+  final int? askedCount;
+  final int? commentCount;
+  final int? likeCount;
+  final int? dislikeCount;
+
+  const ProfileStatusWidget({
+    super.key,
+    required this.askedCount,
+    required this.commentCount,
+    required this.likeCount,
+    required this.dislikeCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +32,7 @@ class ProfileStatusWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const Text(
-                'Expert',
+                'Beginner',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -31,9 +41,9 @@ class ProfileStatusWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(height: vMin(context, 1)),
-              Text(
-                level.toString(),
-                style: const TextStyle(
+              const Text(
+                "Level",
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset-Regular',
@@ -42,23 +52,23 @@ class ProfileStatusWidget extends StatelessWidget {
               ),
             ],
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                '15',
-                style: TextStyle(
+              Text(
+                askedCount?.toString() ?? '0',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset',
+                  color: kColorSecondary,
                 ),
               ),
               SizedBox(height: vMin(context, 1)),
-              Text(
-                asked.toString(),
-                style: const TextStyle(
+              const Text(
+                'Asked',
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset-Regular',
@@ -67,23 +77,22 @@ class ProfileStatusWidget extends StatelessWidget {
               ),
             ],
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                '34',
-                style: TextStyle(
+              Text(
+                commentCount?.toString() ?? '0',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset',
                 ),
               ),
               SizedBox(height: vMin(context, 1)),
-              Text(
-                commented.toString(),
-                style: const TextStyle(
+              const Text(
+                "Commented",
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset-Regular',
@@ -92,24 +101,22 @@ class ProfileStatusWidget extends StatelessWidget {
               ),
             ],
           ),
-
-          // Liked
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                '24',
-                style: TextStyle(
+              Text(
+                likeCount?.toString() ?? '0',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset',
                 ),
               ),
               SizedBox(height: vMin(context, 1)),
-              Text(
-                liked.toString(),
-                style: const TextStyle(
+              const Text(
+                "Liked",
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset-Regular',
@@ -118,23 +125,22 @@ class ProfileStatusWidget extends StatelessWidget {
               ),
             ],
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                '1',
-                style: TextStyle(
+              Text(
+                dislikeCount?.toString() ?? '0',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset',
                 ),
               ),
               SizedBox(height: vMin(context, 1)),
-              Text(
-                disliked.toString(),
-                style: const TextStyle(
+              const Text(
+                "Disliked",
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Onset-Regular',
@@ -144,7 +150,7 @@ class ProfileStatusWidget extends StatelessWidget {
             ],
           ),
         ],
-      )
+      ),
     );
   }
 }
