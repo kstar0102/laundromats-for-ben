@@ -69,7 +69,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
 
       if (result['success'] == true) {
         await SharedPreferencesUtil.saveUserDetails(
-          userId: result['userId'],
+          userId: result['userId'].toString(),
           userName: GlobalVariable.userName!,
           userEmail: GlobalVariable.userEmail!,
           userExpertIn: " ",

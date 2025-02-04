@@ -328,7 +328,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                 padding: EdgeInsets.all(16.0),
                 child: Text(
                   'Select Category',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Onset-Regular',
@@ -1103,8 +1103,9 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                                 fit: BoxFit.cover,
                                                 loadingBuilder: (context, child,
                                                     loadingProgress) {
-                                                  if (loadingProgress == null)
+                                                  if (loadingProgress == null) {
                                                     return child;
+                                                  }
                                                   return const Center(
                                                     child:
                                                         CircularProgressIndicator(),

@@ -6,6 +6,8 @@ import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class ManuallyScreen extends StatelessWidget {
+  const ManuallyScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(padding: EdgeInsets.all(vMin(context, 4)),
@@ -318,7 +320,7 @@ class ManuallyScreen extends StatelessWidget {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) => PrimiumModal(),
+                        builder: (context) => const PrimiumModal(),
                       );
                     },
                   ),

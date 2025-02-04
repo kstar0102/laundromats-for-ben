@@ -26,10 +26,6 @@ int _selectedTab = 0;
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   bool allowRevert = true;
 
@@ -191,7 +187,7 @@ int _selectedTab = 0;
                       SizedBox(height: vMin(context, 4)),
 
                       Expanded(
-                        child: _selectedTab == 0 ? ManuallyScreen() : ManuallyScreen(),
+                        child: _selectedTab == 0 ? const ManuallyScreen() : const ManuallyScreen(),
                       ),
 
                       Padding(padding: EdgeInsets.all(vMin(context, 4)),
