@@ -26,7 +26,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final bool _isKeyboardVisible = false;
   String? userName;
   List<dynamic> questions = [];
-
+  bool _isLoading = false;
   final logger = Logger();
 
   @override
@@ -43,6 +43,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool allowRevert = true;
 
   Future<void> getData() async {
+    setState(() {
+      _isLoading = true;
+    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString('userName') ?? "Guest"; // Fallback to "Guest"
@@ -57,6 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       setState(() {
         questions = validQuestions;
+        _isLoading = false;
       });
     } catch (e) {
       logger.i('Error fetching questions: $e');
@@ -183,21 +187,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ),
                       Padding(
-                          padding: EdgeInsets.only(
-                            left: vMin(context, 4),
-                            right: vMin(context, 4),
-                            top: vMin(context, 2),
-                          ),
-                          child: Column(
-                            children: [
-                              questions.isNotEmpty
-                                  ? HomeDataWidget(
-                                      questions: questions
-                                          .cast<Map<String, dynamic>>())
-                                  : const Center(
-                                      child: CircularProgressIndicator()),
-                            ],
-                          )),
+                        padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2),
+                        ),
+                        child: Column(
+                          children: [
+                            _isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : questions.isNotEmpty
+                                    ? HomeDataWidget(
+                                        questions: questions
+                                            .cast<Map<String, dynamic>>(),
+                                      )
+                                    : const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: Text(
+                                            "No questions found.",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: kColorSecondary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                          ],
+                        ),
+                      ),
                     ]),
               ),
             ),
