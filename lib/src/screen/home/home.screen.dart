@@ -82,6 +82,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -95,7 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      const HeaderWidget(role: true),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       Padding(
                           padding: EdgeInsets.all(vMin(context, 4)),
                           child: SizedBox(
@@ -207,7 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         child: Padding(
                                           padding: EdgeInsets.all(16.0),
                                           child: Text(
-                                            "No questions found.",
+                                            "No questions.",
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,

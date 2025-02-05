@@ -132,7 +132,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const HeaderWidget(role: true),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       Padding(
                           padding: EdgeInsets.all(vMin(context, 4)),
                           child: SizedBox(

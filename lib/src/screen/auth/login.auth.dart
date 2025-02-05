@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/auth/login.screen.dart';
+import 'package:laundromats/src/screen/auth/set.password.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
@@ -42,6 +44,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return false;
   }
 
+  void _signInEmail() {
+    final navigator = Navigator.of(context);
+
+    navigator.push(
+      MaterialPageRoute(
+        builder: (context) => const LoginAuthScreen(),
+      ),
+    );
+  }
+
   Future<void> _signInGoogle(BuildContext context) async {
     // Capture a reference to the Navigator directly to avoid keeping context across async calls.
     final navigator = Navigator.of(context);
@@ -58,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Use the navigator directly
         navigator.push(
           MaterialPageRoute(
-            builder: (context) => const CategoryScreen(),
+            builder: (context) => const SetPasswordScreen(),
           ),
         );
       }
@@ -95,6 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
@@ -159,7 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       SizedBox(
-                        height: vMin(context, 25),
+                        height: vMin(context, 15),
                       ),
                       Padding(
                           padding: EdgeInsets.only(
@@ -177,6 +190,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               SizedBox(
                                 height: vMin(context, 10),
+                              ),
+                              ButtonWidget(
+                                btnType: ButtonWidgetType.emailLogin,
+                                borderColor: kColorPrimary,
+                                textColor: kColorWhite,
+                                fullColor: kColorPrimary,
+                                size: false,
+                                icon: true,
+                                onPressed: () {
+                                  _signInEmail();
+                                },
+                              ),
+                              SizedBox(
+                                height: vMin(context, 5),
                               ),
                               ButtonWidget(
                                 btnType: ButtonWidgetType.googleLogin,

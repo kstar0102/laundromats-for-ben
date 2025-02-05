@@ -138,7 +138,7 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const HeaderWidget(role: true),
+                    const HeaderWidget(role: true, isLogoutBtn: false),
 
                     // Header Section
                     Padding(

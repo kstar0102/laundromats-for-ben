@@ -1,3 +1,4 @@
+import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,8 @@ enum ButtonWidgetType {
   continueBtn,
   selectAllBtn,
   filterBtn,
-  disSelectAllBtn
+  disSelectAllBtn,
+  emailLogin
 }
 
 class ButtonWidget extends StatefulWidget {
@@ -56,6 +58,16 @@ class _ButtonWidgetState extends State<ButtonWidget> {
     Widget? arrowIconWidget;
 
     switch (widget.btnType) {
+      case ButtonWidgetType.emailLogin:
+        btnTitle = "Sign-In with Email";
+        if (widget.icon == true) {
+          iconWidget = Icon(
+            Icons.mail, // System-provided email icon
+            size: vMin(context, 3.5), // Adjust size based on your layout
+            color: kColorInputBorder, // Customize color if needed
+          );
+        }
+        break;
       case ButtonWidgetType.googleLogin:
         btnTitle = googleLogin.toString();
         if (widget.icon == true) {

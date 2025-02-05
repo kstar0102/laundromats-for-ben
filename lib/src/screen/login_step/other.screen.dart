@@ -63,7 +63,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
       final result = await authService.signup(
         name: GlobalVariable.userName ?? "",
         email: GlobalVariable.userEmail ?? "",
-        password: "123123", // Replace with actual password logic
+        password: GlobalVariable.userPassword ?? "",
         role: "Other",
         roleExpertIn: GlobalVariable.userExpertIn!,
         roleBusinessTime: GlobalVariable.userbusinessTime!,
@@ -152,9 +152,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      const HeaderWidget(
-                        role: false,
-                      ),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       SizedBox(
                         height: vMin(context, 10),
                       ),

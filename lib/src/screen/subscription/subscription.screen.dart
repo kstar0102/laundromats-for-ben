@@ -15,17 +15,17 @@ class SubscriptionScreen extends ConsumerStatefulWidget {
   ConsumerState<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
-class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> with SingleTickerProviderStateMixin {
+class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen>
+    with SingleTickerProviderStateMixin {
   double screenHeight = 0;
   double keyboardHeight = 0;
   final bool _isKeyboardVisible = false;
-int _selectedTab = 0;
+  int _selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
   }
-
 
   bool allowRevert = true;
 
@@ -57,14 +57,16 @@ int _selectedTab = 0;
                 constraints: BoxConstraints(
                   minHeight: constraints.maxHeight,
                 ),
-                child: IntrinsicHeight( 
+                child: IntrinsicHeight(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const HeaderWidget(role: true),
-
+                      const HeaderWidget(role: false, isLogoutBtn: false),
                       Padding(
-                        padding: EdgeInsets.only(left: vMin(context, 4), right: vMin(context, 4), top: vMin(context, 8)),
+                        padding: EdgeInsets.only(
+                            left: vMin(context, 4),
+                            right: vMin(context, 4),
+                            top: vMin(context, 8)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -91,7 +93,6 @@ int _selectedTab = 0;
                           ],
                         ),
                       ),
-
                       Center(
                         child: Text(
                           experience.toString(),
@@ -105,7 +106,10 @@ int _selectedTab = 0;
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(left: vMin(context, 4), right: vMin(context, 4), top: vMin(context, 4)),
+                        padding: EdgeInsets.only(
+                            left: vMin(context, 4),
+                            right: vMin(context, 4),
+                            top: vMin(context, 4)),
                         child: Center(
                           child: Text(
                             subscriptionDescription.toString(),
@@ -118,9 +122,7 @@ int _selectedTab = 0;
                           ),
                         ),
                       ),
-
                       SizedBox(height: vMin(context, 4)),
-
                       Container(
                         height: vMin(context, 10),
                         width: vMin(context, 80),
@@ -142,13 +144,17 @@ int _selectedTab = 0;
                                 child: Container(
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: _selectedTab == 0 ? kColorPrimary : kColorWhite,
+                                    color: _selectedTab == 0
+                                        ? kColorPrimary
+                                        : kColorWhite,
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Text(
                                     billedMonthly.toString(),
                                     style: TextStyle(
-                                      color: _selectedTab == 0 ? kColorWhite : kColorPrimary,
+                                      color: _selectedTab == 0
+                                          ? kColorWhite
+                                          : kColorPrimary,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'Onset-Regular',
                                     ),
@@ -166,13 +172,17 @@ int _selectedTab = 0;
                                 child: Container(
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: _selectedTab == 1 ? kColorPrimary : kColorWhite,
+                                    color: _selectedTab == 1
+                                        ? kColorPrimary
+                                        : kColorWhite,
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Text(
                                     billedAnnully.toString(),
                                     style: TextStyle(
-                                      color: _selectedTab == 1 ? kColorWhite : kColorPrimary,
+                                      color: _selectedTab == 1
+                                          ? kColorWhite
+                                          : kColorPrimary,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'Onset-Regular',
                                     ),
@@ -183,14 +193,14 @@ int _selectedTab = 0;
                           ],
                         ),
                       ),
-
                       SizedBox(height: vMin(context, 4)),
-
                       Expanded(
-                        child: _selectedTab == 0 ? const ManuallyScreen() : const ManuallyScreen(),
+                        child: _selectedTab == 0
+                            ? const ManuallyScreen()
+                            : const ManuallyScreen(),
                       ),
-
-                      Padding(padding: EdgeInsets.all(vMin(context, 4)),
+                      Padding(
+                        padding: EdgeInsets.all(vMin(context, 4)),
                         child: SizedBox(
                           width: vMin(context, 100),
                           child: ButtonWidget(
@@ -204,7 +214,9 @@ int _selectedTab = 0;
                               Navigator.pushReplacement(
                                 context,
                                 PageRouteBuilder(
-                                  pageBuilder: (context, animation1, animation2) => const ProfileScreen(),
+                                  pageBuilder:
+                                      (context, animation1, animation2) =>
+                                          const ProfileScreen(),
                                   transitionDuration: Duration.zero,
                                   reverseTransitionDuration: Duration.zero,
                                 ),
@@ -223,5 +235,4 @@ int _selectedTab = 0;
       ),
     );
   }
-
 }

@@ -106,7 +106,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      const HeaderWidget(role: false),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       SizedBox(
                         height: vMin(context, 10),
                       ),

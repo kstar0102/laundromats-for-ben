@@ -146,7 +146,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const HeaderWidget(role: true),
+                      const HeaderWidget(role: true, isLogoutBtn: true),
                       Container(
                         padding: EdgeInsets.only(
                             top: vMin(context, 3),

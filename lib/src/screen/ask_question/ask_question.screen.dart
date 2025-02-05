@@ -465,6 +465,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -478,7 +479,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const HeaderWidget(role: true),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       Padding(
                           padding: EdgeInsets.all(vMin(context, 4)),
                           child: SizedBox(

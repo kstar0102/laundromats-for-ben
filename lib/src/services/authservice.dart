@@ -12,8 +12,8 @@ class AuthService {
 
   final logger = Logger();
 
-  // final String baseUrl = 'http://192.168.141.105:5000/api';
-  final String baseUrl = 'http://146.190.117.4:5000/api';
+  final String baseUrl = 'http://192.168.141.105:5000/api';
+  // final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<User?> signInWithGoogle() async {
@@ -66,6 +66,40 @@ class AuthService {
     } catch (e) {
       logger.i("Error during Facebook sign-in: $e");
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> login(
+      {required String email, required String password}) async {
+    final Uri url = Uri.parse('$baseUrl/auth/signin');
+
+    Map<String, String> requestData = {
+      "email": email,
+      "password": password,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return {
+          "success": true,
+          "data": responseData,
+          "token": responseData["token"]
+        };
+      } else {
+        return {
+          "success": false,
+          "message": jsonDecode(response.body)['message'] ?? 'Unknown error'
+        };
+      }
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
     }
   }
 

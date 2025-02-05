@@ -3,6 +3,7 @@
 class GlobalVariable {
   static String? userName;
   static String? userEmail;
+  static String? userPassword;
   static String? userRole;
   static String? userExpertIn;
   static String? userbusinessTime;
