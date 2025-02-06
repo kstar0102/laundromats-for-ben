@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/screen/profile/profile.screen.dart';
 import 'package:laundromats/src/screen/subscription/partials/manually.screen.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -211,16 +210,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen>
                             size: false,
                             icon: true,
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation1, animation2) =>
-                                          const ProfileScreen(),
-                                  transitionDuration: Duration.zero,
-                                  reverseTransitionDuration: Duration.zero,
-                                ),
-                              );
+                              Navigator.pop(context);
                             },
                           ),
                         ),
