@@ -134,7 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginAuthScreen> {
                   height: vh(context, 6),
                   child: TextField(
                     controller: _emailController,
-                    keyboardType: TextInputType.name,
+                    keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     cursorColor: Colors.grey,
                     decoration: const InputDecoration(

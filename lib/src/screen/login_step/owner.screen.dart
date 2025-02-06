@@ -11,7 +11,7 @@ import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:laundromats/src/utils/shared_preferences_util.dart';
-
+import 'package:logger/logger.dart';
 class OwnerScreen extends ConsumerStatefulWidget {
   const OwnerScreen({super.key});
 
@@ -26,6 +26,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
   final bool _isKeyboardVisible = false;
   final _howLaundromatsValue = TextEditingController();
   final _businessValue = TextEditingController();
+  final logger = Logger();
 
   @override
   void initState() {
@@ -66,6 +67,8 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
         roleLaundromatsCount:
             GlobalVariable.userLaundromatsCount!, // Add relevant value
       );
+
+      logger.i(result);
 
       if (result['success'] == true) {
         await SharedPreferencesUtil.saveUserDetails(
