@@ -23,7 +23,10 @@ enum ButtonWidgetType {
   selectAllBtn,
   filterBtn,
   disSelectAllBtn,
-  emailLogin
+  emailLogin,
+  editProfile,
+  settingBtn,
+  termsBtn
 }
 
 class ButtonWidget extends StatefulWidget {
@@ -90,6 +93,15 @@ class _ButtonWidgetState extends State<ButtonWidget> {
         break;
       case ButtonWidgetType.nextBtn:
         btnTitle = nextBtn.toString();
+        break;
+      case ButtonWidgetType.editProfile:
+        btnTitle = editprofileBtn.toString();
+        break;
+      case ButtonWidgetType.settingBtn:
+        btnTitle = settingBtn.toString();
+        break;
+      case ButtonWidgetType.termsBtn:
+        btnTitle = termsBtn.toString();
         break;
       case ButtonWidgetType.backBtn:
         btnTitle = backBtn.toString();

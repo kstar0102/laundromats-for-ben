@@ -136,6 +136,7 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
@@ -179,6 +180,7 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
                         child: ProgressIndicatorWidget(
                           currentStep: currentStep,
                           activeColor: kColorPrimary,
+                          // ignore: deprecated_member_use
                           inactiveColor: kColorSecondary.withOpacity(0.5),
                         ),
                       ),

@@ -12,8 +12,8 @@ class AuthService {
 
   final logger = Logger();
 
-  // final String baseUrl = 'http://192.168.141.105:5000/api';
-  final String baseUrl = 'http://146.190.117.4:5000/api';
+  final String baseUrl = 'http://192.168.141.105:5000/api';
+  // final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<User?> signInWithGoogle() async {
@@ -382,6 +382,36 @@ class AuthService {
       }
     } catch (e) {
       throw Exception('Error searching questions: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchUserData(int userId) async {
+    final url = Uri.parse('$baseUrl/users/userdata/$userId');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['message'] == 'User data fetched successfully' &&
+            data['user'] != null) {
+          return {
+            'success': true,
+            'data': data['user'],
+          };
+        } else {
+          return {
+            'success': false,
+            'data': null,
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'data': null,
+        };
+      }
+    } catch (e) {
+      throw Exception('Error fetching user data: $e');
     }
   }
 }
