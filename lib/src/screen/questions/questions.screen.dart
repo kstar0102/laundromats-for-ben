@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
+import 'package:laundromats/src/common/profile_status.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -30,6 +30,10 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   List<dynamic> questions = [];
   Set<String> selectedCategories = {};
   bool isLoading = false;
+  int? askedCount;
+  int? commentCount;
+  int? likeCount;
+  int? dislikeCount;
 
   final logger = Logger();
 
@@ -59,6 +63,34 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
             setState(() {
               questions = fetchedQuestions;
+              askedCount = questions.length;
+              commentCount = questions.fold<int>(0, (sum, question) {
+                final answers = question['answers'] as List<dynamic>?;
+                return (sum) +
+                    (answers?.length ?? 0); // Handle null for sum and answers
+              });
+              commentCount = questions.fold<int>(0, (sum, question) {
+                final answers = question['answers'] as List<dynamic>?;
+                return (sum) +
+                    (answers?.length ?? 0); // Handle null for sum and answers
+              });
+
+              // Total likes count
+              likeCount = questions.fold<int>(0, (sum, question) {
+                final likes =
+                    int.tryParse(question['likes_count']?.toString() ?? '0') ??
+                        0;
+                return (sum) + likes; // Ensure sum is non-null
+              });
+
+              // Total dislikes count
+              dislikeCount = questions.fold<int>(0, (sum, question) {
+                final likes = int.tryParse(
+                        question['dislikes_count']?.toString() ?? '0') ??
+                    0;
+                return (sum) + likes; // Ensure sum is non-null
+              });
+              isLoading = false;
             });
 
             // logger.i(questions);
@@ -142,13 +174,16 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
                     // Header Section
                     Padding(
-                      padding: EdgeInsets.all(vMin(context, 4)),
+                      padding: EdgeInsets.only(
+                          top: vh(context, 3),
+                          left: vw(context, 2),
+                          right: vw(context, 2)),
                       child: SizedBox(
                         width: vww(context, 100),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               "My Questions",
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -158,65 +193,7 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                 color: kColorSecondary,
                               ),
                             ),
-                            SizedBox(
-                              width: vMin(context, 40),
-                              child: ButtonWidget(
-                                btnType: ButtonWidgetType.askQuestionBtn,
-                                borderColor: kColorPrimary,
-                                textColor: kColorWhite,
-                                fullColor: kColorPrimary,
-                                size: false,
-                                icon: true,
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder:
-                                          (context, animation1, animation2) =>
-                                              const AskQuestionScreen(),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
                           ],
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2)),
-                      child: Text(
-                        allYourQuestions.toString(),
-                        textAlign: TextAlign.left,
-                        softWrap: true,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Onset-Regular',
-                          color: kColorSecondary,
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2)),
-                      child: Text(
-                        "${questions.length} Questions",
-                        textAlign: TextAlign.left,
-                        softWrap: true,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Onset-Regular',
-                          color: kColorThird,
                         ),
                       ),
                     ),
@@ -255,8 +232,13 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                 filled: false,
                                 disabledBorder: InputBorder.none,
                                 contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 counterText: '',
+                                prefixIcon: const Icon(
+                                  Icons.search,
+                                  color: kColorLightGrey,
+                                  size: 20,
+                                ),
                                 suffixIcon: _searchValue.text
                                         .isNotEmpty // Show icons only when text exists
                                     ? Row(
@@ -294,6 +276,30 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                               )),
                         ],
                       ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2)),
+                      child: Text(
+                        "${questions.length} Questions",
+                        textAlign: TextAlign.left,
+                        softWrap: true,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Onset-Regular',
+                          color: kColorThird,
+                        ),
+                      ),
+                    ),
+
+                    ProfileStatusWidget(
+                      askedCount: askedCount ?? 0,
+                      commentCount: commentCount ?? 0,
+                      likeCount: likeCount ?? 0,
+                      dislikeCount: dislikeCount ?? 0,
                     ),
 
                     if (selectedCategories.isNotEmpty)
@@ -376,6 +382,25 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
             ),
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AskQuestionScreen()),
+            );
+          },
+          backgroundColor: kColorPrimary,
+          shape: const CircleBorder(), // Ensures Circular Shape
+          child: const Icon(
+            Icons.edit_document, // Edit Icon Similar to Image
+            color: Colors.white, // White Color for Icon
+            size: 26, // Slightly Larger for Visibility
+          ),
+        ),
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.endFloat, // ✅ Bottom Right
+
         bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
       ),
     );

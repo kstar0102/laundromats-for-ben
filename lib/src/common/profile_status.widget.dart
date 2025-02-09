@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+// import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class ProfileStatusWidget extends StatelessWidget {
@@ -27,127 +28,70 @@ class ProfileStatusWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Text(
-                'Beginner',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset',
-                  color: kColorSecondary,
-                ),
-              ),
-              SizedBox(height: vMin(context, 1)),
-              const Text(
-                "Level",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset-Regular',
-                  color: kColorSecondary,
-                ),
-              ),
-            ],
+          _buildStatusItem(
+            context: context,
+            title: 'Asked',
+            count: askedCount?.toString() ?? '0',
+            icon: Icons.question_answer_outlined,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                askedCount?.toString() ?? '0',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset',
-                  color: kColorSecondary,
-                ),
-              ),
-              SizedBox(height: vMin(context, 1)),
-              const Text(
-                'Asked',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset-Regular',
-                  color: kColorSecondary,
-                ),
-              ),
-            ],
+          _buildStatusItem(
+            context: context,
+            title: 'Commented',
+            count: commentCount?.toString() ?? '0',
+            icon: Icons.comment_outlined,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                commentCount?.toString() ?? '0',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset',
-                ),
-              ),
-              SizedBox(height: vMin(context, 1)),
-              const Text(
-                "Commented",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset-Regular',
-                  color: kColorSecondary,
-                ),
-              ),
-            ],
+          _buildStatusItem(
+            context: context,
+            title: 'Liked',
+            count: likeCount?.toString() ?? '0',
+            icon: Icons.thumb_up_outlined,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                likeCount?.toString() ?? '0',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset',
-                ),
-              ),
-              SizedBox(height: vMin(context, 1)),
-              const Text(
-                "Liked",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset-Regular',
-                  color: kColorSecondary,
-                ),
-              ),
-            ],
+          _buildStatusItem(
+            context: context,
+            title: 'Disliked',
+            count: dislikeCount?.toString() ?? '0',
+            icon: Icons.thumb_down_outlined,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                dislikeCount?.toString() ?? '0',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset',
-                ),
-              ),
-              SizedBox(height: vMin(context, 1)),
-              const Text(
-                "Disliked",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Onset-Regular',
-                  color: kColorSecondary,
-                ),
-              ),
-            ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusItem({
+    required BuildContext context,
+    required String title,
+    required String count,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        color: Colors.grey.shade200, // Light background color
+      ),
+      width: vMin(context, 20), // Adjust width if needed
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 24, color: kColorPrimary),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            count,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: kColorPrimary,
+            ),
           ),
         ],
       ),
