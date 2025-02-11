@@ -3,9 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/auth/login.auth.dart';
+import 'package:laundromats/src/screen/profile/editprofile.screen.dart';
+import 'package:laundromats/src/screen/profile/policy.screen.dart';
+import 'package:laundromats/src/screen/profile/terms.screen.dart';
 import 'package:laundromats/src/screen/subscription/subscription.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
+import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
+import 'package:laundromats/src/utils/shared_preferences_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
 
@@ -50,6 +56,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> getUserQuestions() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     String? userIdString = prefs.getString('userId');
 
     setState(() {
@@ -75,9 +82,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               final userData = result['data'];
               setState(() {
                 userRole = userData['user_role'];
+                GlobalVariable.userRole = userData['user_role'];
                 userRoleExpert = userData['user_role_expertIn'];
+                GlobalVariable.userExpertIn = userData['user_role_expertIn'];
                 userRoleBusiness = userData['user_role_businessTime'];
+                GlobalVariable.userbusinessTime =
+                    userData['user_role_businessTime'];
                 userRoleLaundromatsCount =
+                    userData['user_role_laundromatsCount'];
+                GlobalVariable.userLaundromatsCount =
                     userData['user_role_laundromatsCount'];
               });
             } else {
@@ -101,6 +114,90 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         builder: (context) => const SubscriptionScreen(),
       ),
     );
+  }
+
+  Future<void> _logoutClicked() async {
+    bool confirmLogout = await _showConfirmationDialog(
+      context,
+      title: "Logout",
+      content: "Are you sure you want to log out?",
+    );
+
+    if (confirmLogout) {
+      // Clear user details from SharedPreferences
+      await SharedPreferencesUtil.saveUserDetails(
+        userId: "",
+        userName: "",
+        userEmail: "",
+        userExpertIn: "",
+        userBusinessTime: "",
+        userLaundromatsCount: "",
+      );
+
+      // Optionally clear global variables
+      GlobalVariable.userName = null;
+      GlobalVariable.userEmail = null;
+      GlobalVariable.userExpertIn = null;
+      GlobalVariable.userbusinessTime = null;
+
+      // Navigate to login screen or close session
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation1, animation2) =>
+                const LoginScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _onPolicyClicked() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()),
+    );
+  }
+
+  Future<void> _onTermsClicked() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TermsOfServiceScreen()),
+    );
+  }
+
+  Future<void> _onEditProfileClicked() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+    );
+  }
+
+  Future<bool> _showConfirmationDialog(BuildContext context,
+      {required String title, required String content}) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(title),
+              content: Text(content),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false), // Cancel
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true), // Confirm
+                  child: const Text("Yes"),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Default to false if the dialog is dismissed
   }
 
   bool allowRevert = true;
@@ -370,9 +467,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildProfileOption(
                         icon: Icons.person_outline,
                         title: "Edit Account",
-                        onTap: () {
-                          // Handle Edit Account action
-                        },
+                        onTap: _onEditProfileClicked,
                       ),
                       _buildProfileOption(
                         icon: Icons.notifications_outlined,
@@ -384,16 +479,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildProfileOption(
                         icon: Icons.perm_device_information,
                         title: "About",
-                        onTap: () {
-                          // Handle Notifications action
-                        },
+                        onTap: _onPolicyClicked,
                       ),
                       _buildProfileOption(
                         icon: Icons.policy,
                         title: "Terms",
-                        onTap: () {
-                          // Handle Notifications action
-                        },
+                        onTap: _onTermsClicked,
                       ),
                       _buildProfileOption(
                         icon: Icons.credit_card_outlined,
@@ -403,9 +494,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildProfileOption(
                         icon: Icons.logout,
                         title: "Logout Account",
-                        onTap: () {
-                          // Handle Manage Payment Methods action
-                        },
+                        onTap: _logoutClicked,
                       ),
                       _buildProfileOption(
                         icon: Icons.delete_forever,

@@ -12,6 +12,7 @@ import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:laundromats/src/utils/shared_preferences_util.dart';
 import 'package:logger/logger.dart';
+
 class OwnerScreen extends ConsumerStatefulWidget {
   const OwnerScreen({super.key});
 
@@ -138,6 +139,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(

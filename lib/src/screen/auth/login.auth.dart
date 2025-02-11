@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/screen/auth/login.screen.dart';
-import 'package:laundromats/src/screen/auth/set.password.dart';
+import 'package:laundromats/src/screen/auth/signup.screen.dart';
+import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
@@ -49,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     navigator.push(
       MaterialPageRoute(
-        builder: (context) => const LoginAuthScreen(),
+        builder: (context) => const SignupScreen(),
       ),
     );
   }
@@ -67,12 +67,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         GlobalVariable.userName = user.displayName;
         GlobalVariable.userEmail = user.email;
 
-        // Use the navigator directly
-        navigator.push(
-          MaterialPageRoute(
-            builder: (context) => const SetPasswordScreen(),
-          ),
-        );
+        bool userExists = await AuthService().checkUserExistence(user.email!);
+
+        if (userExists) {
+          navigator.push(
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
+        } else {
+          navigator.push(
+            MaterialPageRoute(
+              builder: (context) => const CategoryScreen(),
+            ),
+          );
+        }
       }
     } catch (e) {
       logger.e("Google Login Failed: $e");

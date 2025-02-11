@@ -62,7 +62,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
 
     switch (widget.btnType) {
       case ButtonWidgetType.emailLogin:
-        btnTitle = "Sign-In with Email";
+        btnTitle = "Sign up using an app";
         if (widget.icon == true) {
           iconWidget = Icon(
             Icons.mail, // System-provided email icon

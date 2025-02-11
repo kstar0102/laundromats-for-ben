@@ -105,7 +105,7 @@ class _LoginScreenState extends ConsumerState<LoginAuthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const HeaderWidget(role: true, isLogoutBtn: false),
+              const HeaderWidget(role: false, isLogoutBtn: false),
               SizedBox(height: vh(context, 10)),
               const Text(
                 "Login to Laundromats",

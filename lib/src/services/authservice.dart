@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -15,6 +17,39 @@ class AuthService {
   final String baseUrl = 'http://192.168.141.105:5000/api';
   // final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
+
+  Future<bool> checkUserExistence(String email) async {
+    final Uri url = Uri.parse("$baseUrl/users/googlecheck");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final userId = responseData["user_id"].toString();
+
+        // Save user ID locally
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("userId", userId);
+
+        logger.i("User exists. UserID: $userId");
+        return true; // User exists
+      } else if (response.statusCode == 404) {
+        logger.w("User does not exist.");
+        return false; // User does not exist
+      } else {
+        logger.e("Error checking user existence: ${response.body}");
+        return false; // Treat as user not found
+      }
+    } catch (e) {
+      logger.e("Network Error: $e");
+      return false; // Return false on network error
+    }
+  }
 
   Future<User?> signInWithGoogle() async {
     try {
