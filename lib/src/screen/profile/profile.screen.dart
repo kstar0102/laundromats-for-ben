@@ -38,6 +38,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? userRoleExpert;
   String? userRoleBusiness;
   String? userRoleLaundromatsCount;
+  String? userImageUrl;
   bool isLoading = false;
   List<dynamic> questions = [];
 
@@ -60,8 +61,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     String? userIdString = prefs.getString('userId');
 
     setState(() {
-      userName = prefs.getString("userName");
-      userEmail = prefs.getString("userEmail");
       isLoading = true;
     });
 
@@ -81,6 +80,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             if (result['success'] == true) {
               final userData = result['data'];
               setState(() {
+                userName = userData['user_name'];
+                GlobalVariable.userName = userData['user_name'];
+                userEmail = userData['email'];
+                GlobalVariable.userEmail = userData['email'];
                 userRole = userData['user_role'];
                 GlobalVariable.userRole = userData['user_role'];
                 userRoleExpert = userData['user_role_expertIn'];
@@ -92,6 +95,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     userData['user_role_laundromatsCount'];
                 GlobalVariable.userLaundromatsCount =
                     userData['user_role_laundromatsCount'];
+                userImageUrl = userData['user_image'];
+                GlobalVariable.userImageUrl = userData['user_image'];
               });
             } else {
               logger.e('Failed to fetch user data: Invalid response');
@@ -209,6 +214,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return false;
   }
 
+  void _showBadgeDialog(String title, String emoji) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("You will get this badge"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                emoji,
+                width: 50,
+                height: 50,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isKeyboardVisible == true) {
@@ -268,14 +305,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           width: 1,
                                         ),
                                       ),
-                                      child: const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.white,
-                                        child: Icon(
-                                          Icons.person,
-                                          color: kColorPrimary,
-                                          size: 25,
-                                        ),
+                                      child: ClipOval(
+                                        child: userImageUrl == null ||
+                                                userImageUrl!.isEmpty
+                                            ? const CircleAvatar(
+                                                radius: 40,
+                                                backgroundColor: Colors.white,
+                                                child: Icon(
+                                                  Icons.person,
+                                                  color: kColorPrimary,
+                                                  size: 40,
+                                                ),
+                                              )
+                                            : Image.network(
+                                                userImageUrl!,
+                                                width: 80,
+                                                height: 80,
+                                                fit: BoxFit.cover,
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return const Center(
+                                                      child:
+                                                          CircularProgressIndicator());
+                                                },
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return const CircleAvatar(
+                                                    radius: 40,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    child: Icon(
+                                                      Icons.person,
+                                                      color: kColorPrimary,
+                                                      size: 40,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                       ),
                                     ),
                                     SizedBox(height: vMin(context, 1)),
@@ -285,14 +354,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Onset-Regular',
                                         color: kColorSecondary,
-                                        fontSize: 14,
+                                        fontSize: 16,
                                       ),
                                     ),
                                     SizedBox(height: vMin(context, 0.5)),
                                     Text(
                                       userEmail ?? 'Guest Email',
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: kColorPrimary,
                                       ),
@@ -309,35 +378,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Level",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorPrimary,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: vw(context, 2),
-                                        ),
-                                        const Text(
-                                          "Beginner",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorBlack,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: vh(context, 1),
-                                    ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -367,41 +407,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     SizedBox(
                                       height: vh(context, 1),
                                     ),
-                                    userRole == "Owner"
-                                        ? const SizedBox
-                                            .shrink() // Return an empty widget if the condition is true
-                                        : Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                "Expert In",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Onset-Regular',
-                                                  color: kColorPrimary,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: vw(context, 2),
-                                              ),
-                                              Text(
-                                                userRoleExpert ?? " ",
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: 'Onset-Regular',
-                                                  color: kColorBlack,
-                                                ),
-                                              )
-                                            ],
-                                          ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         const Text(
-                                          "Business Year",
+                                          "Tips earned for answers",
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
@@ -412,9 +423,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         SizedBox(
                                           width: vw(context, 2),
                                         ),
-                                        Text(
-                                          userRoleBusiness ?? " ",
-                                          style: const TextStyle(
+                                        const Text(
+                                          "10",
+                                          style: TextStyle(
                                             fontSize: 14,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorBlack,
@@ -425,37 +436,55 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     SizedBox(
                                       height: vh(context, 1),
                                     ),
-                                    userRole == "Machanic"
-                                        ? const SizedBox
-                                            .shrink() // Return an empty widget if the condition is true
-                                        : Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                "laundromats Counts",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Onset-Regular',
-                                                  color: kColorPrimary,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: vw(context, 2),
-                                              ),
-                                              Text(
-                                                userRoleLaundromatsCount ?? " ",
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: 'Onset-Regular',
-                                                  color: kColorBlack,
-                                                ),
-                                              )
-                                            ],
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Tips given to others",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Onset-Regular',
+                                            color: kColorPrimary,
                                           ),
+                                        ),
+                                        SizedBox(
+                                          width: vw(context, 2),
+                                        ),
+                                        const Text(
+                                          "25",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'Onset-Regular',
+                                            color: kColorBlack,
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ],
                                 ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: vh(context, 1),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildBadgeItem(
+                                    "Answered 1 question",
+                                    "assets/images/icons/first_answer.png",
+                                    "Helping Hand Answered 10 questions",
+                                    "assets/images/icons/ten_answer.png"),
+                                SizedBox(
+                                  height: vw(context, 1),
+                                ),
+                                _buildBadgeItem(
+                                    "Active Member ",
+                                    "assets/images/icons/week_login.png",
+                                    "Super Active Logged in daily for 30 days",
+                                    "assets/images/icons/month_login.png"),
                               ],
                             ),
                             SizedBox(
@@ -542,6 +571,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildBadgeItem(
+      String text, String emoji, String dialogText, String dialogEmoji) {
+    return GestureDetector(
+      onTap: () {
+        _showBadgeDialog(dialogText, dialogEmoji);
+      },
+      child: Row(
+        children: [
+          Image.asset(
+            emoji,
+            width: 24, // Set a fixed size for the image
+            height: 24,
+          ),
+          SizedBox(width: vw(context, 1)),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Onset-Regular',
+              color: kColorPrimary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

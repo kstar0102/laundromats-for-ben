@@ -14,8 +14,8 @@ class AuthService {
 
   final logger = Logger();
 
-  final String baseUrl = 'http://192.168.141.105:5000/api';
-  // final String baseUrl = 'http://146.190.117.4:5000/api';
+  // final String baseUrl = 'http://192.168.141.105:5000/api';
+  final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<bool> checkUserExistence(String email) async {
@@ -447,6 +447,30 @@ class AuthService {
       }
     } catch (e) {
       throw Exception('Error fetching user data: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateUserProfile(
+      Map<String, dynamic> userData) async {
+    final Uri url = Uri.parse('$baseUrl/auth/update');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(userData),
+      );
+
+      if (response.statusCode == 200) {
+        return {"success": true, "message": "Profile updated successfully"};
+      } else {
+        return {
+          "success": false,
+          "message": jsonDecode(response.body)['message'] ?? 'Unknown error'
+        };
+      }
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
     }
   }
 }

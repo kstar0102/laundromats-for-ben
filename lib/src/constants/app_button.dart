@@ -26,7 +26,8 @@ enum ButtonWidgetType {
   emailLogin,
   editProfile,
   settingBtn,
-  termsBtn
+  termsBtn,
+  updateBtn,
 }
 
 class ButtonWidget extends StatefulWidget {
@@ -90,6 +91,9 @@ class _ButtonWidgetState extends State<ButtonWidget> {
             height: vMin(context, 20),
           );
         }
+        break;
+      case ButtonWidgetType.updateBtn:
+        btnTitle = updateBtn.toString();
         break;
       case ButtonWidgetType.nextBtn:
         btnTitle = nextBtn.toString();

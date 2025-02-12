@@ -8,4 +8,5 @@ class GlobalVariable {
   static String? userExpertIn;
   static String? userbusinessTime;
   static String? userLaundromatsCount;
+  static String? userImageUrl;
 }
