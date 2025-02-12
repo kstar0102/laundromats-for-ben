@@ -28,6 +28,7 @@ enum ButtonWidgetType {
   settingBtn,
   termsBtn,
   updateBtn,
+  addBtn
 }
 
 class ButtonWidget extends StatefulWidget {
@@ -94,6 +95,9 @@ class _ButtonWidgetState extends State<ButtonWidget> {
         break;
       case ButtonWidgetType.updateBtn:
         btnTitle = updateBtn.toString();
+        break;
+      case ButtonWidgetType.addBtn:
+        btnTitle = addBtn.toString();
         break;
       case ButtonWidgetType.nextBtn:
         btnTitle = nextBtn.toString();

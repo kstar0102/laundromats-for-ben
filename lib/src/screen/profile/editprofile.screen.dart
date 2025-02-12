@@ -96,7 +96,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
 
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Upload successful!')),
+        const SnackBar(content: Text('Changed successful!')),
       );
 
       logger.i(uploadedImageUrl);

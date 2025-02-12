@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/ask_question/ask_question.screen.dart';
@@ -21,7 +20,7 @@ class BottomNavBar extends StatelessWidget {
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation1, animation2) =>
-                const HomeScreen(),
+                  const HomeScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -31,7 +30,8 @@ class BottomNavBar extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => const SearchScreen(),
+              pageBuilder: (context, animation1, animation2) =>
+                  const SearchScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -42,7 +42,8 @@ class BottomNavBar extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => const AskQuestionScreen(),
+              pageBuilder: (context, animation1, animation2) =>
+                  const AskQuestionScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -52,7 +53,8 @@ class BottomNavBar extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => const QuestionScreen(),
+              pageBuilder: (context, animation1, animation2) =>
+                  const QuestionScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -62,7 +64,8 @@ class BottomNavBar extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => const ProfileScreen(),
+              pageBuilder: (context, animation1, animation2) =>
+                  const ProfileScreen(),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),
@@ -107,7 +110,8 @@ class BottomNavBar extends StatelessWidget {
             BottomNavigationBarItem(
                 icon: currentIndex == 2
                     ? const Image(
-                        image: AssetImage("assets/images/icons/add-square-1.png"),
+                        image:
+                            AssetImage("assets/images/icons/add-square-1.png"),
                         width: 24)
                     : const Image(
                         image: AssetImage("assets/images/icons/add-square.png"),

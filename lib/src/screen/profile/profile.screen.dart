@@ -5,9 +5,9 @@ import 'package:laundromats/src/components/bottom_nav_bar.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/auth/login.auth.dart';
 import 'package:laundromats/src/screen/profile/editprofile.screen.dart';
+import 'package:laundromats/src/screen/profile/payment.screen.dart';
 import 'package:laundromats/src/screen/profile/policy.screen.dart';
 import 'package:laundromats/src/screen/profile/terms.screen.dart';
-import 'package:laundromats/src/screen/subscription/subscription.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -111,15 +111,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  Future<void> _onPaymentClick() async {
-    final navigator = Navigator.of(context);
+  // Future<void> _onPaymentClick() async {
+  //   final navigator = Navigator.of(context);
 
-    navigator.push(
-      MaterialPageRoute(
-        builder: (context) => const SubscriptionScreen(),
-      ),
-    );
-  }
+  //   navigator.push(
+  //     MaterialPageRoute(
+  //       builder: (context) => const SubscriptionScreen(),
+  //     ),
+  //   );
+  // }
 
   Future<void> _logoutClicked() async {
     bool confirmLogout = await _showConfirmationDialog(
@@ -160,6 +160,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    bool confirmDelete = await _showConfirmationDialog(
+      context,
+      title: "Delete Account",
+      content:
+          "Are you sure you want to permanently delete your account? This action cannot be undone.",
+    );
+
+    if (!confirmDelete) return;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userIdString = prefs.getString("userId");
+
+    if (userIdString == null || userIdString.isEmpty) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Error: Unable to delete account. Please log in again.')),
+      );
+      return;
+    }
+
+    int userId = int.parse(userIdString);
+    bool success = await AuthService().deleteUser(userId);
+
+    if (success) {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Failed to delete account. Please try again.')),
+      );
+    }
+  }
+
   Future<void> _onPolicyClicked() async {
     Navigator.push(
       context,
@@ -171,6 +213,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const TermsOfServiceScreen()),
+    );
+  }
+
+  Future<void> _onPaymentClicked() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CardInputScreen()),
     );
   }
 
@@ -268,7 +317,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const HeaderWidget(role: false, isLogoutBtn: false),
+                      const HeaderWidget(role: true, isLogoutBtn: false),
                       Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
@@ -357,20 +406,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    SizedBox(height: vMin(context, 0.5)),
-                                    Text(
-                                      userEmail ?? 'Guest Email',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
+                                    // SizedBox(height: vMin(context, 0.5)),
+                                    // Text(
+                                    //   userEmail ?? 'Guest Email',
+                                    //   style: const TextStyle(
+                                    //     fontSize: 12,
+                                    //     fontWeight: FontWeight.bold,
+                                    //     color: kColorPrimary,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                                 Container(
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 20),
+                                      horizontal: 10),
                                   height: vMin(context, 25),
                                   width: 1,
                                   color: kColorPrimary,
@@ -470,7 +519,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               height: vh(context, 1),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 _buildBadgeItem(
                                     "Answered 1 question",
@@ -478,7 +527,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     "Helping Hand Answered 10 questions",
                                     "assets/images/icons/ten_answer.png"),
                                 SizedBox(
-                                  height: vw(context, 1),
+                                  width: vw(context, 3),
                                 ),
                                 _buildBadgeItem(
                                     "Active Member ",
@@ -518,7 +567,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildProfileOption(
                         icon: Icons.credit_card_outlined,
                         title: "Manage Payment Methods",
-                        onTap: _onPaymentClick,
+                        onTap: _onPaymentClicked,
                       ),
                       _buildProfileOption(
                         icon: Icons.logout,
@@ -528,9 +577,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildProfileOption(
                         icon: Icons.delete_forever,
                         title: "Delete Account",
-                        onTap: () {
-                          // Handle Manage Payment Methods action
-                        },
+                        onTap: _deleteAccount,
                       ),
                     ]),
               ),

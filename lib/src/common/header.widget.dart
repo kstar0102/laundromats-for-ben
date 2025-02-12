@@ -63,30 +63,33 @@ class _HeaderWidgetState extends ConsumerState<HeaderWidget> {
                 color: kColorPrimary,
                 thickness: 1,
               )
-            : InkWell(
-                onTap: () => _showGoPremiumDialog(context),
-                child: Container(
-                  width: vMin(context, 100),
-                  height: vMin(context, 10),
-                  decoration: const BoxDecoration(
-                    color: kColorPrimary,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/icons/crown.png"),
-                      SizedBox(width: vMin(context, 2)),
-                      Text(
-                        getPremium.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Onset-Regular',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
+            : Material(
+                color: Colors.transparent, // Ensures background stays the same
+                child: InkWell(
+                  onTap: () => _showGoPremiumDialog(context),
+                  child: Container(
+                    width: vMin(context, 100),
+                    height: vMin(context, 10),
+                    decoration: const BoxDecoration(
+                      color: kColorPrimary,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset("assets/images/icons/crown.png"),
+                        SizedBox(width: vMin(context, 2)),
+                        Text(
+                          getPremium.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Onset-Regular',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

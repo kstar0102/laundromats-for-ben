@@ -24,15 +24,22 @@ class SignupScreenState extends State<SignupScreen> {
   final Logger logger = Logger();
   bool _isPasswordHidden = true;
   bool _isConfirmPasswordHidden = true;
+  bool _isEmailValid = true;
+  bool _isPasswordValid = true;
 
   /// **Email Validation Function**
   bool _validateEmail(String email) {
     final RegExp emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
     return emailRegex.hasMatch(email);
   }
 
-  void _onSignupClicked() async {
+  void _onSignupClicked() {
+    setState(() {
+      _isEmailValid = _validateEmail(_emailController.text.trim());
+      _isPasswordValid = _passwordController.text.length >= 4;
+    });
+
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -41,8 +48,13 @@ class SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    if (!_validateEmail(_emailController.text.trim())) {
+    if (!_isEmailValid) {
       _showErrorDialog("Please enter a valid email address");
+      return;
+    }
+
+    if (!_isPasswordValid) {
+      _showErrorDialog("Password must be at least 4 characters long");
       return;
     }
 
@@ -56,7 +68,6 @@ class SignupScreenState extends State<SignupScreen> {
     GlobalVariable.userPassword = _passwordController.text;
 
     if (mounted) {
-      // Navigate to HomeScreen after successful signup
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -89,20 +100,11 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  bool allowRevert = true;
-
-  Future<bool> _onWillPop() async {
-    if (!allowRevert) {
-      return false;
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop: () async => false,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         body: SizedBox.expand(
@@ -111,7 +113,7 @@ class SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const HeaderWidget(role: false, isLogoutBtn: false),
-                SizedBox(height: vh(context, 10)),
+                SizedBox(height: vh(context, 5)),
                 const Text(
                   "Create an Account",
                   textAlign: TextAlign.center,
@@ -123,33 +125,40 @@ class SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 SizedBox(height: vh(context, 5)),
-
-                /// Username Field
-                _buildInputField(
-                    "Full Name", _nameController, TextInputType.text),
-
-                /// Email Field
+                _buildInputField("Full Name", _nameController,
+                    TextInputType.text, "Enter your full name"),
+                SizedBox(height: vh(context, 2)),
                 _buildInputField("Email Address", _emailController,
-                    TextInputType.emailAddress),
-
-                /// Password Field
-                _buildPasswordField("Password", _passwordController, true),
-
-                /// Confirm Password Field
-                _buildPasswordField(
-                    "Confirm Password", _confirmPasswordController, false),
-
-                SizedBox(height: vMin(context, 10)),
-
+                    TextInputType.emailAddress, "Enter your email"),
+                if (!_isEmailValid)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20.0, top: 5.0),
+                    child: Text("Invalid email format",
+                        style: TextStyle(color: Colors.grey)),
+                  ),
+                SizedBox(height: vh(context, 2)),
+                _buildPasswordField("Password", _passwordController, true,
+                    "Enter your password"),
+                if (!_isPasswordValid)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20.0, top: 5.0),
+                    child: Text("Password must be at least 4 characters",
+                        style: TextStyle(color: Colors.grey)),
+                  ),
+                SizedBox(height: vh(context, 2)),
+                _buildPasswordField("Confirm Password",
+                    _confirmPasswordController, false, "Confirm your password"),
+                SizedBox(height: vh(context, 2)),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: vww(context, 15)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: vww(context, 10), vertical: vh(context, 3)),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: vMin(context, 20),
+                            width: vMin(context, 30),
                             child: ButtonWidget(
                               btnType: ButtonWidgetType.backBtn,
                               borderColor: kColorPrimary,
@@ -163,7 +172,7 @@ class SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                           SizedBox(
-                            width: vMin(context, 20),
+                            width: vMin(context, 30),
                             child: ButtonWidget(
                               btnType: ButtonWidgetType.nextBtn,
                               borderColor: kColorPrimary,
@@ -176,42 +185,39 @@ class SignupScreenState extends State<SignupScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: vh(context, 2)),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: "Already have an account? ",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: kColorBlack,
-                              ),
-                            ),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginAuthScreen()),
-                                  );
-                                },
-                                child: const Text(
-                                  " Log in",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: kColorPrimary, // Clickable color
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
+                ),
+                RichText(
+                  text: TextSpan(children: [
+                    const TextSpan(
+                      text: "Already have an account? ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: kColorBlack,
+                      ),
+                    ),
+                    WidgetSpan(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginAuthScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "   Log in",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: kColorPrimary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
                 ),
               ],
             ),
@@ -221,8 +227,8 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildInputField(
-      String label, TextEditingController controller, TextInputType type) {
+  Widget _buildInputField(String label, TextEditingController controller,
+      TextInputType type, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -244,15 +250,16 @@ class SignupScreenState extends State<SignupScreen> {
             keyboardType: type,
             autocorrect: false,
             cursorColor: Colors.grey,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.always,
               enabledBorder: kEnableSearchBorder,
               focusedBorder: kFocusSearchBorder,
-              hintStyle: TextStyle(fontSize: 16.0, color: kColorThird),
+              hintStyle: const TextStyle(fontSize: 16.0, color: kColorThird),
+              hintText: hint,
               filled: false,
               disabledBorder: InputBorder.none,
               contentPadding:
-                  EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
             ),
           ),
         ),
@@ -260,8 +267,8 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildPasswordField(
-      String label, TextEditingController controller, bool isPassword) {
+  Widget _buildPasswordField(String label, TextEditingController controller,
+      bool isPassword, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,6 +296,7 @@ class SignupScreenState extends State<SignupScreen> {
               floatingLabelBehavior: FloatingLabelBehavior.always,
               enabledBorder: kEnableSearchBorder,
               focusedBorder: kFocusSearchBorder,
+              hintText: hint,
               suffixIcon: IconButton(
                 icon: Icon(
                   isPassword

@@ -14,8 +14,8 @@ class AuthService {
 
   final logger = Logger();
 
-  // final String baseUrl = 'http://192.168.141.105:5000/api';
-  final String baseUrl = 'http://146.190.117.4:5000/api';
+  final String baseUrl = 'http://192.168.141.105:5000/api';
+  // final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<bool> checkUserExistence(String email) async {
@@ -472,5 +472,48 @@ class AuthService {
     } catch (e) {
       return {"success": false, "message": e.toString()};
     }
+  }
+
+  /// **Delete User Account**
+  Future<bool> deleteUser(int userId) async {
+    final Uri url = Uri.parse("$baseUrl/users/deleteuser");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"user_id": userId}),
+      );
+
+      // **Handle API response classification**
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        logger.i("Account deleted successfully: ${responseData['message']}");
+
+        // Clear user details from SharedPreferences
+        await _clearUserData();
+
+        return true; // ✅ Account deletion successful
+      } else if (response.statusCode == 400) {
+        logger.w("Bad Request: ${response.body}");
+        return false;
+      } else if (response.statusCode == 500) {
+        logger.e("Server Error: ${response.body}");
+        return false;
+      } else {
+        logger.e("Unexpected response: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      logger.e("Network Error: $e");
+      return false;
+    }
+  }
+
+  /// **Clear User Data from SharedPreferences**
+  Future<void> _clearUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    logger.i("User data cleared from local storage.");
   }
 }

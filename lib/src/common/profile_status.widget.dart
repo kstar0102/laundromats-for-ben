@@ -64,7 +64,7 @@ class ProfileStatusWidget extends StatelessWidget {
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 3),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
@@ -75,11 +75,11 @@ class ProfileStatusWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 24, color: kColorPrimary),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),

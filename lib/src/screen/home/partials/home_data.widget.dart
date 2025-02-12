@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/home/userproflie.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
@@ -92,17 +93,20 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
           answerInputVisible.remove(questionId);
         });
 
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Answer submitted successfully!")),
         );
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(response["message"] ?? "Failed to submit answer!")),
         );
       }
     } catch (e) {
-      print("Error submitting answer: $e");
+      logger.i("Error submitting answer: $e");
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Error: Unable to submit answer.")),
       );
@@ -292,15 +296,33 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                     children: [
                       Image.asset('assets/images/icons/user.png'),
                       SizedBox(width: vMin(context, 2)),
-                      Text(
-                        question["user"]?["user_name"] ?? "Anonymous",
-                        style: const TextStyle(
-                          color: kColorSecondary,
-                          fontSize: 14,
+                      GestureDetector(
+                        onTap: () {
+                          int? userId = question["user"]?["user_id"];
+                          if (userId != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UserProfileScreen(userId: userId),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          question["user"]?["user_name"] ?? "Anonymous",
+                          style: const TextStyle(
+                            color: kColorSecondary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration
+                                .underline, // Optional for emphasis
+                          ),
                         ),
                       ),
                     ],
                   ),
+
                   SizedBox(height: vMin(context, 3)),
 
                   // Question Content

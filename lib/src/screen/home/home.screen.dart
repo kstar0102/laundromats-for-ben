@@ -25,6 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final int _currentIndex = 0;
   final bool _isKeyboardVisible = false;
   String? userName;
+  String? userImageUrl;
   List<dynamic> questions = [];
   bool _isLoading = false;
   final logger = Logger();
@@ -43,15 +44,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool allowRevert = true;
 
   Future<void> getData() async {
+    final authService = AuthService();
     setState(() {
       _isLoading = true;
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userName = prefs.getString('userName') ?? "Guest"; // Fallback to "Guest"
-    });
+    String? userIdString = prefs.getString('userId');
+    int? parsedUserId = int.tryParse(userIdString!);
+    try {
+      if (parsedUserId != 0) {
+        final result = await authService.fetchUserData(parsedUserId!);
 
-    final authService = AuthService();
+        if (result['success'] == true) {
+          final userData = result['data'];
+          setState(() {
+            userName = userData['user_name'];
+            userImageUrl = userData['user_image'];
+          });
+        } else {
+          logger.e('Failed to fetch user data: Invalid response');
+        }
+      } else {
+        logger.e('Invalid user ID: $parsedUserId');
+      }
+    } catch (e) {
+      logger.e('Error fetching user questions: $e');
+    }
+
     try {
       final fetchedQuestions = await authService.fetchQuestionsWithAnswers();
       final validQuestions = fetchedQuestions
@@ -104,12 +123,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.asset(
-                                    "assets/images/icons/smile.png",
-                                    width: vhh(context, 7),
-                                    height: vhh(context, 7),
-                                    fit: BoxFit.contain,
-                                  ),
+                                  userImageUrl == null || userImageUrl!.isEmpty
+                                      ? SizedBox(
+                                          width: vhh(context, 7),
+                                          height: vhh(context, 7),
+                                          child:
+                                              const CircularProgressIndicator(), // **Show Loader When Loading**
+                                        )
+                                      : ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              50), // **Make It Circular**
+                                          child: Image.network(
+                                            userImageUrl!,
+                                            width: vhh(context, 7),
+                                            height: vhh(context, 7),
+                                            fit: BoxFit
+                                                .cover, // **Ensure Proper Fit**
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return SizedBox(
+                                                width: vhh(context, 7),
+                                                height: vhh(context, 7),
+                                                child: const Center(
+                                                    child:
+                                                        CircularProgressIndicator()), // **Show Loader While Loading**
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                "assets/images/icons/smile.png", // **Fallback Image on Error**
+                                                width: vhh(context, 7),
+                                                height: vhh(context, 7),
+                                                fit: BoxFit.contain,
+                                              );
+                                            },
+                                          ),
+                                        ),
                                   SizedBox(width: vMin(context, 3)),
                                   Expanded(
                                     child: Column(

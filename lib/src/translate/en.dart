@@ -11,6 +11,7 @@ const String letGetStartedDescription = "Tell us little about your self";
 const String roleName = "What is your role";
 const String nextBtn = "Next";
 const String updateBtn = "Update";
+const String addBtn = "Add Payment";
 const String editprofileBtn = "Edit Profile";
 const String settingBtn = "Setting";
 const String termsBtn = "Terms";
