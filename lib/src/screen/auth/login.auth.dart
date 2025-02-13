@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/auth/signup.screen.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
@@ -200,44 +199,132 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               SizedBox(
                                 height: vMin(context, 10),
                               ),
-                              ButtonWidget(
-                                btnType: ButtonWidgetType.emailLogin,
-                                borderColor: kColorPrimary,
-                                textColor: kColorWhite,
-                                fullColor: kColorPrimary,
-                                size: false,
-                                icon: true,
-                                onPressed: () {
-                                  _signInEmail();
-                                },
-                              ),
-                              SizedBox(
-                                height: vMin(context, 5),
-                              ),
-                              ButtonWidget(
-                                btnType: ButtonWidgetType.googleLogin,
-                                borderColor: kColorPrimary,
-                                textColor: kColorWhite,
-                                fullColor: kColorPrimary,
-                                size: false,
-                                icon: true,
-                                onPressed: () {
-                                  _signInGoogle(context);
-                                },
-                              ),
-                              SizedBox(
-                                height: vMin(context, 5),
-                              ),
-                              ButtonWidget(
-                                btnType: ButtonWidgetType.facebookLogin,
-                                borderColor: kColorPrimary,
-                                textColor: kColorWhite,
-                                fullColor: kColorPrimary,
-                                icon: true,
-                                size: false,
-                                onPressed: () {
-                                  _signInFacebook(context);
-                                },
+                              Column(
+                                children: [
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          kColorPrimary, // Green background color
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // Rounded corners
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 7,
+                                          horizontal: 20), // Adjust padding
+                                    ),
+                                    onPressed: () {
+                                      _signInEmail();
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons
+                                              .mail, // System-provided email icon
+                                          size: vMin(context,
+                                              3.5), // Adjust size based on your layout
+                                          color:
+                                              kColorInputBorder, // Customize color if needed
+                                        ), // Email icon
+                                        const SizedBox(
+                                            width:
+                                                8), // Space between icon and text
+                                        const Text(
+                                          "Sign-up using an app",
+                                          style: TextStyle(
+                                            color: Colors.white, // Text color
+                                            fontSize: 15,
+                                            fontFamily: 'Onset-Regular',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: vMin(context, 3),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          kColorPrimary, // Green background color
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // Rounded corners
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 7,
+                                          horizontal: 20), // Adjust padding
+                                    ),
+                                    onPressed: () {
+                                      _signInGoogle(context);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/icons/google.png',
+                                          width: vMin(context, 5),
+                                          height: vMin(context, 5),
+                                        ), // Email icon
+                                        const SizedBox(
+                                            width:
+                                                8), // Space between icon and text
+                                        const Text(
+                                          "Sign-up with Google",
+                                          style: TextStyle(
+                                            color: Colors.white, // Text color
+                                            fontSize: 15,
+                                            fontFamily: 'Onset-Regular',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: vMin(context, 3),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          kColorPrimary, // Green background color
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            8), // Rounded corners
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 7,
+                                          horizontal: 20), // Adjust padding
+                                    ),
+                                    onPressed: () {
+                                      _signInFacebook(context);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/icons/facebook.png',
+                                          width: vMin(context, 5),
+                                          height: vMin(context, 5),
+                                        ), // Email icon
+                                        const SizedBox(
+                                            width:
+                                                8), // Space between icon and text
+                                        const Text(
+                                          "Sign-up with Facebook",
+                                          style: TextStyle(
+                                            color: Colors.white, // Text color
+                                            fontSize: 15,
+                                            fontFamily: 'Onset-Regular',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ))
