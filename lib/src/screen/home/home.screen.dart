@@ -124,45 +124,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   userImageUrl == null || userImageUrl!.isEmpty
-                                      ? SizedBox(
-                                          width: vhh(context, 7),
-                                          height: vhh(context, 7),
-                                          child:
-                                              const CircularProgressIndicator(), // **Show Loader When Loading**
-                                        )
-                                      : ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                              50), // **Make It Circular**
-                                          child: Image.network(
-                                            userImageUrl!,
-                                            width: vhh(context, 7),
-                                            height: vhh(context, 7),
-                                            fit: BoxFit
-                                                .cover, // **Ensure Proper Fit**
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return SizedBox(
-                                                width: vhh(context, 7),
-                                                height: vhh(context, 7),
-                                                child: const Center(
-                                                    child:
-                                                        CircularProgressIndicator()), // **Show Loader While Loading**
-                                              );
-                                            },
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                "assets/images/icons/smile.png", // **Fallback Image on Error**
-                                                width: vhh(context, 7),
-                                                height: vhh(context, 7),
-                                                fit: BoxFit.contain,
-                                              );
-                                            },
-                                          ),
-                                        ),
+? Image.asset(
+  "assets/images/icons/smile.png", // **Show Fallback Icon Immediately If URL is Null/Empty**
+  width: vhh(context, 7),
+  height: vhh(context, 7),
+  fit: BoxFit.contain,
+)
+: ClipRRect(
+  borderRadius: BorderRadius.circular(50), // **Make It Circular**
+  child: Image.network(
+    userImageUrl!,
+    width: vhh(context, 7),
+    height: vhh(context, 7),
+    fit: BoxFit.cover, // **Ensure Proper Fit**
+    loadingBuilder: (context, child, loadingProgress) {
+      if (loadingProgress == null) {
+        return child; // **Show Image Once Loaded**
+      }
+      return SizedBox(
+        width: vhh(context, 7),
+        height: vhh(context, 7),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    },
+    errorBuilder: (context, error, stackTrace) {
+      return Image.asset(
+        "assets/images/icons/smile.png", // **Show Fallback Image If Error Occurs**
+        width: vhh(context, 7),
+        height: vhh(context, 7),
+        fit: BoxFit.contain,
+      );
+    },
+  ),
+),
+
                                   SizedBox(width: vMin(context, 3)),
                                   Expanded(
                                     child: Column(
