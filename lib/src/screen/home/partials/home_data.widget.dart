@@ -603,7 +603,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                       ),
                       const Spacer(),
                       SizedBox(
-                        width: vMin(context, 40),
+                        width: vMin(context, 45),
                         child: ButtonWidget(
                           btnType: ButtonWidgetType.seeAllAnsersBtn,
                           borderColor: kColorPrimary,

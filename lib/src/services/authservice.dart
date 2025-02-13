@@ -14,8 +14,8 @@ class AuthService {
 
   final logger = Logger();
 
-  // final String baseUrl = 'http://192.168.141.105:5000/api';
-  final String baseUrl = 'http://146.190.117.4:5000/api';
+  final String baseUrl = 'http://192.168.141.105:5000/api';
+  // final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
   Future<bool> checkUserExistence(String email) async {

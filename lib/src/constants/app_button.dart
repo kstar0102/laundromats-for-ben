@@ -222,29 +222,31 @@ class _ButtonWidgetState extends State<ButtonWidget> {
               ),
             ),
             onPressed: widget.onPressed,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (iconWidget != null) ...[
-                  iconWidget,
-                  SizedBox(
-                    width: vMin(context, 1),
-                  )
-                ],
-                Text(
-                  btnTitle,
-                  style: TextStyle(
-                    color: widget.textColor!,
-                    fontFamily: 'Onset-Regular',
+            child: Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (iconWidget != null) ...[
+                    iconWidget,
+                    SizedBox(width: vMin(context, 1)),
+                  ],
+                  Flexible(
+                    // Prevents text overflow
+                    child: Text(
+                      btnTitle,
+                      overflow: TextOverflow.ellipsis, // Avoids breaking UI
+                      style: TextStyle(
+                        color: widget.textColor!,
+                        fontFamily: 'Onset-Regular',
+                      ),
+                    ),
                   ),
-                ),
-                if (arrowIconWidget != null) ...[
-                  SizedBox(
-                    width: vMin(context, 1),
-                  ),
-                  arrowIconWidget,
+                  if (arrowIconWidget != null) ...[
+                    SizedBox(width: vMin(context, 1)),
+                    arrowIconWidget,
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

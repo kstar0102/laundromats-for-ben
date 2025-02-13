@@ -407,10 +407,12 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
       );
 
       // Close the loading dialog
+      // ignore: use_build_context_synchronously
       if (mounted) Navigator.pop(context);
 
       if (result["success"]) {
         // Success message
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Question created successfully!')),
         );
@@ -512,6 +514,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     color: kColorSecondary,
                                   ),
                                 ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8.0),
@@ -564,6 +570,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     color: kColorSecondary,
                                   ),
                                 ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8.0),
@@ -612,6 +622,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     fontSize: 14,
                                     color: kColorSecondary,
                                   ),
+                                ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
@@ -662,6 +676,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     color: kColorSecondary,
                                   ),
                                 ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8.0),
@@ -710,6 +728,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     fontSize: 14,
                                     color: kColorSecondary,
                                   ),
+                                ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
@@ -773,6 +795,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     color: kColorSecondary,
                                   ),
                                 ),
+                                const Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8.0),
@@ -834,6 +860,10 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                     fontSize: 14,
                                     color: kColorSecondary,
                                   ),
+                                ),
+                                Text(
+                                  " *",
+                                  style: TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
@@ -985,6 +1015,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                             Icon(
                                               Icons.file_present,
                                               size: 40,
+                                              // ignore: deprecated_member_use
                                               color: Colors.green.withOpacity(
                                                   0.7), // Success color
                                             ),
@@ -1021,6 +1052,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                               Icons.file_present,
                                               size: 40,
                                               color:
+                                                  // ignore: deprecated_member_use
                                                   Colors.grey.withOpacity(0.7),
                                             ),
                                             SizedBox(height: vMin(context, 2)),

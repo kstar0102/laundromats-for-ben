@@ -215,7 +215,7 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                                     "Helping Hand Answered 10 questions",
                                     "assets/images/icons/ten_answer.png"),
                                 SizedBox(
-                                  width: vw(context, 3),
+                                  width: vw(context, 2),
                                 ),
                                 _buildBadgeItem(
                                     "Active Member ",
@@ -318,14 +318,14 @@ class UserProfileScreenState extends State<UserProfileScreen> {
         children: [
           Image.asset(
             emoji,
-            width: 24, // Set a fixed size for the image
-            height: 24,
+            width: 22, // Set a fixed size for the image
+            height: 22,
           ),
-          SizedBox(width: vw(context, 1)),
+          SizedBox(width: vw(context, 0.5)),
           Text(
             text,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               fontFamily: 'Onset-Regular',
               color: kColorPrimary,

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/screen/auth/login.screen.dart';
@@ -17,6 +18,7 @@ class SignupScreen extends StatefulWidget {
 
 class SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -101,124 +103,138 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: SizedBox.expand(
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0), // Adjust padding
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const HeaderWidget(role: false, isLogoutBtn: false),
                 SizedBox(height: vh(context, 5)),
-                const Text(
-                  "Create an Account",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'Onset',
-                    fontWeight: FontWeight.bold,
-                    color: kColorSecondary,
+
+                /// **Title - "Create an Account"**
+                const Center(
+                  child: Text(
+                    "Create an Account",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Onset',
+                      fontWeight: FontWeight.bold,
+                      color: kColorSecondary,
+                    ),
                   ),
                 ),
-                SizedBox(height: vh(context, 5)),
+                SizedBox(height: vh(context, 3)),
+
+                /// **Form Fields - Centered & Adjusted**
                 _buildInputField("Full Name", _nameController,
-                    TextInputType.text, "Enter your full name"),
+                    TextInputType.text, "Enter your full name", true),
                 SizedBox(height: vh(context, 2)),
-                _buildInputField("Email Address", _emailController,
-                    TextInputType.emailAddress, "Enter your email"),
+
+                _buildInputField("Email", _emailController,
+                    TextInputType.emailAddress, "Enter your email", true),
                 if (!_isEmailValid)
                   const Padding(
-                    padding: EdgeInsets.only(left: 20.0, top: 5.0),
+                    padding: EdgeInsets.only(left: 5.0, top: 5.0),
                     child: Text("Invalid email format",
-                        style: TextStyle(color: Colors.grey)),
+                        style: TextStyle(color: Colors.red)),
                   ),
                 SizedBox(height: vh(context, 2)),
+
+                _buildInputField("Address (Optional)", _addressController,
+                    TextInputType.text, "Enter your Address", false),
+                SizedBox(height: vh(context, 2)),
+
                 _buildPasswordField("Password", _passwordController, true,
                     "Enter your password"),
                 if (!_isPasswordValid)
                   const Padding(
-                    padding: EdgeInsets.only(left: 20.0, top: 5.0),
+                    padding: EdgeInsets.only(left: 5.0, top: 5.0),
                     child: Text("Password must be at least 4 characters",
-                        style: TextStyle(color: Colors.grey)),
+                        style: TextStyle(color: Colors.red)),
                   ),
                 SizedBox(height: vh(context, 2)),
+
                 _buildPasswordField("Confirm Password",
                     _confirmPasswordController, false, "Confirm your password"),
-                SizedBox(height: vh(context, 2)),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: vww(context, 10), vertical: vh(context, 3)),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: vMin(context, 30),
-                            child: ButtonWidget(
-                              btnType: ButtonWidgetType.backBtn,
-                              borderColor: kColorPrimary,
-                              textColor: kColorWhite,
-                              fullColor: kColorPrimary,
-                              size: false,
-                              icon: true,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            width: vMin(context, 30),
-                            child: ButtonWidget(
-                              btnType: ButtonWidgetType.nextBtn,
-                              borderColor: kColorPrimary,
-                              textColor: kColorWhite,
-                              fullColor: kColorPrimary,
-                              size: false,
-                              icon: true,
-                              onPressed: _onSignupClicked,
-                            ),
-                          ),
-                        ],
+                SizedBox(height: vh(context, 3)),
+
+                /// **Buttons - Properly Aligned & Centered**
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ButtonWidget(
+                        btnType: ButtonWidgetType.backBtn,
+                        borderColor: kColorPrimary,
+                        textColor: kColorWhite,
+                        fullColor: kColorPrimary,
+                        size: false,
+                        icon: true,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 16), // Space between buttons
+                    Expanded(
+                      child: ButtonWidget(
+                        btnType: ButtonWidgetType.nextBtn,
+                        borderColor: kColorPrimary,
+                        textColor: kColorWhite,
+                        fullColor: kColorPrimary,
+                        size: false,
+                        icon: true,
+                        onPressed: _onSignupClicked,
+                      ),
+                    ),
+                  ],
                 ),
-                RichText(
-                  text: TextSpan(children: [
-                    const TextSpan(
-                      text: "Already have an account? ",
-                      style: TextStyle(
+
+                SizedBox(height: vh(context, 4)),
+
+                /// **Login Text - Properly Centered**
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: kColorBlack,
                       ),
-                    ),
-                    WidgetSpan(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginAuthScreen()),
-                          );
-                        },
-                        child: const Text(
-                          "   Log in",
-                          style: TextStyle(
-                            fontSize: 15,
+                      children: [
+                        const TextSpan(text: "Already have an account? "),
+                        TextSpan(
+                          text: "Log in",
+                          style: const TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: kColorPrimary,
                             decoration: TextDecoration.underline,
                           ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginAuthScreen(),
+                                ),
+                              );
+                            },
                         ),
-                      ),
+                      ],
                     ),
-                  ]),
+                  ),
                 ),
+                SizedBox(height: vh(context, 3)),
               ],
             ),
           ),
@@ -228,22 +244,32 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildInputField(String label, TextEditingController controller,
-      TextInputType type, String hint) {
+      TextInputType type, String hint, bool _require) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Onset-bold',
-            color: kColorBlack,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Onset-bold',
+                color: kColorBlack,
+              ),
+            ),
+            if (_require == true)
+              const Text(
+                " *",
+                style: TextStyle(color: Colors.red),
+              ),
+          ],
         ),
         SizedBox(height: vh(context, 1)),
         SizedBox(
-          width: vw(context, 40),
+          width: vw(context, 50),
           height: vh(context, 6),
           child: TextField(
             controller: controller,
@@ -272,18 +298,27 @@ class SignupScreenState extends State<SignupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            fontFamily: 'Onset-bold',
-            color: kColorBlack,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Onset-bold',
+                color: kColorBlack,
+              ),
+            ),
+            const Text(
+              " *",
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
         ),
         SizedBox(height: vh(context, 1)),
         SizedBox(
-          width: vw(context, 40),
+          width: vw(context, 50),
           height: vh(context, 6),
           child: TextField(
             controller: controller,

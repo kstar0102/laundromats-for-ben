@@ -434,7 +434,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         const Text(
                                           "User Role",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorPrimary,
@@ -446,7 +446,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         Text(
                                           userRole ?? " ",
                                           style: const TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorBlack,
                                           ),
@@ -463,19 +463,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         const Text(
                                           "Tips earned for answers",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorPrimary,
                                           ),
                                         ),
                                         SizedBox(
-                                          width: vw(context, 2),
+                                          width: vw(context, 1),
                                         ),
                                         const Text(
                                           "10",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorBlack,
                                           ),
@@ -492,7 +492,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         const Text(
                                           "Tips given to others",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorPrimary,
@@ -504,7 +504,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         const Text(
                                           "25",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 12,
                                             fontFamily: 'Onset-Regular',
                                             color: kColorBlack,
                                           ),
@@ -527,7 +527,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     "Helping Hand Answered 10 questions",
                                     "assets/images/icons/ten_answer.png"),
                                 SizedBox(
-                                  width: vw(context, 3),
+                                  width: vw(context, 2),
                                 ),
                                 _buildBadgeItem(
                                     "Active Member ",
@@ -631,14 +631,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         children: [
           Image.asset(
             emoji,
-            width: 24, // Set a fixed size for the image
-            height: 24,
+            width: 22, // Set a fixed size for the image
+            height: 22,
           ),
           SizedBox(width: vw(context, 1)),
           Text(
             text,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12.5,
               fontWeight: FontWeight.bold,
               fontFamily: 'Onset-Regular',
               color: kColorPrimary,
