@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:laundromats/src/common/header.widget.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'dart:convert';
@@ -271,27 +270,49 @@ class CardInputScreenState extends State<CardInputScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 SizedBox(
-                  width: vMin(context, 30),
-                  child: ButtonWidget(
-                    btnType: ButtonWidgetType.backBtn,
-                    borderColor: kColorPrimary,
-                    textColor: kColorWhite,
-                    fullColor: kColorPrimary,
-                    size: false,
-                    icon: true,
+                  width: vMin(context, 40),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: kColorPrimary, // Green background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 7, horizontal: 20), // Adjust padding
+                    ),
                     onPressed: onBackClicked,
+                    child: const Text(
+                      "Back",
+                      style: TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 15,
+                        fontFamily: 'Onset-Regular',
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(
-                  width: vMin(context, 30),
-                  child: ButtonWidget(
-                    btnType: ButtonWidgetType.addBtn,
-                    borderColor: kColorPrimary,
-                    textColor: kColorWhite,
-                    fullColor: kColorPrimary,
-                    size: false,
-                    icon: true,
+                  width: vMin(context, 40),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: kColorPrimary, // Green background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 7, horizontal: 20), // Adjust padding
+                    ),
                     onPressed: processPayment,
+                    child: const Text(
+                      "Add Payment",
+                      style: TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 15,
+                        fontFamily: 'Onset-Regular',
+                      ),
+                    ),
                   ),
                 ),
               ],

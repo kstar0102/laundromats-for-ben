@@ -6,7 +6,6 @@ import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:logger/logger.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -32,7 +31,7 @@ class SignupScreenState extends State<SignupScreen> {
   /// **Email Validation Function**
   bool _validateEmail(String email) {
     final RegExp emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -172,29 +171,57 @@ class SignupScreenState extends State<SignupScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: ButtonWidget(
-                        btnType: ButtonWidgetType.backBtn,
-                        borderColor: kColorPrimary,
-                        textColor: kColorWhite,
-                        fullColor: kColorPrimary,
-                        size: false,
-                        icon: true,
+                    SizedBox(
+                      width: vw(context, 15), // Set your desired width
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
                         onPressed: () {
                           Navigator.pop(context);
                         },
+                        child: const Text(
+                          "Back",
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
                       ),
                     ),
+
                     const SizedBox(width: 16), // Space between buttons
-                    Expanded(
-                      child: ButtonWidget(
-                        btnType: ButtonWidgetType.nextBtn,
-                        borderColor: kColorPrimary,
-                        textColor: kColorWhite,
-                        fullColor: kColorPrimary,
-                        size: false,
-                        icon: true,
+
+                    SizedBox(
+                      width: vw(context, 15), // Set your desired width
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
                         onPressed: _onSignupClicked,
+                        child: const Text(
+                          "Next",
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -244,7 +271,7 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildInputField(String label, TextEditingController controller,
-      TextInputType type, String hint, bool _require) {
+      TextInputType type, String hint, bool require) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -260,7 +287,7 @@ class SignupScreenState extends State<SignupScreen> {
                 color: kColorBlack,
               ),
             ),
-            if (_require == true)
+            if (require == true)
               const Text(
                 " *",
                 style: TextStyle(color: Colors.red),

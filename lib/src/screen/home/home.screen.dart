@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
+import 'package:laundromats/src/components/filter.category.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<dynamic> questions = [];
   bool _isLoading = false;
   final logger = Logger();
+  Set<String> selectedCategories = {};
 
   @override
   void initState() {
@@ -91,6 +93,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return false;
     }
     return false;
+  }
+
+  void _openFilterModal() async {
+    final selectedFilters = await showDialog<Set<String>>(
+      context: context,
+      builder: (context) => const FilterCategoryModal(),
+    );
+
+    if (selectedFilters != null) {
+      setState(() {
+        selectedCategories = selectedFilters; // ✅ Update selected categories
+      });
+    }
   }
 
   @override
@@ -233,7 +248,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ),
                             ),
                             InkWell(
-                                onTap: () {},
+                                onTap: _openFilterModal,
                                 child: Image.asset(
                                   'assets/images/icons/filter.png',
                                   fit: BoxFit.cover,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/common/progress.widget.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
@@ -139,6 +138,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+    // ignore: deprecated_member_use
     return WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
@@ -182,6 +182,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                         child: ProgressIndicatorWidget(
                           currentStep: currentStep,
                           activeColor: kColorPrimary,
+                          // ignore: deprecated_member_use
                           inactiveColor: kColorSecondary.withOpacity(0.5),
                         ),
                       ),
@@ -337,30 +338,56 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                                   children: [
                                     SizedBox(
                                       width: vMin(context, 20),
-                                      child: ButtonWidget(
-                                        btnType: ButtonWidgetType.backBtn,
-                                        borderColor: kColorPrimary,
-                                        textColor: kColorWhite,
-                                        fullColor: kColorPrimary,
-                                        size: false,
-                                        icon: true,
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor:
+                                              kColorPrimary, // Green background color
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                8), // Rounded corners
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 7,
+                                              horizontal: 20), // Adjust padding
+                                        ),
                                         onPressed: () {
                                           _onBackClicked();
                                         },
+                                        child: const Text(
+                                          "Back",
+                                          style: TextStyle(
+                                            color: Colors.white, // Text color
+                                            fontSize: 15,
+                                            fontFamily: 'Onset-Regular',
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
                                       width: vMin(context, 20),
-                                      child: ButtonWidget(
-                                        btnType: ButtonWidgetType.nextBtn,
-                                        borderColor: kColorPrimary,
-                                        textColor: kColorWhite,
-                                        fullColor: kColorPrimary,
-                                        size: false,
-                                        icon: true,
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          backgroundColor:
+                                              kColorPrimary, // Green background color
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                8), // Rounded corners
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 7,
+                                              horizontal: 20), // Adjust padding
+                                        ),
                                         onPressed: () {
                                           _onNextClicked();
                                         },
+                                        child: const Text(
+                                          "Next",
+                                          style: TextStyle(
+                                            color: Colors.white, // Text color
+                                            fontSize: 15,
+                                            fontFamily: 'Onset-Regular',
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],

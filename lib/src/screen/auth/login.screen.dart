@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -208,36 +207,62 @@ class _LoginScreenState extends ConsumerState<LoginAuthScreen> {
               ]),
               SizedBox(height: vMin(context, 12)),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: vww(context, 15)),
+                padding: EdgeInsets.symmetric(horizontal: vww(context, 10)),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: vMin(context, 20),
-                          child: ButtonWidget(
-                            btnType: ButtonWidgetType.backBtn,
-                            borderColor: kColorPrimary,
-                            textColor: kColorWhite,
-                            fullColor: kColorPrimary,
-                            size: false,
-                            icon: true,
+                          width: vw(context, 15), // Set your desired width
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  kColorPrimary, // Green background color
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(8), // Rounded corners
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 7,
+                                  horizontal: 20), // Adjust padding
+                            ),
                             onPressed: () {
                               Navigator.pop(context);
                             },
+                            child: const Text(
+                              "Back",
+                              style: TextStyle(
+                                color: Colors.white, // Text color
+                                fontSize: 15,
+                                fontFamily: 'Onset-Regular',
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
-                          width: vMin(context, 20),
-                          child: ButtonWidget(
-                            btnType: ButtonWidgetType.nextBtn,
-                            borderColor: kColorPrimary,
-                            textColor: kColorWhite,
-                            fullColor: kColorPrimary,
-                            size: false,
-                            icon: true,
+                          width: vw(context, 15), // Set your desired width
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  kColorPrimary, // Green background color
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(8), // Rounded corners
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 7,
+                                  horizontal: 20), // Adjust padding
+                            ),
                             onPressed: _onLoginClicked,
+                            child: const Text(
+                              "Next",
+                              style: TextStyle(
+                                color: Colors.white, // Text color
+                                fontSize: 15,
+                                fontFamily: 'Onset-Regular',
+                              ),
+                            ),
                           ),
                         ),
                       ],

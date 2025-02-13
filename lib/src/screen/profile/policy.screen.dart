@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/utils/index.dart';
 
@@ -77,16 +76,27 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 padding: EdgeInsets.all(vMin(context, 4)),
                 child: SizedBox(
                   width: vMin(context, 100),
-                  child: ButtonWidget(
-                    btnType: ButtonWidgetType.backBtn,
-                    borderColor: kColorPrimary,
-                    textColor: kColorWhite,
-                    fullColor: kColorPrimary,
-                    size: false,
-                    icon: true,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: kColorPrimary, // Green background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 7, horizontal: 20), // Adjust padding
+                    ),
                     onPressed: () {
                       Navigator.pop(context);
                     },
+                    child: const Text(
+                      "Back",
+                      style: TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 15,
+                        fontFamily: 'Onset-Regular',
+                      ),
+                    ),
                   ),
                 ),
               )

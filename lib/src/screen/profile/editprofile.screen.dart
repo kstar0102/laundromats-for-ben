@@ -9,7 +9,6 @@ import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -327,26 +326,52 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   SizedBox(
                     width: vMin(context, 30),
-                    child: ButtonWidget(
-                      btnType: ButtonWidgetType.backBtn,
-                      borderColor: kColorPrimary,
-                      textColor: kColorWhite,
-                      fullColor: kColorPrimary,
-                      size: false,
-                      icon: true,
-                      onPressed: onBackClicked,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor:
+                            kColorPrimary, // Green background color
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(8), // Rounded corners
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 7, horizontal: 20), // Adjust padding
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Back",
+                        style: TextStyle(
+                          color: Colors.white, // Text color
+                          fontSize: 15,
+                          fontFamily: 'Onset-Regular',
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(
                     width: vMin(context, 30),
-                    child: ButtonWidget(
-                      btnType: ButtonWidgetType.updateBtn,
-                      borderColor: kColorPrimary,
-                      textColor: kColorWhite,
-                      fullColor: kColorPrimary,
-                      size: false,
-                      icon: true,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor:
+                            kColorPrimary, // Green background color
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(8), // Rounded corners
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 7, horizontal: 20), // Adjust padding
+                      ),
                       onPressed: _updateProfile,
+                      child: const Text(
+                        "Update",
+                        style: TextStyle(
+                          color: Colors.white, // Text color
+                          fontSize: 15,
+                          fontFamily: 'Onset-Regular',
+                        ),
+                      ),
                     ),
                   ),
                 ],

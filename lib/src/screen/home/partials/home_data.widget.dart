@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/userproflie.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -604,15 +603,38 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                       const Spacer(),
                       SizedBox(
                         width: vMin(context, 45),
-                        child: ButtonWidget(
-                          btnType: ButtonWidgetType.seeAllAnsersBtn,
-                          borderColor: kColorPrimary,
-                          textColor: kColorWhite,
-                          fullColor: kColorPrimary,
-                          size: false,
-                          icon: true,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                kColorPrimary, // Green background color
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 7, horizontal: 20), // Adjust padding
+                          ),
                           onPressed: () =>
                               toggleAnswers(question["question_id"]),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Space between icon and text
+                              const Text(
+                                "See all answers",
+                                style: TextStyle(
+                                  color: Colors.white, // Text color
+                                  fontSize: 13.5,
+                                  fontFamily: 'Onset-Regular',
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/images/icons/arrow-right.png',
+                                width: vMin(context, 5),
+                                height: vMin(context, 5),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ],
