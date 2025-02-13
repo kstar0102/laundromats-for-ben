@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/common/header.widget.dart';
+import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -126,11 +127,10 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Column(
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: 80,
-                                      height: 80,
+                                      width: 100,
+                                      height: 100,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
@@ -142,18 +142,18 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                                         child: userImageUrl == null ||
                                                 userImageUrl!.isEmpty
                                             ? const CircleAvatar(
-                                                radius: 40,
+                                                radius: 50,
                                                 backgroundColor: Colors.white,
                                                 child: Icon(
                                                   Icons.person,
                                                   color: kColorPrimary,
-                                                  size: 40,
+                                                  size: 50,
                                                 ),
                                               )
                                             : Image.network(
                                                 userImageUrl!,
-                                                width: 80,
-                                                height: 80,
+                                                width: 120,
+                                                height: 120,
                                                 fit: BoxFit.cover,
                                                 loadingBuilder: (context, child,
                                                     loadingProgress) {
@@ -167,13 +167,13 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                                                 errorBuilder: (context, error,
                                                     stackTrace) {
                                                   return const CircleAvatar(
-                                                    radius: 40,
+                                                    radius: 45,
                                                     backgroundColor:
                                                         Colors.white,
                                                     child: Icon(
                                                       Icons.person,
                                                       color: kColorPrimary,
-                                                      size: 40,
+                                                      size: 50,
                                                     ),
                                                   );
                                                 },
@@ -194,7 +194,7 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                                     Text(
                                       userEmail ?? 'Guest Email',
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: kColorPrimary,
                                       ),
@@ -227,96 +227,79 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                             SizedBox(
                               height: vh(context, 1),
                             ),
+                            const Divider(
+                              color: kColorThird,
+                              thickness: 0.7,
+                            ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "User Role",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: vw(context, 2),
-                                    ),
-                                    Text(
-                                      userRole ?? " ",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorBlack,
-                                      ),
-                                    )
-                                  ],
+                                SizedBox(
+                                  height: vh(context, 1),
+                                ),
+                                _buildUserRoleItem(
+                                    "Tips earned for answers", "12"),
+                                SizedBox(
+                                  height: vh(context, 1),
+                                ),
+                                _buildUserRoleItem(
+                                    "Tips given to others", "86"),
+                                SizedBox(
+                                  height: vh(context, 1),
+                                ),
+                                const Divider(
+                                  color: kColorThird,
+                                  thickness: 0.6,
                                 ),
                                 SizedBox(
                                   height: vh(context, 1),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Tips earned for answers",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: vw(context, 2),
-                                    ),
-                                    const Text(
-                                      "10",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorBlack,
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                _buildUserRoleItem(
+                                    "User Role", userRole ?? " "),
                                 SizedBox(
                                   height: vh(context, 1),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Tips given to others",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: vw(context, 2),
-                                    ),
-                                    const Text(
-                                      "25",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorBlack,
-                                      ),
-                                    )
-                                  ],
+                                userRole != "Owner"
+                                    ? _buildUserRoleItem(
+                                        "Expert In", userRoleExpert ?? " ")
+                                    : const SizedBox.shrink(),
+                                userRole != "Owner"
+                                    ? SizedBox(
+                                        height: vh(context, 1),
+                                      )
+                                    : const SizedBox.shrink(),
+                                _buildUserRoleItem(
+                                    "Business Years", userRoleBusiness ?? " "),
+                                SizedBox(
+                                  height: vh(context, 1),
                                 ),
+                                userRole != "Mechanic"
+                                    ? _buildUserRoleItem("Laundromats Counts",
+                                        userRoleLaundromatsCount ?? " ")
+                                    : const SizedBox.shrink(),
                               ],
                             ),
                           ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: vh(context, 3),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: SizedBox(
+                          width: vMin(context, 60),
+                          child: ButtonWidget(
+                            btnType: ButtonWidgetType.backBtn,
+                            borderColor: kColorPrimary,
+                            textColor: kColorWhite,
+                            fullColor: kColorPrimary,
+                            size: false,
+                            icon: true,
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -350,6 +333,31 @@ class UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUserRoleItem(String title, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Onset-Regular',
+            color: kColorPrimary,
+          ),
+        ),
+        Text(
+          value.isNotEmpty ? value : "  ",
+          style: const TextStyle(
+            fontSize: 15,
+            fontFamily: 'Onset-Regular',
+            color: kColorBlack,
+          ),
+        ),
+      ],
     );
   }
 }
