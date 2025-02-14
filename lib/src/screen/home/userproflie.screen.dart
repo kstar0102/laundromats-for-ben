@@ -101,7 +101,11 @@ class UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const HeaderWidget(role: false, isLogoutBtn: false),
+                      const HeaderWidget(
+                        role: false,
+                        isLogoutBtn: false,
+                        backIcon: true,
+                      ),
                       Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),

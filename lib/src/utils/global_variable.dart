@@ -9,4 +9,6 @@ class GlobalVariable {
   static String? userbusinessTime;
   static String? userLaundromatsCount;
   static String? userImageUrl;
+  static String? userAddress;
+  static String? userphoneNumber;
 }

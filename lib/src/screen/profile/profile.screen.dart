@@ -309,6 +309,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Scaffold(
           backgroundColor: kColorWhite,
           resizeToAvoidBottomInset: true,
+          appBar: PreferredSize(
+            preferredSize:
+                const Size.fromHeight(0.0), // Adjust the height as needed
+            child: AppBar(
+              backgroundColor: kColorWhite,
+              elevation: 0, // Removes shadow for a flat UI
+              automaticallyImplyLeading:
+                  false, // Hides back button if unnecessary
+            ),
+          ),
           body: SizedBox.expand(
               child: SingleChildScrollView(
             child: FocusScope(
@@ -317,7 +327,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const HeaderWidget(role: true, isLogoutBtn: false),
+                      const HeaderWidget(
+                        role: true,
+                        isLogoutBtn: false,
+                        backIcon: false,
+                      ),
                       Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
@@ -406,15 +420,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         fontSize: 16,
                                       ),
                                     ),
-                                    // SizedBox(height: vMin(context, 0.5)),
-                                    // Text(
-                                    //   userEmail ?? 'Guest Email',
-                                    //   style: const TextStyle(
-                                    //     fontSize: 12,
-                                    //     fontWeight: FontWeight.bold,
-                                    //     color: kColorPrimary,
-                                    //   ),
-                                    // ),
                                   ],
                                 ),
                                 Container(

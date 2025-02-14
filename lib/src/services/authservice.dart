@@ -146,6 +146,8 @@ class AuthService {
     required String roleExpertIn,
     required String roleBusinessTime,
     required String roleLaundromatsCount,
+    required String userAddress,
+    required String userPhoneNumber,
   }) async {
     final Uri url = Uri.parse('$baseUrl/auth/signup');
 
@@ -157,6 +159,8 @@ class AuthService {
       "role_expertIn": roleExpertIn,
       "role_businessTime": roleBusinessTime,
       "role_laundromatsCount": roleLaundromatsCount,
+      "addresss": userAddress,
+      "phoneNumber": userPhoneNumber
     };
 
     try {

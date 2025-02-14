@@ -70,7 +70,11 @@ class _SetPasswordScreenState extends ConsumerState<SetPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const HeaderWidget(role: true, isLogoutBtn: false),
+              const HeaderWidget(
+                role: true,
+                isLogoutBtn: false,
+                backIcon: true,
+              ),
               SizedBox(height: vh(context, 10)),
               const Text(
                 "Set New Password",

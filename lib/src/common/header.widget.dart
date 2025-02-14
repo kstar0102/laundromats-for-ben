@@ -8,10 +8,16 @@ import 'package:laundromats/src/utils/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HeaderWidget extends ConsumerStatefulWidget {
-  const HeaderWidget(
-      {super.key, required this.role, required this.isLogoutBtn});
+  const HeaderWidget({
+    super.key,
+    required this.role,
+    required this.isLogoutBtn,
+    required this.backIcon, // Added Back Icon control
+  });
+
   final bool? role; // Controls premium banner
   final bool isLogoutBtn; // Controls logout button visibility
+  final bool backIcon; // Controls back button visibility
 
   @override
   ConsumerState<HeaderWidget> createState() => _HeaderWidgetState();
@@ -25,30 +31,41 @@ class _HeaderWidgetState extends ConsumerState<HeaderWidget> {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(
-              left: vMin(context, 3),
-              right: vMin(context, 3),
-              top: vMin(context, 3),
-              bottom: vMin(context, 1)),
+            left: vMin(context, 1),
+            right: vMin(context, 3),
+            top: vMin(context, 3),
+            bottom: vMin(context, 1),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
+                  // Show Back Icon only if backIcon is true
+                  if (widget.backIcon)
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: kColorPrimary),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  SizedBox(
+                    width: vw(context, 1),
+                  ),
                   Image.asset(
                     'assets/images/icons/icon.png',
                   ),
-                  SizedBox(width: vMin(context, 1)),
+                  SizedBox(width: vMin(context, 3)),
                   Text(
                     appName.toString(),
                     style: const TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Onset-Regular',
-                        fontWeight: FontWeight.bold,
-                        color: kColorPrimary),
+                      fontSize: 20,
+                      fontFamily: 'Onset-Regular',
+                      fontWeight: FontWeight.bold,
+                      color: kColorPrimary,
+                    ),
                   ),
                 ],
               ),
-              // Show Logout Button only if _isLogoutBtn is true
+              // Show Logout Button only if isLogoutBtn is true
               if (widget.isLogoutBtn)
                 IconButton(
                   icon: const Icon(Icons.logout, color: kColorPrimary),
@@ -165,7 +182,6 @@ class _HeaderWidgetState extends ConsumerState<HeaderWidget> {
     if (mounted) {
       // ignore: use_build_context_synchronously
       final navigator = Navigator.of(context);
-
       navigator.push(
         MaterialPageRoute(
           builder: (context) => const LoginScreen(),

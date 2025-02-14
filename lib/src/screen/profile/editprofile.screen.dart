@@ -214,173 +214,184 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const HeaderWidget(role: false, isLogoutBtn: false),
-              SizedBox(
-                height: vh(context, 2),
-              ),
+          appBar: PreferredSize(
+            preferredSize:
+                const Size.fromHeight(0.0), // Adjust the height as needed
+            child: AppBar(
+              backgroundColor: kColorWhite,
+              elevation: 0, // Removes shadow for a flat UI
+              automaticallyImplyLeading:
+                  false, // Hides back button if unnecessary
+            ),
+          ),
+          body: Container(
+            color: kColorWhite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  const HeaderWidget(
+                      role: false, isLogoutBtn: false, backIcon: true),
+                  SizedBox(
+                    height: vh(context, 2),
+                  ),
 
-              /// **Profile Picture Upload**
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors
-                          .grey[300], // Light grey background when loading
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!)
-                          : (GlobalVariable.userImageUrl != null &&
-                                  GlobalVariable.userImageUrl!.isNotEmpty)
-                              ? NetworkImage(GlobalVariable.userImageUrl!)
-                                  as ImageProvider
+                  /// **Profile Picture Upload**
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors
+                              .grey[300], // Light grey background when loading
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : (GlobalVariable.userImageUrl != null &&
+                                      GlobalVariable.userImageUrl!.isNotEmpty)
+                                  ? NetworkImage(GlobalVariable.userImageUrl!)
+                                      as ImageProvider
+                                  : null,
+                          child: (_profileImage == null &&
+                                  (GlobalVariable.userImageUrl == null ||
+                                      GlobalVariable.userImageUrl!.isEmpty))
+                              ? const Icon(
+                                  Icons.person,
+                                  color: kColorPrimary,
+                                  size: 50,
+                                )
                               : null,
-                      child: (_profileImage == null &&
-                              (GlobalVariable.userImageUrl == null ||
-                                  GlobalVariable.userImageUrl!.isEmpty))
-                          ? const Icon(
-                              Icons.person,
-                              color: kColorPrimary,
-                              size: 50,
-                            )
-                          : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            backgroundColor: kColorPrimary,
+                            radius: 20,
+                            child: IconButton(
+                              icon: const Icon(Icons.camera_alt,
+                                  color: Colors.white),
+                              onPressed: () {
+                                _showImageSourceDialog();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        backgroundColor: kColorPrimary,
-                        radius: 20,
-                        child: IconButton(
-                          icon:
-                              const Icon(Icons.camera_alt, color: Colors.white),
+                  ),
+                  SizedBox(height: vh(context, 3)),
+
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: vh(context, 2),
+                        left: vw(context, 3),
+                        right: vw(context, 3)),
+                    child: Column(
+                      children: [
+                        _buildInputField(
+                            "Full Name", _nameController, TextInputType.text),
+
+                        /// **Email Field**
+                        _buildInputField("Email Address", _emailController,
+                            TextInputType.emailAddress),
+
+                        /// **Password Field (Optional)**
+                        _buildInputField(
+                          "User Role",
+                          _userRoleContoller,
+                          TextInputType.text,
+                        ),
+
+                        GlobalVariable.userRole == "Owner"
+                            ? const SizedBox
+                                .shrink() // Return an empty widget if the condition is true
+                            : _buildInputField(
+                                "Expert In",
+                                _userExpertInContoller,
+                                TextInputType.text,
+                              ),
+
+                        _buildInputField(
+                          "Business Year",
+                          _userBusinessYearContoller,
+                          TextInputType.text,
+                        ),
+
+                        GlobalVariable.userRole == "Machanic"
+                            ? const SizedBox
+                                .shrink() // Return an empty widget if the condition is true
+                            : _buildInputField(
+                                "Laundromats Counts",
+                                _userLaundromatsCountContoller,
+                                TextInputType.text,
+                              ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: vh(context, 3)),
+
+                  /// **Save Changes Button**
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        width: vMin(context, 30),
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                kColorPrimary, // Green background color
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 7, horizontal: 20), // Adjust padding
+                          ),
                           onPressed: () {
-                            _showImageSourceDialog();
+                            Navigator.pop(context);
                           },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: vh(context, 3)),
-
-              Padding(
-                padding: EdgeInsets.only(
-                    top: vh(context, 2),
-                    left: vw(context, 3),
-                    right: vw(context, 3)),
-                child: Column(
-                  children: [
-                    _buildInputField(
-                        "Full Name", _nameController, TextInputType.text),
-
-                    /// **Email Field**
-                    _buildInputField("Email Address", _emailController,
-                        TextInputType.emailAddress),
-
-                    /// **Password Field (Optional)**
-                    _buildInputField(
-                      "User Role",
-                      _userRoleContoller,
-                      TextInputType.text,
-                    ),
-
-                    GlobalVariable.userRole == "Owner"
-                        ? const SizedBox
-                            .shrink() // Return an empty widget if the condition is true
-                        : _buildInputField(
-                            "Expert In",
-                            _userExpertInContoller,
-                            TextInputType.text,
+                          child: const Text(
+                            "Back",
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 15,
+                              fontFamily: 'Onset-Regular',
+                            ),
                           ),
-
-                    _buildInputField(
-                      "Business Year",
-                      _userBusinessYearContoller,
-                      TextInputType.text,
-                    ),
-
-                    GlobalVariable.userRole == "Machanic"
-                        ? const SizedBox
-                            .shrink() // Return an empty widget if the condition is true
-                        : _buildInputField(
-                            "Laundromats Counts",
-                            _userLaundromatsCountContoller,
-                            TextInputType.text,
+                        ),
+                      ),
+                      SizedBox(
+                        width: vMin(context, 30),
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                kColorPrimary, // Green background color
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 7, horizontal: 20), // Adjust padding
                           ),
-                  ],
-                ),
-              ),
-
-              /// **Username Field**
-
-              SizedBox(height: vh(context, 4)),
-
-              /// **Save Changes Button**
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: vMin(context, 30),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor:
-                            kColorPrimary, // Green background color
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(8), // Rounded corners
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 7, horizontal: 20), // Adjust padding
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "Back",
-                        style: TextStyle(
-                          color: Colors.white, // Text color
-                          fontSize: 15,
-                          fontFamily: 'Onset-Regular',
+                          onPressed: _updateProfile,
+                          child: const Text(
+                            "Update",
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 15,
+                              fontFamily: 'Onset-Regular',
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  SizedBox(
-                    width: vMin(context, 30),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor:
-                            kColorPrimary, // Green background color
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(8), // Rounded corners
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 7, horizontal: 20), // Adjust padding
-                      ),
-                      onPressed: _updateProfile,
-                      child: const Text(
-                        "Update",
-                        style: TextStyle(
-                          color: Colors.white, // Text color
-                          fontSize: 15,
-                          fontFamily: 'Onset-Regular',
-                        ),
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: vh(context, 5)),
                 ],
               ),
-              SizedBox(height: vh(context, 4)),
-            ],
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 

@@ -146,180 +146,201 @@ class CardInputScreenState extends State<CardInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(0.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const HeaderWidget(role: true, isLogoutBtn: false),
-            SizedBox(
-              height: vh(context, 5),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Card Number",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: kColorBlack),
-                  ),
-                  SizedBox(
-                    height: vh(context, 1),
-                  ),
-                  SizedBox(
-                    height: 60, // Set desired height
-                    child: TextField(
-                      controller: _cardNumberController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 19,
-                      onChanged: _onCardNumberChanged,
-                      decoration: const InputDecoration(
-                        hintText: "1234-5678-9012-3456",
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        enabledBorder: kEnableBorder,
-                        focusedBorder: kFocusSearchBorder,
-                        filled: false,
-                        disabledBorder: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 2.0, horizontal: 10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Expiry Date (MM/YY)",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: kColorBlack),
-                  ),
-                  SizedBox(
-                    height: vh(context, 1),
-                  ),
-                  SizedBox(
-                    height: 60, // Set desired height
-                    child: TextField(
-                      controller: _expiryDateController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 5,
-                      onChanged: _onExpiryDateChanged,
-                      decoration: const InputDecoration(
-                        hintText: "12/24",
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        enabledBorder: kEnableBorder,
-                        focusedBorder: kFocusSearchBorder,
-                        filled: false,
-                        disabledBorder: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 2.0, horizontal: 10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "CVV",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: kColorBlack),
-                  ),
-                  SizedBox(
-                    height: vh(context, 1),
-                  ),
-                  SizedBox(
-                    height: 60, // Set desired height
-                    child: TextField(
-                      controller: _cvvController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 3,
-                      decoration: const InputDecoration(
-                        hintText: "123",
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        enabledBorder: kEnableBorder,
-                        focusedBorder: kFocusSearchBorder,
-                        filled: false,
-                        disabledBorder: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 2.0, horizontal: 10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(0.0), // Adjust the height as needed
+          child: AppBar(
+            backgroundColor: kColorWhite,
+            elevation: 0, // Removes shadow for a flat UI
+            automaticallyImplyLeading:
+                false, // Hides back button if unnecessary
+          ),
+        ),
+        body: Container(
+          color: kColorWhite,
+          child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: vMin(context, 40),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: kColorPrimary, // Green background color
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 7, horizontal: 20), // Adjust padding
-                    ),
-                    onPressed: onBackClicked,
-                    child: const Text(
-                      "Back",
-                      style: TextStyle(
-                        color: Colors.white, // Text color
-                        fontSize: 15,
-                        fontFamily: 'Onset-Regular',
-                      ),
-                    ),
-                  ),
+                const HeaderWidget(
+                  role: true,
+                  isLogoutBtn: false,
+                  backIcon: true,
                 ),
                 SizedBox(
-                  width: vMin(context, 40),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: kColorPrimary, // Green background color
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
+                  height: vh(context, 5),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Card Number",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: kColorBlack),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 7, horizontal: 20), // Adjust padding
-                    ),
-                    onPressed: processPayment,
-                    child: const Text(
-                      "Add Payment",
-                      style: TextStyle(
-                        color: Colors.white, // Text color
-                        fontSize: 15,
-                        fontFamily: 'Onset-Regular',
+                      SizedBox(
+                        height: vh(context, 1),
                       ),
-                    ),
+                      SizedBox(
+                        height: 60, // Set desired height
+                        child: TextField(
+                          controller: _cardNumberController,
+                          keyboardType: TextInputType.number,
+                          maxLength: 19,
+                          onChanged: _onCardNumberChanged,
+                          decoration: const InputDecoration(
+                            hintText: "1234-5678-9012-3456",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            enabledBorder: kEnableBorder,
+                            focusedBorder: kFocusSearchBorder,
+                            filled: false,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 2.0, horizontal: 10),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Expiry Date (MM/YY)",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: kColorBlack),
+                      ),
+                      SizedBox(
+                        height: vh(context, 1),
+                      ),
+                      SizedBox(
+                        height: 60, // Set desired height
+                        child: TextField(
+                          controller: _expiryDateController,
+                          keyboardType: TextInputType.number,
+                          maxLength: 5,
+                          onChanged: _onExpiryDateChanged,
+                          decoration: const InputDecoration(
+                            hintText: "12/24",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            enabledBorder: kEnableBorder,
+                            focusedBorder: kFocusSearchBorder,
+                            filled: false,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 2.0, horizontal: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "CVV",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: kColorBlack),
+                      ),
+                      SizedBox(
+                        height: vh(context, 1),
+                      ),
+                      SizedBox(
+                        height: 60, // Set desired height
+                        child: TextField(
+                          controller: _cvvController,
+                          keyboardType: TextInputType.number,
+                          maxLength: 3,
+                          decoration: const InputDecoration(
+                            hintText: "123",
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            enabledBorder: kEnableBorder,
+                            focusedBorder: kFocusSearchBorder,
+                            filled: false,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 2.0, horizontal: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(
+                      width: vMin(context, 40),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
+                        onPressed: onBackClicked,
+                        child: const Text(
+                          "Back",
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: vMin(context, 40),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
+                        onPressed: processPayment,
+                        child: const Text(
+                          "Add Payment",
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/screen/auth/signup.screen.dart';
+import 'package:laundromats/src/screen/auth/login.screen.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -48,13 +48,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     navigator.push(
       MaterialPageRoute(
-        builder: (context) => const SignupScreen(),
+        builder: (context) => const LoginAuthScreen(),
       ),
     );
   }
 
   Future<void> _signInGoogle(BuildContext context) async {
-    // Capture a reference to the Navigator directly to avoid keeping context across async calls.
     final navigator = Navigator.of(context);
 
     try {
@@ -63,28 +62,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (user != null) {
         logger.i("Google Login Success: ${user.displayName}");
         logger.i("Email: ${user.email}");
+
         GlobalVariable.userName = user.displayName;
         GlobalVariable.userEmail = user.email;
 
         bool userExists = await AuthService().checkUserExistence(user.email!);
 
         if (userExists) {
-          navigator.push(
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
+          navigator.pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         } else {
-          navigator.push(
-            MaterialPageRoute(
-              builder: (context) => const CategoryScreen(),
-            ),
-          );
+          // ❌ User does not exist, show dialog before proceeding
+          bool proceedToRegister = await _showRegisterDialog(context);
+
+          if (proceedToRegister) {
+            navigator.pushReplacement(
+              MaterialPageRoute(builder: (context) => const CategoryScreen()),
+            );
+          }
         }
       }
     } catch (e) {
       logger.e("Google Login Failed: $e");
     }
+  }
+
+  Future<bool> _showRegisterDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("User Not Found"),
+          content: const Text(
+              "You need to register before proceeding. Would you like to continue?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false); // ❌ Cancel, stay on login screen
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true); // ✅ Proceed to CategoryScreen
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _signInFacebook(BuildContext context) async {
@@ -151,7 +179,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ],
                       ),
                       SizedBox(
-                        height: vMin(context, 20),
+                        height: vMin(context, 10),
                       ),
                       Text(
                         loginHeaderTitle.toString(),
@@ -232,7 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                             width:
                                                 8), // Space between icon and text
                                         const Text(
-                                          "Sign-up using an app",
+                                          "Sign-In using Email",
                                           style: TextStyle(
                                             color: Colors.white, // Text color
                                             fontSize: 15,
@@ -273,7 +301,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                             width:
                                                 8), // Space between icon and text
                                         const Text(
-                                          "Sign-up with Google",
+                                          "Sign-In with Google",
                                           style: TextStyle(
                                             color: Colors.white, // Text color
                                             fontSize: 15,
@@ -314,7 +342,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                             width:
                                                 8), // Space between icon and text
                                         const Text(
-                                          "Sign-up with Facebook",
+                                          "Sign-In with Facebook",
                                           style: TextStyle(
                                             color: Colors.white, // Text color
                                             fontSize: 15,

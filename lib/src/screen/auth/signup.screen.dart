@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/screen/auth/login.screen.dart';
-import 'package:laundromats/src/screen/login_step/category.screen.dart';
+import 'package:laundromats/src/screen/auth/phonenumber.screen.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:logger/logger.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
@@ -67,15 +67,22 @@ class SignupScreenState extends State<SignupScreen> {
     GlobalVariable.userName = _nameController.text;
     GlobalVariable.userEmail = _emailController.text;
     GlobalVariable.userPassword = _passwordController.text;
+    GlobalVariable.userAddress = _addressController.text;
 
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              const CategoryScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+      // Navigator.pushReplacement(
+      //   context,
+      //   PageRouteBuilder(
+      //     pageBuilder: (context, animation1, animation2) =>
+      //         const PhoneNumberScreen(),
+      //     transitionDuration: Duration.zero,
+      //     reverseTransitionDuration: Duration.zero,
+      //   ),
+      // );
+      Navigator.push(
+        context, // Pass the BuildContext
+        MaterialPageRoute(
+          builder: (context) => const PhoneNumberScreen(),
         ),
       );
     }
@@ -108,165 +115,206 @@ class SignupScreenState extends State<SignupScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0), // Adjust padding
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const HeaderWidget(role: false, isLogoutBtn: false),
-                SizedBox(height: vh(context, 5)),
-
-                /// **Title - "Create an Account"**
-                const Center(
-                  child: Text(
-                    "Create an Account",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontFamily: 'Onset',
-                      fontWeight: FontWeight.bold,
-                      color: kColorSecondary,
-                    ),
-                  ),
-                ),
-                SizedBox(height: vh(context, 3)),
-
-                /// **Form Fields - Centered & Adjusted**
-                _buildInputField("Full Name", _nameController,
-                    TextInputType.text, "Enter your full name", true),
-                SizedBox(height: vh(context, 2)),
-
-                _buildInputField("Email", _emailController,
-                    TextInputType.emailAddress, "Enter your email", true),
-                if (!_isEmailValid)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 5.0, top: 5.0),
-                    child: Text("Invalid email format",
-                        style: TextStyle(color: Colors.red)),
-                  ),
-                SizedBox(height: vh(context, 2)),
-
-                _buildInputField("Address (Optional)", _addressController,
-                    TextInputType.text, "Enter your Address", false),
-                SizedBox(height: vh(context, 2)),
-
-                _buildPasswordField("Password", _passwordController, true,
-                    "Enter your password"),
-                if (!_isPasswordValid)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 5.0, top: 5.0),
-                    child: Text("Password must be at least 4 characters",
-                        style: TextStyle(color: Colors.red)),
-                  ),
-                SizedBox(height: vh(context, 2)),
-
-                _buildPasswordField("Confirm Password",
-                    _confirmPasswordController, false, "Confirm your password"),
-                SizedBox(height: vh(context, 3)),
-
-                /// **Buttons - Properly Aligned & Centered**
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: vw(context, 15), // Set your desired width
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor:
-                              kColorPrimary, // Green background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(8), // Rounded corners
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 7, horizontal: 20), // Adjust padding
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          "Back",
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 15,
-                            fontFamily: 'Onset-Regular',
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 16), // Space between buttons
-
-                    SizedBox(
-                      width: vw(context, 15), // Set your desired width
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor:
-                              kColorPrimary, // Green background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(8), // Rounded corners
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 7, horizontal: 20), // Adjust padding
-                        ),
-                        onPressed: _onSignupClicked,
-                        child: const Text(
-                          "Next",
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 15,
-                            fontFamily: 'Onset-Regular',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: vh(context, 4)),
-
-                /// **Login Text - Properly Centered**
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: kColorBlack,
-                      ),
-                      children: [
-                        const TextSpan(text: "Already have an account? "),
-                        TextSpan(
-                          text: "Log in",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginAuthScreen(),
-                                ),
-                              );
-                            },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: vh(context, 3)),
-              ],
+          resizeToAvoidBottomInset: true,
+          appBar: PreferredSize(
+            preferredSize:
+                const Size.fromHeight(0.0), // Adjust the height as needed
+            child: AppBar(
+              backgroundColor: kColorWhite,
+              elevation: 0, // Removes shadow for a flat UI
+              automaticallyImplyLeading:
+                  false, // Hides back button if unnecessary
             ),
           ),
-        ),
-      ),
+          body: Container(
+            color: kColorWhite,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 0.0), // Adjust padding
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const HeaderWidget(
+                      role: false,
+                      isLogoutBtn: false,
+                      backIcon: true,
+                    ),
+                    SizedBox(height: vh(context, 3)),
+
+                    /// **Title - "Create an Account"**
+                    const Center(
+                      child: Text(
+                        "Create an Account",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontFamily: 'Onset',
+                          fontWeight: FontWeight.bold,
+                          color: kColorSecondary,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: vh(context, 3)),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: [
+                          /// **Form Fields - Centered & Adjusted**
+                          _buildInputField("Full Name", _nameController,
+                              TextInputType.text, "Enter your full name", true),
+                          SizedBox(height: vh(context, 2)),
+
+                          _buildInputField(
+                              "Email",
+                              _emailController,
+                              TextInputType.emailAddress,
+                              "Enter your email",
+                              true),
+                          if (!_isEmailValid)
+                            const Padding(
+                              padding: EdgeInsets.only(left: 5.0, top: 5.0),
+                              child: Text("Invalid email format",
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          SizedBox(height: vh(context, 2)),
+
+                          _buildInputField(
+                              "Address (Optional)",
+                              _addressController,
+                              TextInputType.text,
+                              "Enter your Address",
+                              false),
+                          SizedBox(height: vh(context, 2)),
+
+                          _buildPasswordField("Password", _passwordController,
+                              true, "Enter your password"),
+                          if (!_isPasswordValid)
+                            const Padding(
+                              padding: EdgeInsets.only(left: 5.0, top: 5.0),
+                              child: Text(
+                                  "Password must be at least 4 characters",
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          SizedBox(height: vh(context, 2)),
+
+                          _buildPasswordField(
+                              "Confirm Password",
+                              _confirmPasswordController,
+                              false,
+                              "Confirm your password"),
+                          SizedBox(height: vh(context, 3)),
+
+                          /// **Buttons - Properly Aligned & Centered**
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width:
+                                    vw(context, 15), // Set your desired width
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        kColorPrimary, // Green background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          8), // Rounded corners
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 7,
+                                        horizontal: 20), // Adjust padding
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text(
+                                    "Back",
+                                    style: TextStyle(
+                                      color: Colors.white, // Text color
+                                      fontSize: 15,
+                                      fontFamily: 'Onset-Regular',
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(
+                                  width: 16), // Space between buttons
+
+                              SizedBox(
+                                width:
+                                    vw(context, 15), // Set your desired width
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        kColorPrimary, // Green background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          8), // Rounded corners
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 7,
+                                        horizontal: 20), // Adjust padding
+                                  ),
+                                  onPressed: _onSignupClicked,
+                                  child: const Text(
+                                    "Next",
+                                    style: TextStyle(
+                                      color: Colors.white, // Text color
+                                      fontSize: 15,
+                                      fontFamily: 'Onset-Regular',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: vh(context, 4)),
+
+                    /// **Login Text - Properly Centered**
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: kColorBlack,
+                          ),
+                          children: [
+                            const TextSpan(text: "Already have an account? "),
+                            TextSpan(
+                              text: "Log in",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: kColorPrimary,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LoginAuthScreen(),
+                                    ),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: vh(context, 3)),
+                  ],
+                ),
+              ),
+            ),
+          )),
     );
   }
 

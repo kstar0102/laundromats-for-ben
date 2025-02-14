@@ -152,7 +152,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        const HeaderWidget(role: true, isLogoutBtn: false),
+                        const HeaderWidget(
+                          role: true,
+                          isLogoutBtn: false,
+                          backIcon: false,
+                        ),
                         Padding(
                             padding: EdgeInsets.all(vMin(context, 4)),
                             child: SizedBox(

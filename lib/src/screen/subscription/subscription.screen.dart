@@ -49,6 +49,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen>
       child: Scaffold(
         backgroundColor: kColorWhite,
         resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(0.0), // Adjust the height as needed
+          child: AppBar(
+            backgroundColor: kColorWhite,
+            elevation: 0, // Removes shadow for a flat UI
+            automaticallyImplyLeading:
+                false, // Hides back button if unnecessary
+          ),
+        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
@@ -60,7 +70,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const HeaderWidget(role: false, isLogoutBtn: false),
+                      const HeaderWidget(
+                        role: false,
+                        isLogoutBtn: false,
+                        backIcon: true,
+                      ),
                       Padding(
                         padding: EdgeInsets.only(
                             left: vMin(context, 4),

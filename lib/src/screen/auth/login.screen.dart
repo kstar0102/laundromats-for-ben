@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/auth/signup.screen.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -98,182 +100,242 @@ class _LoginScreenState extends ConsumerState<LoginAuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: SizedBox.expand(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const HeaderWidget(role: false, isLogoutBtn: false),
-              SizedBox(height: vh(context, 10)),
-              const Text(
-                "Login to Laundromats",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontFamily: 'Onset',
-                  fontWeight: FontWeight.bold,
-                  color: kColorSecondary,
-                ),
-              ),
-              SizedBox(height: vh(context, 8)),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text(
-                  "User Email",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Onset-bold',
-                      color: kColorBlack),
-                ),
-                SizedBox(height: vh(context, 1)),
-                SizedBox(
-                  width: vw(context, 40),
-                  height: vh(context, 6),
-                  child: TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    cursorColor: Colors.grey,
-                    decoration: const InputDecoration(
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      enabledBorder: kEnableSearchBorder,
-                      focusedBorder: kFocusSearchBorder,
-                      hintStyle: TextStyle(fontSize: 16.0, color: kColorThird),
-                      hintText: "Email",
-                      filled: false,
-                      disabledBorder: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-                      counterText: '',
+        resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(0.0), // Adjust the height as needed
+          child: AppBar(
+            backgroundColor: kColorWhite,
+            elevation: 0, // Removes shadow for a flat UI
+            automaticallyImplyLeading:
+                false, // Hides back button if unnecessary
+          ),
+        ),
+        body: Container(
+          color: kColorWhite,
+          child: SizedBox.expand(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  const HeaderWidget(
+                    role: false,
+                    isLogoutBtn: false,
+                    backIcon: true,
+                  ),
+                  SizedBox(height: vh(context, 5)),
+                  const Text(
+                    "Login to Laundromats",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Onset',
+                      fontWeight: FontWeight.bold,
+                      color: kColorSecondary,
                     ),
                   ),
-                ),
-              ]),
-              SizedBox(height: vh(context, 3)),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text(
-                  "User Password",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Onset-bold',
-                      color: kColorBlack),
-                ),
-                SizedBox(height: vh(context, 1)),
-                SizedBox(
-                  width: vw(context, 40),
-                  height: vh(context, 6),
-                  child: TextField(
-                    controller: _passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    obscureText:
-                        _isPasswordHidden, // Toggles password visibility
-                    autocorrect: false,
-                    cursorColor: Colors.grey,
-                    style: const TextStyle(
-                        fontSize: 16.0, color: Colors.black), // Text style
-                    decoration: InputDecoration(
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      enabledBorder: kEnableSearchBorder,
-                      focusedBorder: kFocusSearchBorder,
-                      hintStyle:
-                          const TextStyle(fontSize: 16.0, color: kColorThird),
-                      hintText: "Password",
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordHidden
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordHidden =
-                                !_isPasswordHidden; // Toggle visibility
-                          });
-                        },
-                      ),
-                      filled: false,
-                      disabledBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 10),
-                      counterText: '',
-                    ),
-                  ),
-                ),
-              ]),
-              SizedBox(height: vMin(context, 12)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: vww(context, 10)),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(height: vh(context, 8)),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Text(
+                          "User Email",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Onset-bold',
+                              color: kColorBlack),
+                        ),
+                        SizedBox(height: vh(context, 1)),
                         SizedBox(
-                          width: vw(context, 15), // Set your desired width
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  kColorPrimary, // Green background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8), // Rounded corners
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 7,
-                                  horizontal: 20), // Adjust padding
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              "Back",
-                              style: TextStyle(
-                                color: Colors.white, // Text color
-                                fontSize: 15,
-                                fontFamily: 'Onset-Regular',
-                              ),
+                          width: vw(context, 40),
+                          height: vh(context, 6),
+                          child: TextField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            autocorrect: false,
+                            cursorColor: Colors.grey,
+                            decoration: const InputDecoration(
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              enabledBorder: kEnableSearchBorder,
+                              focusedBorder: kFocusSearchBorder,
+                              hintStyle:
+                                  TextStyle(fontSize: 16.0, color: kColorThird),
+                              hintText: "Email",
+                              filled: false,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 10),
+                              counterText: '',
                             ),
                           ),
                         ),
+                      ]),
+                  SizedBox(height: vh(context, 3)),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "User Password",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Onset-bold',
+                              color: kColorBlack),
+                        ),
+                        SizedBox(height: vh(context, 1)),
                         SizedBox(
-                          width: vw(context, 15), // Set your desired width
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  kColorPrimary, // Green background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8), // Rounded corners
+                          width: vw(context, 40),
+                          height: vh(context, 6),
+                          child: TextField(
+                            controller: _passwordController,
+                            keyboardType: TextInputType.visiblePassword,
+                            obscureText:
+                                _isPasswordHidden, // Toggles password visibility
+                            autocorrect: false,
+                            cursorColor: Colors.grey,
+                            style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black), // Text style
+                            decoration: InputDecoration(
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              enabledBorder: kEnableSearchBorder,
+                              focusedBorder: kFocusSearchBorder,
+                              hintStyle: const TextStyle(
+                                  fontSize: 16.0, color: kColorThird),
+                              hintText: "Password",
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isPasswordHidden
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isPasswordHidden =
+                                        !_isPasswordHidden; // Toggle visibility
+                                  });
+                                },
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 7,
-                                  horizontal: 20), // Adjust padding
-                            ),
-                            onPressed: _onLoginClicked,
-                            child: const Text(
-                              "Next",
-                              style: TextStyle(
-                                color: Colors.white, // Text color
-                                fontSize: 15,
-                                fontFamily: 'Onset-Regular',
-                              ),
+                              filled: false,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 10),
+                              counterText: '',
                             ),
                           ),
+                        ),
+                      ]),
+                  SizedBox(height: vMin(context, 4)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: kColorBlack,
+                          ),
+                          children: [
+                            const TextSpan(text: "Don't have an account? "),
+                            TextSpan(
+                              text: "Sign Up",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: kColorPrimary,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                    context, // Pass the BuildContext
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SignupScreen(),
+                                    ),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: vMin(context, 8)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: vww(context, 10)),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: vw(context, 15), // Set your desired width
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      kColorPrimary, // Green background color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8), // Rounded corners
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 7,
+                                      horizontal: 20), // Adjust padding
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  "Back",
+                                  style: TextStyle(
+                                    color: Colors.white, // Text color
+                                    fontSize: 15,
+                                    fontFamily: 'Onset-Regular',
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: vw(context, 15), // Set your desired width
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      kColorPrimary, // Green background color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8), // Rounded corners
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 7,
+                                      horizontal: 20), // Adjust padding
+                                ),
+                                onPressed: _onLoginClicked,
+                                child: const Text(
+                                  "Next",
+                                  style: TextStyle(
+                                    color: Colors.white, // Text color
+                                    fontSize: 15,
+                                    fontFamily: 'Onset-Regular',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

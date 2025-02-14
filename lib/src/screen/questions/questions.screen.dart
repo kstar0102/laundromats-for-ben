@@ -34,6 +34,8 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   int? commentCount;
   int? likeCount;
   int? dislikeCount;
+  String? selectedFilter; // Tracks active filter
+  List<dynamic> filteredQuestions = []; // Stores filtered questions
 
   final logger = Logger();
 
@@ -43,16 +45,16 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
     getUserQuestions();
   }
 
+  /// Fetch user questions and apply the filter
   Future<void> getUserQuestions() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userIdString = prefs.getString('userId');
 
     if (userIdString != null) {
       int? parsedUserId = int.tryParse(userIdString);
-
       if (parsedUserId != null) {
         setState(() {
-          userId = parsedUserId; // Ensure `setState` is updating properly
+          userId = parsedUserId;
         });
 
         final authService = AuthService();
@@ -66,42 +68,63 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
               askedCount = questions.length;
               commentCount = questions.fold<int>(0, (sum, question) {
                 final answers = question['answers'] as List<dynamic>?;
-                return (sum) +
-                    (answers?.length ?? 0); // Handle null for sum and answers
-              });
-              commentCount = questions.fold<int>(0, (sum, question) {
-                final answers = question['answers'] as List<dynamic>?;
-                return (sum) +
-                    (answers?.length ?? 0); // Handle null for sum and answers
+                return sum + (answers?.length ?? 0);
               });
 
-              // Total likes count
               likeCount = questions.fold<int>(0, (sum, question) {
-                final likes =
-                    int.tryParse(question['likes_count']?.toString() ?? '0') ??
-                        0;
-                return (sum) + likes; // Ensure sum is non-null
+                return sum +
+                    (int.tryParse(question['likes_count']?.toString() ?? '0') ??
+                        0);
               });
 
-              // Total dislikes count
               dislikeCount = questions.fold<int>(0, (sum, question) {
-                final likes = int.tryParse(
-                        question['dislikes_count']?.toString() ?? '0') ??
-                    0;
-                return (sum) + likes; // Ensure sum is non-null
+                return sum +
+                    (int.tryParse(
+                            question['dislikes_count']?.toString() ?? '0') ??
+                        0);
               });
-              isLoading = false;
-            });
 
-            // logger.i(questions);
-          } else {
-            logger.e('Invalid user ID: $userId');
+              isLoading = false;
+              applyFilter(); // Apply filter after fetching data
+            });
           }
         } catch (e) {
           logger.e('Error fetching user questions: $e');
         }
       }
     }
+  }
+
+  /// Apply filters when a user selects a tab
+  void applyFilter() {
+    setState(() {
+      if (selectedFilter == null) {
+        filteredQuestions = questions;
+      } else if (selectedFilter == 'asked') {
+        filteredQuestions = questions;
+      } else if (selectedFilter == 'commented') {
+        filteredQuestions =
+            questions.where((q) => q['answers'].isNotEmpty).toList();
+      } else if (selectedFilter == 'liked') {
+        filteredQuestions =
+            questions.where((q) => (q['likes_count'] ?? 0) > 0).toList();
+      } else if (selectedFilter == 'disliked') {
+        filteredQuestions =
+            questions.where((q) => (q['dislikes_count'] ?? 0) > 0).toList();
+      }
+    });
+  }
+
+  /// Handles filter selection
+  void onFilterSelected(String? filterKey) {
+    setState(() {
+      if (selectedFilter == filterKey) {
+        selectedFilter = null;
+      } else {
+        selectedFilter = filterKey;
+      }
+      applyFilter();
+    });
   }
 
   void _openFilterModal() async {
@@ -117,12 +140,12 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
     }
   }
 
+  /// Search questions with applied filters
   Future<void> searchQuestions() async {
     if (userId == null) return;
 
     setState(() {
-      questions = []; // Clear the list while searching
-      isLoading = true; // Show loading indicator
+      isLoading = true;
     });
 
     try {
@@ -138,12 +161,13 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
       setState(() {
         questions = response;
-        isLoading = false; // Hide loading indicator
+        isLoading = false;
+        applyFilter(); // Apply filter after searching
       });
     } catch (e) {
       logger.e('Error searching questions: $e');
       setState(() {
-        isLoading = false; // Hide loading indicator on error
+        isLoading = false;
       });
     }
   }
@@ -162,6 +186,16 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
       child: Scaffold(
         backgroundColor: kColorWhite,
         resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(0.0), // Adjust the height as needed
+          child: AppBar(
+            backgroundColor: kColorWhite,
+            elevation: 0, // Removes shadow for a flat UI
+            automaticallyImplyLeading:
+                false, // Hides back button if unnecessary
+          ),
+        ),
         body: SizedBox.expand(
           child: SingleChildScrollView(
             child: FocusScope(
@@ -170,7 +204,11 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const HeaderWidget(role: true, isLogoutBtn: false),
+                    const HeaderWidget(
+                      role: true,
+                      isLogoutBtn: false,
+                      backIcon: false,
+                    ),
 
                     // Header Section
                     Padding(
@@ -300,6 +338,8 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                       commentCount: commentCount ?? 0,
                       likeCount: likeCount ?? 0,
                       dislikeCount: dislikeCount ?? 0,
+                      selectedFilter: selectedFilter,
+                      onFilterSelected: onFilterSelected,
                     ),
 
                     if (selectedCategories.isNotEmpty)
@@ -345,36 +385,25 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                     // Question List
                     Padding(
                       padding: EdgeInsets.only(
-                        left: vMin(context, 4),
-                        right: vMin(context, 4),
-                        top: vMin(context, 2),
-                      ),
-                      child: Column(
-                        children: [
-                          isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : questions.isNotEmpty
-                                  ? HomeDataWidget(
-                                      questions: questions
-                                          .cast<Map<String, dynamic>>(),
-                                    )
-                                  : const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16.0),
-                                        child: Text(
-                                          "No questions found.",
-                                          style: TextStyle(
+                          left: vMin(context, 4),
+                          right: vMin(context, 4),
+                          top: vMin(context, 2)),
+                      child: isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : filteredQuestions.isNotEmpty
+                              ? HomeDataWidget(
+                                  questions: filteredQuestions
+                                      .cast<Map<String, dynamic>>())
+                              : const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text("No questions found.",
+                                        style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: kColorSecondary,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                        ],
-                      ),
+                                            color: kColorSecondary)),
+                                  ),
+                                ),
                     ),
                   ],
                 ),

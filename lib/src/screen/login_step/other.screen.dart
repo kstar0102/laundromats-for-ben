@@ -66,8 +66,9 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
         role: "Other",
         roleExpertIn: GlobalVariable.userExpertIn!,
         roleBusinessTime: GlobalVariable.userbusinessTime!,
-        roleLaundromatsCount:
-            GlobalVariable.userLaundromatsCount!, // Add relevant value
+        roleLaundromatsCount: GlobalVariable.userLaundromatsCount!,
+        userAddress: GlobalVariable.userAddress!,
+        userPhoneNumber: GlobalVariable.userphoneNumber!,
       );
 
       if (result['success'] == true) {
@@ -143,6 +144,16 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
         onWillPop: _onWillPop,
         child: Scaffold(
           resizeToAvoidBottomInset: true,
+          appBar: PreferredSize(
+            preferredSize:
+                const Size.fromHeight(0.0), // Adjust the height as needed
+            child: AppBar(
+              backgroundColor: kColorWhite,
+              elevation: 0, // Removes shadow for a flat UI
+              automaticallyImplyLeading:
+                  false, // Hides back button if unnecessary
+            ),
+          ),
           body: SizedBox.expand(
               child: SingleChildScrollView(
             child: FocusScope(
@@ -152,7 +163,11 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      const HeaderWidget(role: true, isLogoutBtn: false),
+                      const HeaderWidget(
+                        role: true,
+                        isLogoutBtn: false,
+                        backIcon: true,
+                      ),
                       SizedBox(
                         height: vMin(context, 10),
                       ),
