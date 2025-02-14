@@ -272,7 +272,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                                       height: vh(context, 5),
                                       child: TextField(
                                         controller: _businessValue,
-                                        keyboardType: TextInputType.name,
+                                        keyboardType: TextInputType.number,
                                         autocorrect: false,
                                         cursorColor: Colors.grey,
                                         decoration: const InputDecoration(
@@ -316,7 +316,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
                                       height: vh(context, 5),
                                       child: TextField(
                                         controller: _howLaundromatsValue,
-                                        keyboardType: TextInputType.name,
+                                        keyboardType: TextInputType.number,
                                         autocorrect: false,
                                         cursorColor: Colors.grey,
                                         decoration: const InputDecoration(

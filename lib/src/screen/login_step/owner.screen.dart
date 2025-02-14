@@ -227,7 +227,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
                                       height: vh(context, 5),
                                       child: TextField(
                                         controller: _howLaundromatsValue,
-                                        keyboardType: TextInputType.name,
+                                        keyboardType: TextInputType.number,
                                         autocorrect: false,
                                         cursorColor: Colors.grey,
                                         decoration: const InputDecoration(
@@ -271,7 +271,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
                                       height: vh(context, 5),
                                       child: TextField(
                                         controller: _businessValue,
-                                        keyboardType: TextInputType.name,
+                                        keyboardType: TextInputType.number,
                                         autocorrect: false,
                                         cursorColor: Colors.grey,
                                         decoration: const InputDecoration(

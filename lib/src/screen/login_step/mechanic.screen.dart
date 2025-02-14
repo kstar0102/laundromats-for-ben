@@ -273,7 +273,7 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
                                       height: vh(context, 5),
                                       child: TextField(
                                         controller: _businessValue,
-                                        keyboardType: TextInputType.name,
+                                        keyboardType: TextInputType.number,
                                         autocorrect: false,
                                         cursorColor: Colors.grey,
                                         decoration: const InputDecoration(
