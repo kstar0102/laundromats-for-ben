@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/userproflie.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
+import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
 
@@ -28,7 +29,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
 
   final logger = Logger();
   bool initialized = false;
-
+  String? username;
   @override
   void initState() {
     super.initState();
@@ -86,7 +87,8 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
             "answer_id": response["answer_id"],
             "answer": answerText,
             "user_id": 12, // Replace with actual user ID
-            "user_name": "Current User", // Replace with logged-in user's name
+            "user_name":
+                GlobalVariable.userName, // Replace with logged-in user's name
             "created_at": DateTime.now().toIso8601String(),
           });
           answerControllers[questionId]?.clear();
@@ -264,6 +266,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
     if (result['success'] == true) {
       // ✅ Navigate to User Profile Screen if user exists
       Navigator.push(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => UserProfileScreen(userId: userId),

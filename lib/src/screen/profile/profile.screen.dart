@@ -56,13 +56,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> getUserQuestions() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String? userIdString = prefs.getString('userId');
-
     setState(() {
-      isLoading = true;
+      isLoading = true; // ✅ Show loading bar while fetching data
     });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userIdString = prefs.getString('userId');
 
     if (userIdString != null) {
       int? parsedUserId = int.tryParse(userIdString);
@@ -106,20 +105,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           }
         } catch (e) {
           logger.e('Error fetching user questions: $e');
+        } finally {
+          setState(() {
+            isLoading = false; // ✅ Hide loading bar when done
+          });
         }
       }
     }
   }
-
-  // Future<void> _onPaymentClick() async {
-  //   final navigator = Navigator.of(context);
-
-  //   navigator.push(
-  //     MaterialPageRoute(
-  //       builder: (context) => const SubscriptionScreen(),
-  //     ),
-  //   );
-  // }
 
   Future<void> _logoutClicked() async {
     bool confirmLogout = await _showConfirmationDialog(
@@ -147,13 +140,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       // Navigate to login screen or close session
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) =>
-                const LoginScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
+        Navigator.push(
+          context, // Pass the BuildContext
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
           ),
         );
       }
@@ -188,7 +178,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     if (success) {
       if (mounted) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
@@ -319,275 +309,284 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   false, // Hides back button if unnecessary
             ),
           ),
-          body: SizedBox.expand(
-              child: SingleChildScrollView(
-            child: FocusScope(
-              child: Container(
-                decoration: const BoxDecoration(color: kColorWhite),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const HeaderWidget(
-                        role: true,
-                        isLogoutBtn: false,
-                        backIcon: false,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              // ignore: deprecated_member_use
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(
-                                  0, 3), // changes position of shadow
+          body: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(), // ✅ Show loading spinner
+                )
+              : SizedBox.expand(
+                  child: SingleChildScrollView(
+                  child: FocusScope(
+                    child: Container(
+                      decoration: const BoxDecoration(color: kColorWhite),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            const HeaderWidget(
+                              role: true,
+                              isLogoutBtn: false,
+                              backIcon: false,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: kColorPrimary,
-                                          width: 1,
-                                        ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    // ignore: deprecated_member_use
+                                    color: Colors.grey.withOpacity(0.3),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: const Offset(
+                                        0, 3), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        // crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: kColorPrimary,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: ClipOval(
+                                              child: userImageUrl == null ||
+                                                      userImageUrl!.isEmpty
+                                                  ? const CircleAvatar(
+                                                      radius: 40,
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        color: kColorPrimary,
+                                                        size: 40,
+                                                      ),
+                                                    )
+                                                  : Image.network(
+                                                      userImageUrl!,
+                                                      width: 80,
+                                                      height: 80,
+                                                      fit: BoxFit.cover,
+                                                      loadingBuilder: (context,
+                                                          child,
+                                                          loadingProgress) {
+                                                        if (loadingProgress ==
+                                                            null) {
+                                                          return child;
+                                                        }
+                                                        return const Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      },
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return const CircleAvatar(
+                                                          radius: 40,
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          child: Icon(
+                                                            Icons.person,
+                                                            color:
+                                                                kColorPrimary,
+                                                            size: 40,
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                            ),
+                                          ),
+                                          SizedBox(height: vMin(context, 1)),
+                                          Text(
+                                            userName ?? 'Guest',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Onset-Regular',
+                                              color: kColorSecondary,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      child: ClipOval(
-                                        child: userImageUrl == null ||
-                                                userImageUrl!.isEmpty
-                                            ? const CircleAvatar(
-                                                radius: 40,
-                                                backgroundColor: Colors.white,
-                                                child: Icon(
-                                                  Icons.person,
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        height: vMin(context, 25),
+                                        width: 1,
+                                        color: kColorPrimary,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text(
+                                                "User Role",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Onset-Regular',
                                                   color: kColorPrimary,
-                                                  size: 40,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: vw(context, 2),
+                                              ),
+                                              Text(
+                                                userRole ?? " ",
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontFamily: 'Onset-Regular',
+                                                  color: kColorBlack,
                                                 ),
                                               )
-                                            : Image.network(
-                                                userImageUrl!,
-                                                width: 80,
-                                                height: 80,
-                                                fit: BoxFit.cover,
-                                                loadingBuilder: (context, child,
-                                                    loadingProgress) {
-                                                  if (loadingProgress == null) {
-                                                    return child;
-                                                  }
-                                                  return const Center(
-                                                      child:
-                                                          CircularProgressIndicator());
-                                                },
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return const CircleAvatar(
-                                                    radius: 40,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    child: Icon(
-                                                      Icons.person,
-                                                      color: kColorPrimary,
-                                                      size: 40,
-                                                    ),
-                                                  );
-                                                },
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: vh(context, 1),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text(
+                                                "Tips earned for answers",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Onset-Regular',
+                                                  color: kColorPrimary,
+                                                ),
                                               ),
+                                              SizedBox(
+                                                width: vw(context, 1),
+                                              ),
+                                              const Text(
+                                                "10",
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontFamily: 'Onset-Regular',
+                                                  color: kColorBlack,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: vh(context, 1),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text(
+                                                "Tips given to others",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Onset-Regular',
+                                                  color: kColorPrimary,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: vw(context, 2),
+                                              ),
+                                              const Text(
+                                                "25",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontFamily: 'Onset-Regular',
+                                                  color: kColorBlack,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(height: vMin(context, 1)),
-                                    Text(
-                                      userName ?? 'Guest',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Onset-Regular',
-                                        color: kColorSecondary,
-                                        fontSize: 16,
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: vh(context, 1),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      _buildBadgeItem(
+                                          "Answered 1 question",
+                                          "assets/images/icons/first_answer.png",
+                                          "Helping Hand Answered 10 questions",
+                                          "assets/images/icons/ten_answer.png"),
+                                      SizedBox(
+                                        width: vw(context, 2),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  height: vMin(context, 25),
-                                  width: 1,
-                                  color: kColorPrimary,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "User Role",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorPrimary,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: vw(context, 2),
-                                        ),
-                                        Text(
-                                          userRole ?? " ",
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorBlack,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: vh(context, 1),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Tips earned for answers",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorPrimary,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: vw(context, 1),
-                                        ),
-                                        const Text(
-                                          "10",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorBlack,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: vh(context, 1),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          "Tips given to others",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorPrimary,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: vw(context, 2),
-                                        ),
-                                        const Text(
-                                          "25",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: 'Onset-Regular',
-                                            color: kColorBlack,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      _buildBadgeItem(
+                                          "Active Member ",
+                                          "assets/images/icons/week_login.png",
+                                          "Super Active Logged in daily for 30 days",
+                                          "assets/images/icons/month_login.png"),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: vh(context, 1),
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(
-                              height: vh(context, 1),
+                            _buildProfileOption(
+                              icon: Icons.person_outline,
+                              title: "Edit Account",
+                              onTap: _onEditProfileClicked,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                _buildBadgeItem(
-                                    "Answered 1 question",
-                                    "assets/images/icons/first_answer.png",
-                                    "Helping Hand Answered 10 questions",
-                                    "assets/images/icons/ten_answer.png"),
-                                SizedBox(
-                                  width: vw(context, 2),
-                                ),
-                                _buildBadgeItem(
-                                    "Active Member ",
-                                    "assets/images/icons/week_login.png",
-                                    "Super Active Logged in daily for 30 days",
-                                    "assets/images/icons/month_login.png"),
-                              ],
+                            _buildProfileOption(
+                              icon: Icons.notifications_outlined,
+                              title: "Notifications",
+                              onTap: () {
+                                // Handle Notifications action
+                              },
                             ),
-                            SizedBox(
-                              height: vh(context, 1),
+                            _buildProfileOption(
+                              icon: Icons.perm_device_information,
+                              title: "About",
+                              onTap: _onPolicyClicked,
                             ),
-                          ],
-                        ),
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.person_outline,
-                        title: "Edit Account",
-                        onTap: _onEditProfileClicked,
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.notifications_outlined,
-                        title: "Notifications",
-                        onTap: () {
-                          // Handle Notifications action
-                        },
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.perm_device_information,
-                        title: "About",
-                        onTap: _onPolicyClicked,
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.policy,
-                        title: "Terms",
-                        onTap: _onTermsClicked,
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.credit_card_outlined,
-                        title: "Manage Payment Methods",
-                        onTap: _onPaymentClicked,
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.logout,
-                        title: "Logout Account",
-                        onTap: _logoutClicked,
-                      ),
-                      _buildProfileOption(
-                        icon: Icons.delete_forever,
-                        title: "Delete Account",
-                        onTap: _deleteAccount,
-                      ),
-                    ]),
-              ),
-            ),
-          )),
+                            _buildProfileOption(
+                              icon: Icons.policy,
+                              title: "Terms",
+                              onTap: _onTermsClicked,
+                            ),
+                            _buildProfileOption(
+                              icon: Icons.credit_card_outlined,
+                              title: "Manage Payment Methods",
+                              onTap: _onPaymentClicked,
+                            ),
+                            _buildProfileOption(
+                              icon: Icons.logout,
+                              title: "Logout Account",
+                              onTap: _logoutClicked,
+                            ),
+                            _buildProfileOption(
+                              icon: Icons.delete_forever,
+                              title: "Delete Account",
+                              onTap: _deleteAccount,
+                            ),
+                          ]),
+                    ),
+                  ),
+                )),
           bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)),
     );
   }

@@ -70,15 +70,6 @@ class SignupScreenState extends State<SignupScreen> {
     GlobalVariable.userAddress = _addressController.text;
 
     if (mounted) {
-      // Navigator.pushReplacement(
-      //   context,
-      //   PageRouteBuilder(
-      //     pageBuilder: (context, animation1, animation2) =>
-      //         const PhoneNumberScreen(),
-      //     transitionDuration: Duration.zero,
-      //     reverseTransitionDuration: Duration.zero,
-      //   ),
-      // );
       Navigator.push(
         context, // Pass the BuildContext
         MaterialPageRoute(
@@ -296,7 +287,7 @@ class SignupScreenState extends State<SignupScreen> {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>

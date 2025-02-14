@@ -61,13 +61,10 @@ class _LoginScreenState extends ConsumerState<LoginAuthScreen> {
 
         if (mounted) {
           // Navigate to HomeScreen
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  const HomeScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
+          Navigator.push(
+            context, // Pass the BuildContext
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
             ),
           );
         }

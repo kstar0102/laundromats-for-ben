@@ -52,33 +52,26 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   Future<void> _onClickCategory() async {
     if (selectedRole == 0) {
       GlobalVariable.userRole = "Mechanic";
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) =>
-              const MechanicScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+        MaterialPageRoute(
+          builder: (context) => const MechanicScreen(),
         ),
       );
     } else if (selectedRole == 1) {
       GlobalVariable.userRole = "Owner";
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => const OwnerScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+        MaterialPageRoute(
+          builder: (context) => const OwnerScreen(),
         ),
       );
     } else if (selectedRole == 2) {
       GlobalVariable.userRole = "Other";
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation1, animation2) => const OtherScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
+        MaterialPageRoute(
+          builder: (context) => const OtherScreen(),
         ),
       );
     }

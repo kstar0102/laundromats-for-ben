@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:laundromats/src/constants/app_button.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -121,16 +120,18 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
-                      width: vMin(context, 28),
-                      child: ButtonWidget(
-                        btnType: selectedCategories.length == categories.length
-                            ? ButtonWidgetType.disSelectAllBtn
-                            : ButtonWidgetType.selectAllBtn,
-                        borderColor: kColorPrimary,
-                        textColor: kColorWhite,
-                        fullColor: kColorPrimary,
-                        size: false,
-                        icon: true,
+                      width: vMin(context, 30),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
                         onPressed: () {
                           setState(() {
                             if (selectedCategories.length ==
@@ -141,6 +142,16 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
                             }
                           });
                         },
+                        child: Text(
+                          selectedCategories.length == categories.length
+                              ? "Deselect All"
+                              : "Select All",
+                          style: const TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -148,16 +159,28 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
                     ),
                     SizedBox(
                       width: vMin(context, 28),
-                      child: ButtonWidget(
-                        btnType: ButtonWidgetType.filterBtn,
-                        borderColor: kColorPrimary,
-                        textColor: kColorWhite,
-                        fullColor: kColorPrimary,
-                        size: false,
-                        icon: true,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              kColorPrimary, // Green background color
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(8), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 7, horizontal: 20), // Adjust padding
+                        ),
                         onPressed: () {
                           Navigator.of(context).pop(selectedCategories);
                         },
+                        child: const Text(
+                          "Filter",
+                          style: TextStyle(
+                            color: Colors.white, // Text color
+                            fontSize: 15,
+                            fontFamily: 'Onset-Regular',
+                          ),
+                        ),
                       ),
                     ),
                   ],

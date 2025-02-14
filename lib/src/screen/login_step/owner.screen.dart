@@ -83,14 +83,9 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
 
         if (mounted) {
           // Navigate to HomeScreen
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  const HomeScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            ),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         }
       } else {
@@ -120,14 +115,9 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
   }
 
   void _onBackClicked() {
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            const CategoryScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
+      MaterialPageRoute(builder: (context) => const CategoryScreen()),
     );
   }
 

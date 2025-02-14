@@ -81,13 +81,10 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
 
         if (mounted) {
           // Navigate to HomeScreen
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) =>
-                  const HomeScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
+          Navigator.push(
+            context, // Pass the BuildContext
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
             ),
           );
         }
@@ -118,13 +115,10 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
   }
 
   void _onBackClicked() {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation1, animation2) =>
-            const CategoryScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
+    Navigator.push(
+      context, // Pass the BuildContext
+      MaterialPageRoute(
+        builder: (context) => const CategoryScreen(),
       ),
     );
   }
