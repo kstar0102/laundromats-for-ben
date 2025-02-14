@@ -2,8 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/auth/phonenumber.screen.dart';
 import 'package:laundromats/src/screen/auth/signup.screen.dart';
-// import 'package:laundromats/src/screen/auth/login.screen.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
 import 'package:laundromats/src/screen/login_step/category.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
@@ -76,7 +76,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
           if (proceedToRegister) {
             navigator.push(
-              MaterialPageRoute(builder: (context) => const CategoryScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const PhoneNumberScreen()),
             );
           }
         }
