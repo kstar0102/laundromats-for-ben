@@ -47,6 +47,10 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
   /// Fetch user questions and apply the filter
   Future<void> getUserQuestions() async {
+    setState(() {
+      isLoading = true; // Show loading
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userIdString = prefs.getString('userId');
 
@@ -90,28 +94,72 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
           }
         } catch (e) {
           logger.e('Error fetching user questions: $e');
+          setState(() {
+            isLoading = false;
+          });
         }
       }
+    }
+  }
+
+  /// Search questions with applied filters
+  Future<void> searchQuestions() async {
+    if (userId == null) return;
+
+    setState(() {
+      isLoading = true; // Show loading
+    });
+
+    try {
+      final authService = AuthService();
+      final searchQuery = _searchValue.text.trim();
+      final List<String> categories = selectedCategories.toList();
+
+      final response = await authService.searchQuestions(
+        userId!,
+        searchQuery,
+        categories,
+      );
+
+      setState(() {
+        questions = response;
+        isLoading = false;
+        applyFilter(); // Apply filter after searching
+      });
+    } catch (e) {
+      logger.e('Error searching questions: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   /// Apply filters when a user selects a tab
   void applyFilter() {
     setState(() {
-      if (selectedFilter == null) {
-        filteredQuestions = questions;
-      } else if (selectedFilter == 'asked') {
-        filteredQuestions = questions;
-      } else if (selectedFilter == 'commented') {
-        filteredQuestions =
-            questions.where((q) => q['answers'].isNotEmpty).toList();
+      List<Map<String, dynamic>> tempFilteredQuestions = questions
+          .cast<Map<String, dynamic>>() // Ensure correct type
+          .where((q) =>
+              selectedCategories.isEmpty || // Show all if no category selected
+              selectedCategories.contains(q["category"]))
+          .toList(); // Convert back to a list
+
+      // Apply tab-based filters
+      if (selectedFilter == 'commented') {
+        tempFilteredQuestions = tempFilteredQuestions
+            .where((q) => q['answers'] != null && q['answers'].isNotEmpty)
+            .toList();
       } else if (selectedFilter == 'liked') {
-        filteredQuestions =
-            questions.where((q) => (q['likes_count'] ?? 0) > 0).toList();
+        tempFilteredQuestions = tempFilteredQuestions
+            .where((q) => (q['likes_count'] ?? 0) > 0)
+            .toList();
       } else if (selectedFilter == 'disliked') {
-        filteredQuestions =
-            questions.where((q) => (q['dislikes_count'] ?? 0) > 0).toList();
+        tempFilteredQuestions = tempFilteredQuestions
+            .where((q) => (q['dislikes_count'] ?? 0) > 0)
+            .toList();
       }
+
+      filteredQuestions = tempFilteredQuestions;
     });
   }
 
@@ -137,38 +185,7 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
       setState(() {
         selectedCategories = selectedFilters; // ✅ Update selected categories
       });
-    }
-  }
-
-  /// Search questions with applied filters
-  Future<void> searchQuestions() async {
-    if (userId == null) return;
-
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final authService = AuthService();
-      final searchQuery = _searchValue.text.trim();
-      final List<String> categories = selectedCategories.toList();
-
-      final response = await authService.searchQuestions(
-        userId!,
-        searchQuery,
-        categories,
-      );
-
-      setState(() {
-        questions = response;
-        isLoading = false;
-        applyFilter(); // Apply filter after searching
-      });
-    } catch (e) {
-      logger.e('Error searching questions: $e');
-      setState(() {
-        isLoading = false;
-      });
+      applyFilter();
     }
   }
 
@@ -383,13 +400,20 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                       ),
 
                     // Question List
+                    // Question List
                     Padding(
                       padding: EdgeInsets.only(
                           left: vMin(context, 4),
                           right: vMin(context, 4),
                           top: vMin(context, 2)),
                       child: isLoading
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20.0),
+                                child: CircularProgressIndicator(
+                                    color: kColorPrimary), // Loader
+                              ),
+                            )
                           : filteredQuestions.isNotEmpty
                               ? HomeDataWidget(
                                   questions: filteredQuestions
