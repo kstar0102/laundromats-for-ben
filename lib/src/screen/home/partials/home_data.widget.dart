@@ -35,6 +35,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
 
     if (widget.questions.isNotEmpty) {
       initializeData();
+      logger.i(widget.questions);
     }
   }
 
@@ -123,12 +124,13 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
     });
   }
 
-  void toggleAnswers(int questionId) {
+  void toggleAnswers(int? questionId) {
+    if (questionId == null) return;
     setState(() {
       if (expandedQuestions.contains(questionId)) {
-        expandedQuestions.remove(questionId); // Collapse if already expanded
+        expandedQuestions.remove(questionId);
       } else {
-        expandedQuestions.add(questionId); // Expand otherwise
+        expandedQuestions.add(questionId);
       }
     });
   }
@@ -244,6 +246,69 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
     }
   }
 
+  void _handleUserNavigation(int? userId) async {
+    if (userId == null) {
+      _showUserNotFoundDialog();
+      return;
+    }
+
+    // Show Loading Dialog
+    _showLoadingDialog();
+
+    final authService = AuthService();
+    final result = await authService.fetchUserData(userId);
+
+    // Close Loading Dialog after getting response
+    if (mounted) Navigator.pop(context);
+
+    if (result['success'] == true) {
+      // ✅ Navigate to User Profile Screen if user exists
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserProfileScreen(userId: userId),
+        ),
+      );
+    } else {
+      // ❌ Show error dialog if user not found
+      _showUserNotFoundDialog();
+    }
+  }
+
+// ❌ Show Dialog if User Not Found
+  void _showUserNotFoundDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("User Not Found"),
+          content: const Text("This user does not exist or has been removed."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+// 🔄 Show Loading Dialog
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing while loading
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(), // Loading Spinner
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -296,18 +361,8 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                       Image.asset('assets/images/icons/user.png'),
                       SizedBox(width: vMin(context, 2)),
                       GestureDetector(
-                        onTap: () {
-                          int? userId = question["user"]?["user_id"];
-                          if (userId != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    UserProfileScreen(userId: userId),
-                              ),
-                            );
-                          }
-                        },
+                        onTap: () =>
+                            _handleUserNavigation(question["user"]?["user_id"]),
                         child: Text(
                           question["user"]?["user_name"] ?? "Anonymous",
                           style: const TextStyle(
@@ -500,7 +555,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                                               "assets/images/icons/user.png"),
                                           SizedBox(width: vMin(context, 2)),
                                           Text(
-                                            answer["user_name"]!,
+                                            answer["user_name"] ?? "Anonymous",
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14,
@@ -543,8 +598,12 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                     children: [
                       InkWell(
                         onTap: () => toggleAnswerInput(question["question_id"]),
-                        child:
-                            Image.asset("assets/images/icons/chat-message.png"),
+                        child: Image.asset(
+                          "assets/images/icons/chat-message.png",
+                          width: 20, // Set custom width
+                          height: 20, // Set custom height
+                          fit: BoxFit.contain, // Ensures the image fits well
+                        ),
                       ),
                       SizedBox(height: vMin(context, 2)),
                       SizedBox(width: vMin(context, 1)),
@@ -564,7 +623,10 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                           "assets/images/icons/like.png",
                           color: userReactionMap[question['question_id']] == 1
                               ? Colors.green // Highlighted color for like
-                              : Colors.grey, // Default color
+                              : Colors.grey,
+                          width: 20, // Set custom width
+                          height: 20, // Set custom height
+                          fit: BoxFit.contain,
                         ),
                       ),
                       SizedBox(width: vMin(context, 1)),
@@ -586,8 +648,11 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                         child: Image.asset(
                           "assets/images/icons/dislike.png",
                           color: userReactionMap[question['question_id']] == 0
-                              ? Colors.red // Highlighted color for dislike
-                              : Colors.grey, // Default color
+                              ? Colors.red
+                              : Colors.grey,
+                          width: 20, // Set custom width
+                          height: 20, // Set custom height
+                          fit: BoxFit.contain,
                         ),
                       ),
                       SizedBox(width: vMin(context, 1)),

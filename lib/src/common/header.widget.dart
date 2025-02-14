@@ -27,7 +27,7 @@ class _HeaderWidgetState extends ConsumerState<HeaderWidget> {
           padding: EdgeInsets.only(
               left: vMin(context, 3),
               right: vMin(context, 3),
-              top: vMin(context, 10),
+              top: vMin(context, 3),
               bottom: vMin(context, 1)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
