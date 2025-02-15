@@ -67,7 +67,7 @@ class _OtherScreenState extends ConsumerState<OtherScreen> {
         roleExpertIn: GlobalVariable.userExpertIn!,
         roleBusinessTime: GlobalVariable.userbusinessTime!,
         roleLaundromatsCount: GlobalVariable.userLaundromatsCount!,
-        userAddress: GlobalVariable.userAddress!,
+        userAddress: GlobalVariable.userAddress ?? "",
         userPhoneNumber: GlobalVariable.userphoneNumber!,
       );
 

@@ -162,6 +162,7 @@ class AuthService {
       "addresss": userAddress,
       "phoneNumber": userPhoneNumber
     };
+    logger.i(requestData);
 
     try {
       final response = await http.post(

@@ -65,7 +65,7 @@ class _MechanicScreenState extends ConsumerState<MechanicScreen> {
         roleExpertIn: GlobalVariable.userExpertIn!,
         roleBusinessTime: GlobalVariable.userbusinessTime!,
         roleLaundromatsCount: " ",
-        userAddress: GlobalVariable.userAddress!,
+        userAddress: GlobalVariable.userAddress ?? "",
         userPhoneNumber: GlobalVariable.userphoneNumber!,
       );
 

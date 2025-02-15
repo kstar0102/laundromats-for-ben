@@ -65,7 +65,7 @@ class _OwnerScreenState extends ConsumerState<OwnerScreen> {
         roleExpertIn: " ",
         roleBusinessTime: GlobalVariable.userbusinessTime!,
         roleLaundromatsCount: GlobalVariable.userLaundromatsCount!,
-        userAddress: GlobalVariable.userAddress!,
+        userAddress: GlobalVariable.userAddress ?? "",
         userPhoneNumber: GlobalVariable.userphoneNumber!,
       );
 
