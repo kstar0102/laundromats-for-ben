@@ -212,7 +212,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     // ignore: deprecated_member_use
     return GestureDetector(
-      onVerticalDragDown: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+      onVerticalDragUpdate: (details) {
+        if (details.primaryDelta! > 5) {
+          // Detect downward drag
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      behavior: HitTestBehavior.opaque,
       // ignore: deprecated_member_use
       child: WillPopScope(
           onWillPop: _onWillPop,
