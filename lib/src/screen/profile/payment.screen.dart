@@ -145,7 +145,20 @@ class CardInputScreenState extends State<CardInputScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (event.delta.dy > 10) {
+          // Detect downward movement
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        onTap: () {
+          FocusManager.instance.primaryFocus
+              ?.unfocus(); // Tap anywhere to dismiss
+        },
+        child: Scaffold(
         appBar: PreferredSize(
           preferredSize:
               const Size.fromHeight(0.0), // Adjust the height as needed
@@ -160,6 +173,7 @@ class CardInputScreenState extends State<CardInputScreen> {
           color: kColorWhite,
           child: Padding(
             padding: const EdgeInsets.all(0.0),
+            child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -341,6 +355,6 @@ class CardInputScreenState extends State<CardInputScreen> {
               ],
             ),
           ),
-        ));
+        )),),));
   }
 }

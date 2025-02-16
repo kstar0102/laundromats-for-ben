@@ -30,6 +30,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
   final logger = Logger();
   bool initialized = false;
   String? username;
+
   @override
   void initState() {
     super.initState();
@@ -558,7 +559,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                                               "assets/images/icons/user.png"),
                                           SizedBox(width: vMin(context, 2)),
                                           Text(
-                                            answer["user_name"] ?? "Anonymous",
+                                            answer["answer_user_name"] ?? "Anonymous",
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14,

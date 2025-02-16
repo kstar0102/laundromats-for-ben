@@ -110,7 +110,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       const HeaderWidget(
-                        role: true,
+                        role: false,
                         isLogoutBtn: false,
                         backIcon: true,
                       ),

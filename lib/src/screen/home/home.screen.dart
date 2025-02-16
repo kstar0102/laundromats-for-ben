@@ -128,7 +128,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .toList(); // Convert back to a list
 
     // ignore: deprecated_member_use
-    return WillPopScope(
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (event.delta.dy > 10) {
+          // Detect downward movement
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        onTap: () {
+          FocusManager.instance.primaryFocus
+              ?.unfocus(); // Tap anywhere to dismiss
+        },
+        // ignore: deprecated_member_use
+        child: WillPopScope(
         onWillPop: _onWillPop,
         child: Scaffold(
           backgroundColor: kColorWhite,
@@ -390,6 +404,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             )),
           ),
           bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
-        ));
+        )),),);
   }
 }

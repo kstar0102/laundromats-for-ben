@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:laundromats/src/common/header.widget.dart';
-import 'package:laundromats/src/screen/auth/login.screen.dart';
+import 'package:laundromats/src/screen/auth/login.auth.dart';
 import 'package:laundromats/src/screen/auth/phonenumber.screen.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:logger/logger.dart';
@@ -100,10 +100,22 @@ class SignupScreenState extends State<SignupScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (event.delta.dy > 10) {
+          // Detect downward movement
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        onTap: () {
+          FocusManager.instance.primaryFocus
+              ?.unfocus(); // Tap anywhere to dismiss
+        },
+        // ignore: deprecated_member_use
+        child: WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
           resizeToAvoidBottomInset: true,
@@ -291,7 +303,7 @@ class SignupScreenState extends State<SignupScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          const LoginAuthScreen(),
+                                          const LoginScreen(),
                                     ),
                                   );
                                 },
@@ -305,7 +317,7 @@ class SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             ),
-          )),
+          )),),)
     );
   }
 

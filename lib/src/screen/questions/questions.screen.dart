@@ -197,8 +197,21 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
-    // ignore: deprecated_member_use
-    return WillPopScope(
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (event.delta.dy > 10) {
+          // Detect downward movement
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        onTap: () {
+          FocusManager.instance.primaryFocus
+              ?.unfocus(); // Tap anywhere to dismiss
+        },
+        // ignore: deprecated_member_use
+        child: WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: kColorWhite,
@@ -456,6 +469,6 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
 
         bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
       ),
-    );
+    )),);
   }
 }

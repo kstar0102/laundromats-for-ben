@@ -32,7 +32,21 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Listener(
+      onPointerMove: (PointerMoveEvent event) {
+        if (event.delta.dy > 10) {
+          // Detect downward movement
+          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+        }
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        onTap: () {
+          FocusManager.instance.primaryFocus
+              ?.unfocus(); // Tap anywhere to dismiss
+        },
+        // ignore: deprecated_member_use
+        child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(0.0),
@@ -47,7 +61,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
         child: Column(
           children: [
             const HeaderWidget(
-              role: true,
+              role: false,
               isLogoutBtn: false,
               backIcon: true,
             ),
@@ -153,7 +167,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
             ),
           ],
         ),
-      ),
+      ),),)
     );
   }
 }
