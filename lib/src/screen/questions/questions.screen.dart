@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/common/header.widget.dart';
-import 'package:laundromats/src/common/profile_status.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
-import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
+import 'package:laundromats/src/screen/home/filter.bar.widget.dart';
+import 'package:laundromats/src/screen/questions/question_data.widget.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/screen/ask_question/ask_question.screen.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -66,6 +66,8 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
           if (userId != 0) {
             final fetchedQuestions =
                 await authService.fetchUserQuestionsWithAnswers(userId!);
+
+            logger.i(fetchedQuestions);
 
             setState(() {
               questions = fetchedQuestions;
@@ -137,29 +139,27 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   /// Apply filters when a user selects a tab
   void applyFilter() {
     setState(() {
-      List<Map<String, dynamic>> tempFilteredQuestions = questions
-          .cast<Map<String, dynamic>>() // Ensure correct type
+      filteredQuestions = questions
           .where((q) =>
-              selectedCategories.isEmpty || // Show all if no category selected
+              selectedCategories.isEmpty ||
               selectedCategories.contains(q["category"]))
-          .toList(); // Convert back to a list
+          .where((q) {
+        bool hasUserAnswer = (q["answers"] as List<dynamic>?)
+                ?.any((answer) => answer["isWho"] == "user") ??
+            false;
+        bool isUnanswered = !hasUserAnswer;
+        bool isResolved = q["solved_state"] == "Solved" ||
+            (q["answers"] as List<dynamic>?)!
+                .any((answer) => answer["solved_state"] == "Solved");
+        bool isUnresolved = !isResolved;
 
-      // Apply tab-based filters
-      if (selectedFilter == 'commented') {
-        tempFilteredQuestions = tempFilteredQuestions
-            .where((q) => q['answers'] != null && q['answers'].isNotEmpty)
-            .toList();
-      } else if (selectedFilter == 'liked') {
-        tempFilteredQuestions = tempFilteredQuestions
-            .where((q) => (q['likes_count'] ?? 0) > 0)
-            .toList();
-      } else if (selectedFilter == 'disliked') {
-        tempFilteredQuestions = tempFilteredQuestions
-            .where((q) => (q['dislikes_count'] ?? 0) > 0)
-            .toList();
-      }
+        if (selectedFilter == "Answered" && !hasUserAnswer) return false;
+        if (selectedFilter == "Unanswered" && !isUnanswered) return false;
+        if (selectedFilter == "Resolved" && !isResolved) return false;
+        if (selectedFilter == "Unresolved" && !isUnresolved) return false;
 
-      filteredQuestions = tempFilteredQuestions;
+        return true;
+      }).toList();
     });
   }
 
@@ -205,270 +205,269 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
         }
       },
       child: GestureDetector(
-        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
-        onTap: () {
-          FocusManager.instance.primaryFocus
-              ?.unfocus(); // Tap anywhere to dismiss
-        },
-        // ignore: deprecated_member_use
-        child: WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: kColorWhite,
-        resizeToAvoidBottomInset: true,
-        appBar: PreferredSize(
-          preferredSize:
-              const Size.fromHeight(0.0), // Adjust the height as needed
-          child: AppBar(
-            backgroundColor: kColorWhite,
-            elevation: 0, // Removes shadow for a flat UI
-            automaticallyImplyLeading:
-                false, // Hides back button if unnecessary
-          ),
-        ),
-        body: SizedBox.expand(
-          child: SingleChildScrollView(
-            child: FocusScope(
-              child: Container(
-                decoration: const BoxDecoration(color: kColorWhite),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const HeaderWidget(
-                      role: true,
-                      isLogoutBtn: false,
-                      backIcon: false,
-                    ),
+          behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+          onTap: () {
+            FocusManager.instance.primaryFocus
+                ?.unfocus(); // Tap anywhere to dismiss
+          },
+          // ignore: deprecated_member_use
+          child: WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              backgroundColor: kColorWhite,
+              resizeToAvoidBottomInset: true,
+              appBar: PreferredSize(
+                preferredSize:
+                    const Size.fromHeight(0.0), // Adjust the height as needed
+                child: AppBar(
+                  backgroundColor: kColorWhite,
+                  elevation: 0, // Removes shadow for a flat UI
+                  automaticallyImplyLeading:
+                      false, // Hides back button if unnecessary
+                ),
+              ),
+              body: SizedBox.expand(
+                child: SingleChildScrollView(
+                  child: FocusScope(
+                    child: Container(
+                      decoration: const BoxDecoration(color: kColorWhite),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const HeaderWidget(
+                            role: true,
+                            isLogoutBtn: false,
+                            backIcon: false,
+                          ),
 
-                    // Header Section
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: vh(context, 3),
-                          left: vw(context, 2),
-                          right: vw(context, 2)),
-                      child: SizedBox(
-                        width: vww(context, 100),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "My Questions",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Onset',
-                                color: kColorSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: vw(context, 38),
-                            height: vh(context, 5),
-                            child: TextField(
-                              controller: _searchValue,
-                              keyboardType: TextInputType.name,
-                              autocorrect: false,
-                              cursorColor: kColorPrimary,
-                              onChanged: (value) {
-                                setState(
-                                    () {}); // Trigger UI update when text changes
-                              },
-                              decoration: InputDecoration(
-                                hintText: search.toString(),
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                enabledBorder: kEnableSearchBorder,
-                                focusedBorder: kFocusSearchBorder,
-                                hintStyle: const TextStyle(
-                                  fontSize: 14.0,
-                                  fontFamily: 'Onset-Regular',
-                                  color: kColorLightGrey,
-                                ),
-                                filled: false,
-                                disabledBorder: InputBorder.none,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                counterText: '',
-                                prefixIcon: const Icon(
-                                  Icons.search,
-                                  color: kColorLightGrey,
-                                  size: 20,
-                                ),
-                                suffixIcon: _searchValue.text
-                                        .isNotEmpty // Show icons only when text exists
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize
-                                            .min, // Adjusts to content size
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(Icons.close,
-                                                color: kColorPrimary),
-                                            onPressed: () {
-                                              setState(() {
-                                                _searchValue.clear();
-                                                getUserQuestions();
-                                                // Clear the text field
-                                              });
-                                            },
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.send,
-                                                color: kColorPrimary),
-                                            onPressed:
-                                                searchQuestions, // Call the search function
-                                          ),
-                                        ],
-                                      )
-                                    : null,
+                          // Header Section
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: vh(context, 3),
+                                left: vw(context, 2),
+                                right: vw(context, 2)),
+                            child: SizedBox(
+                              width: vww(context, 100),
+                              child: const Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "My Questions",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Onset',
+                                      color: kColorSecondary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          InkWell(
-                              onTap: _openFilterModal,
-                              child: Image.asset(
-                                'assets/images/icons/filter.png',
-                                fit: BoxFit.cover,
-                              )),
+
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: vMin(context, 4),
+                                right: vMin(context, 4),
+                                top: vMin(context, 2)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: vw(context, 38),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _searchValue,
+                                    keyboardType: TextInputType.name,
+                                    autocorrect: false,
+                                    cursorColor: kColorPrimary,
+                                    onChanged: (value) {
+                                      setState(
+                                          () {}); // Trigger UI update when text changes
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: search.toString(),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableSearchBorder,
+                                      focusedBorder: kFocusSearchBorder,
+                                      hintStyle: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: 'Onset-Regular',
+                                        color: kColorLightGrey,
+                                      ),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                      counterText: '',
+                                      prefixIcon: const Icon(
+                                        Icons.search,
+                                        color: kColorLightGrey,
+                                        size: 20,
+                                      ),
+                                      suffixIcon: _searchValue.text
+                                              .isNotEmpty // Show icons only when text exists
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize
+                                                  .min, // Adjusts to content size
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.close,
+                                                      color: kColorPrimary),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _searchValue.clear();
+                                                      getUserQuestions();
+                                                      // Clear the text field
+                                                    });
+                                                  },
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(Icons.send,
+                                                      color: kColorPrimary),
+                                                  onPressed:
+                                                      searchQuestions, // Call the search function
+                                                ),
+                                              ],
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                ),
+                                InkWell(
+                                    onTap: _openFilterModal,
+                                    child: Image.asset(
+                                      'assets/images/icons/filter.png',
+                                      fit: BoxFit.cover,
+                                    )),
+                              ],
+                            ),
+                          ),
+
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: vMin(context, 4),
+                                right: vMin(context, 4),
+                                top: vMin(context, 2)),
+                            child: Text(
+                              "${questions.length} Questions",
+                              textAlign: TextAlign.left,
+                              softWrap: true,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Onset-Regular',
+                                color: kColorThird,
+                              ),
+                            ),
+                          ),
+
+                          FilterBarWidget(
+                            selectedFilter: selectedFilter,
+                            onFilterSelected: onFilterSelected,
+                          ),
+
+                          if (selectedCategories.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: vMin(context, 4),
+                                  right: vMin(context, 4),
+                                  top: vMin(context, 2)),
+                              child: Wrap(
+                                spacing: 6.0, // Horizontal space between tags
+                                runSpacing:
+                                    0.0, // Reduced vertical space between rows
+                                children: selectedCategories.map((category) {
+                                  return Chip(
+                                    label: Text(
+                                      category,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                    backgroundColor: kColorWhite,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      side: const BorderSide(
+                                          color: kColorPrimary),
+                                    ),
+                                    deleteIcon: const Icon(
+                                      Icons.close,
+                                      size: 15,
+                                      color: kColorPrimary,
+                                    ),
+                                    onDeleted: () {
+                                      setState(() {
+                                        selectedCategories.remove(category);
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+
+                          // Question List
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: vMin(context, 4),
+                                right: vMin(context, 4),
+                                top: vMin(context, 2)),
+                            child: isLoading
+                                ? const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(20.0),
+                                      child: CircularProgressIndicator(
+                                          color: kColorPrimary), // Loader
+                                    ),
+                                  )
+                                : filteredQuestions.isNotEmpty
+                                    ? QuestionDataWidget(
+                                        questions: filteredQuestions
+                                            .cast<Map<String, dynamic>>())
+                                    : const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: Text("No questions found.",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kColorSecondary)),
+                                        ),
+                                      ),
+                          ),
                         ],
                       ),
                     ),
-
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2)),
-                      child: Text(
-                        "${questions.length} Questions",
-                        textAlign: TextAlign.left,
-                        softWrap: true,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Onset-Regular',
-                          color: kColorThird,
-                        ),
-                      ),
-                    ),
-
-                    ProfileStatusWidget(
-                      askedCount: askedCount ?? 0,
-                      commentCount: commentCount ?? 0,
-                      likeCount: likeCount ?? 0,
-                      dislikeCount: dislikeCount ?? 0,
-                      selectedFilter: selectedFilter,
-                      onFilterSelected: onFilterSelected,
-                    ),
-
-                    if (selectedCategories.isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: vMin(context, 4),
-                            right: vMin(context, 4),
-                            top: vMin(context, 2)),
-                        child: Wrap(
-                          spacing: 6.0, // Horizontal space between tags
-                          runSpacing:
-                              0.0, // Reduced vertical space between rows
-                          children: selectedCategories.map((category) {
-                            return Chip(
-                              label: Text(
-                                category,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorSecondary,
-                                ),
-                              ),
-                              backgroundColor: kColorWhite,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                side: const BorderSide(color: kColorPrimary),
-                              ),
-                              deleteIcon: const Icon(
-                                Icons.close,
-                                size: 15,
-                                color: kColorPrimary,
-                              ),
-                              onDeleted: () {
-                                setState(() {
-                                  selectedCategories.remove(category);
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-                    // Question List
-                    // Question List
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2)),
-                      child: isLoading
-                          ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(20.0),
-                                child: CircularProgressIndicator(
-                                    color: kColorPrimary), // Loader
-                              ),
-                            )
-                          : filteredQuestions.isNotEmpty
-                              ? HomeDataWidget(
-                                  questions: filteredQuestions
-                                      .cast<Map<String, dynamic>>())
-                              : const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: Text("No questions found.",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: kColorSecondary)),
-                                  ),
-                                ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const AskQuestionScreen()),
-            );
-          },
-          backgroundColor: kColorPrimary,
-          shape: const CircleBorder(), // Ensures Circular Shape
-          child: const Icon(
-            Icons.edit_document, // Edit Icon Similar to Image
-            color: Colors.white, // White Color for Icon
-            size: 26, // Slightly Larger for Visibility
-          ),
-        ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.endFloat, // ✅ Bottom Right
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AskQuestionScreen()),
+                  );
+                },
+                backgroundColor: kColorPrimary,
+                shape: const CircleBorder(), // Ensures Circular Shape
+                child: const Icon(
+                  Icons.edit_document, // Edit Icon Similar to Image
+                  color: Colors.white, // White Color for Icon
+                  size: 26, // Slightly Larger for Visibility
+                ),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat, // ✅ Bottom Right
 
-        bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
-      ),
-    )),);
+              bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
+            ),
+          )),
+    );
   }
 }

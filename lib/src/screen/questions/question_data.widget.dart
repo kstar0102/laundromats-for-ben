@@ -7,16 +7,16 @@ import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
 
-class HomeDataWidget extends ConsumerStatefulWidget {
+class QuestionDataWidget extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> questions;
 
-  const HomeDataWidget({super.key, required this.questions});
+  const QuestionDataWidget({super.key, required this.questions});
 
   @override
-  ConsumerState<HomeDataWidget> createState() => _HomeDataWidgetState();
+  ConsumerState<QuestionDataWidget> createState() => _QuestionDataWidgetState();
 }
 
-class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
+class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
   Map<int, int> userReactionMap =
       {}; // Stores the user's reaction for each question (1 for like, 0 for dislike, -1 for neutral)
   Map<int, int> likesCountMap = {}; // Stores likes count for each question
@@ -53,7 +53,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
   }
 
   @override
-  void didUpdateWidget(HomeDataWidget oldWidget) {
+  void didUpdateWidget(QuestionDataWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.questions != oldWidget.questions) {
       initializeData();
@@ -328,7 +328,6 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
         final aiAnswer = (question["answers"] ?? []).firstWhere(
             (answer) => answer["isWho"] == "AI",
             orElse: () => null);
-
         bool isSolved = question["solved_state"] == "Solved" ||
             (question["answers"] as List<dynamic>?)!
                 .any((answer) => answer["solved_state"] == "Solved");
@@ -407,7 +406,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(width: vMin(context, 2)),
+                      SizedBox(width: vMin(context, 2))
                     ],
                   ),
 
@@ -503,6 +502,73 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                               fontWeight: FontWeight.bold,
                               color: kColorSecondary,
                             ),
+                          ),
+
+                          // ✅ Correct & Incorrect Buttons (Bottom Right in Row)
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.end, // Align to right
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Correct Answer action
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kColorWhite,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: vMin(context, 1.2),
+                                      vertical: vMin(
+                                          context, 0.6)), // Smaller padding
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    side: const BorderSide(
+                                        color: kColorPrimary,
+                                        width: 0.5), // Border
+                                  ),
+                                  minimumSize: Size(vMin(context, 18),
+                                      vMin(context, 3.5)), // Smaller size
+                                ),
+                                child: const Text(
+                                  "Correct",
+                                  style: TextStyle(
+                                    color: kColorBlack,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                  width: vMin(
+                                      context, 1.5)), // Space between buttons
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle Incorrect Answer action
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kColorWhite,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: vMin(context, 1.2),
+                                      vertical: vMin(
+                                          context, 0.6)), // Smaller padding
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    side: const BorderSide(
+                                        color: Colors.red,
+                                        width: 0.5), // Red border
+                                  ),
+                                  minimumSize: Size(vMin(context, 18),
+                                      vMin(context, 3.5)), // Smaller size
+                                ),
+                                child: const Text(
+                                  "Incorrect",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -639,7 +705,8 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                                             ),
                                           SizedBox(width: vMin(context, 2)),
                                           Text(
-                                            getTimeAgo(answer["created_at"]),
+                                            getTimeAgo(
+                                                answer["answer_created_at"]),
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: kColorPrimary,
@@ -663,6 +730,81 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                                       SizedBox(
                                           height: vMin(
                                               context, 1.5)), // Reduce spacing
+
+                                      // ✅ Correct & Incorrect Buttons (Bottom Right)
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .end, // Align to right
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Handle Correct Answer action
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: kColorWhite,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      vMin(context, 1.2),
+                                                  vertical: vMin(context,
+                                                      0.6)), // Smaller padding
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                side: const BorderSide(
+                                                    color: kColorPrimary,
+                                                    width: 0.5), // Border
+                                              ),
+                                              minimumSize: Size(
+                                                  vMin(context, 18),
+                                                  vMin(context,
+                                                      3.5)), // Smaller size
+                                            ),
+                                            child: const Text(
+                                              "Correct",
+                                              style: TextStyle(
+                                                color: kColorBlack,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width: vMin(context,
+                                                  1.5)), // Space between buttons
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Handle Incorrect Answer action
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: kColorWhite,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      vMin(context, 1.2),
+                                                  vertical: vMin(context,
+                                                      0.6)), // Smaller padding
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                side: const BorderSide(
+                                                    color: Colors.red,
+                                                    width: 0.5), // Red border
+                                              ),
+                                              minimumSize: Size(
+                                                  vMin(context, 18),
+                                                  vMin(context,
+                                                      3.5)), // Smaller size
+                                            ),
+                                            child: const Text(
+                                              "Incorrect",
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),

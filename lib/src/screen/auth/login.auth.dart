@@ -144,6 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      logger.i("login response : $result");
       // Check if result is null or API returned an error
       if (result['success'] == false) {
         _showErrorDialog(
@@ -168,6 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           userBusinessTime: user['role_businessTime'] ?? "",
           userLaundromatsCount: user['role_laundromatsCount'] ?? "",
         );
+        GlobalVariable.userName = user['name'];
 
         if (mounted) {
           // Navigate to HomeScreen

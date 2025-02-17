@@ -4,6 +4,7 @@ import 'package:laundromats/src/common/header.widget.dart';
 import 'package:laundromats/src/components/bottom_nav_bar.dart';
 import 'package:laundromats/src/components/filter.category.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/home/filter.bar.widget.dart';
 import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
@@ -11,9 +12,7 @@ import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
-  const SearchScreen({
-    super.key,
-  });
+  const SearchScreen({super.key});
 
   @override
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
@@ -27,6 +26,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _searchValue = TextEditingController();
   List<dynamic> questions = [];
   Set<String> selectedCategories = {};
+  String? selectedFilter; // New filter selection
   final logger = Logger();
   bool isLoading = true;
 
@@ -36,18 +36,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     getData();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> getData() async {
     final authService = AuthService();
     try {
       final fetchedQuestions = await authService.fetchQuestionsWithAnswers();
-      final validQuestions = fetchedQuestions
-          .whereType<Map<String, dynamic>>() // Filters out non-map elements
-          .toList();
+      final validQuestions =
+          fetchedQuestions.whereType<Map<String, dynamic>>().toList();
 
       setState(() {
         questions = validQuestions;
@@ -60,8 +54,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Future<void> searchQuestions() async {
     setState(() {
-      questions = []; // Clear the list while searching
-      isLoading = true; // Show loading indicator
+      questions = [];
+      isLoading = true;
     });
 
     try {
@@ -69,19 +63,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       final searchQuery = _searchValue.text.trim();
       final List<String> categories = selectedCategories.toList();
 
-      final response = await authService.searchQuestionsAll(
-        searchQuery,
-        categories,
-      );
+      final response =
+          await authService.searchQuestionsAll(searchQuery, categories);
 
       setState(() {
         questions = response;
-        isLoading = false; // Hide loading indicator
+        isLoading = false;
       });
     } catch (e) {
       logger.e('Error searching questions: $e');
       setState(() {
-        isLoading = false; // Hide loading indicator on error
+        isLoading = false;
       });
     }
   }
@@ -94,18 +86,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     if (selectedFilters != null) {
       setState(() {
-        selectedCategories = selectedFilters; // ✅ Update selected categories
+        selectedCategories = selectedFilters;
       });
     }
-  }
-
-  bool allowRevert = true;
-
-  Future<bool> _onWillPop() async {
-    if (!allowRevert) {
-      return false;
-    }
-    return false;
   }
 
   @override
@@ -116,276 +99,262 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       screenHeight = 800;
       keyboardHeight = 0;
     }
+
+    // ✅ Apply Filters to Questions List
+    List<Map<String, dynamic>> filteredQuestions = questions
+        .cast<Map<String, dynamic>>()
+        .where((q) =>
+            selectedCategories.isEmpty ||
+            selectedCategories.contains(q["category"]))
+        .where((q) {
+      // ✅ Answered (Has user answers)
+      bool hasUserAnswer = (q["answers"] as List<dynamic>?)
+              ?.any((answer) => answer["isWho"] == "user") ??
+          false;
+
+      // ✅ Unanswered (No user answers)
+      bool isUnanswered = !hasUserAnswer;
+
+      // ✅ Resolved (Has solved_state "Solved")
+      bool isResolved = q["solved_state"] == "Solved" ||
+          (q["answers"] as List<dynamic>?)!
+              .any((answer) => answer["solved_state"] == "Solved");
+
+      // ✅ Unresolved (Does not have "Solved" state)
+      bool isUnresolved = !isResolved;
+
+      // ✅ Apply filters
+      if (selectedFilter == "Answered" && !hasUserAnswer) return false;
+      if (selectedFilter == "Unanswered" && !isUnanswered) return false;
+      if (selectedFilter == "Resolved" && !isResolved) return false;
+      if (selectedFilter == "Unresolved" && !isUnresolved) return false;
+
+      return true; // Pass through
+    }).toList();
+
     return Listener(
       onPointerMove: (PointerMoveEvent event) {
         if (event.delta.dy > 10) {
-          // Detect downward movement
-          FocusManager.instance.primaryFocus?.unfocus(); // Dismiss keyboard
+          FocusManager.instance.primaryFocus?.unfocus();
         }
       },
       child: GestureDetector(
-        behavior: HitTestBehavior.opaque, // Detect taps outside text fields
+        behavior: HitTestBehavior.opaque,
         onTap: () {
-          FocusManager.instance.primaryFocus
-              ?.unfocus(); // Tap anywhere to dismiss
+          FocusManager.instance.primaryFocus?.unfocus();
         },
-        // ignore: deprecated_member_use
-        child: WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-          backgroundColor: kColorWhite,
-          resizeToAvoidBottomInset: true,
-          appBar: PreferredSize(
-            preferredSize:
-                const Size.fromHeight(0.0), // Adjust the height as needed
-            child: AppBar(
-              backgroundColor: kColorWhite,
-              elevation: 0, // Removes shadow for a flat UI
-              automaticallyImplyLeading:
-                  false, // Hides back button if unnecessary
+        child: Scaffold(
+            backgroundColor: kColorWhite,
+            resizeToAvoidBottomInset: true,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(0.0),
+              child: AppBar(
+                backgroundColor: kColorWhite,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+              ),
             ),
-          ),
-          body: SizedBox.expand(
-              child: SingleChildScrollView(
-            child: FocusScope(
-              child: Container(
-                decoration: const BoxDecoration(color: kColorWhite),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const HeaderWidget(
-                        role: true,
-                        isLogoutBtn: false,
-                        backIcon: false,
-                      ),
-                      Padding(
-                          padding: EdgeInsets.all(vMin(context, 4)),
-                          child: SizedBox(
-                              width: vww(context, 100),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    searchQuestion.toString(),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Onset',
-                                      color: kColorSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ))),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: vMin(context, 4),
-                            right: vMin(context, 4),
-                            top: vMin(context, 0)),
-                        child: Text(
-                          exploreQuestionCategory.toString(),
-                          textAlign: TextAlign.left,
-                          softWrap: true,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Onset-Regular',
-                            color: kColorSecondary,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: vMin(context, 4),
-                            right: vMin(context, 4),
-                            top: vMin(context, 2)),
-                        child: Text(
-                          "${questions.length} Questions",
-                          textAlign: TextAlign.left,
-                          softWrap: true,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'Onset-Regular',
-                            color: kColorThird,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: vMin(context, 4),
-                            right: vMin(context, 4),
-                            top: vMin(context, 2)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: vw(context, 38),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _searchValue,
-                                keyboardType: TextInputType.name,
-                                autocorrect: false,
-                                cursorColor: kColorPrimary,
-                                onChanged: (value) {
-                                  setState(
-                                      () {}); // Trigger UI update when text changes
-                                },
-                                decoration: InputDecoration(
-                                  hintText: search.toString(),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableSearchBorder,
-                                  focusedBorder: kFocusSearchBorder,
-                                  hintStyle: const TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Onset-Regular',
-                                    color: kColorLightGrey,
-                                  ),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  counterText: '',
-                                  suffixIcon: _searchValue.text
-                                          .isNotEmpty // Show icons only when text exists
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize
-                                              .min, // Adjusts to content size
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(Icons.close,
-                                                  color: kColorPrimary),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _searchValue.clear();
-                                                  getData();
-                                                  // Clear the text field
-                                                });
-                                              },
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.send,
-                                                  color: kColorPrimary),
-                                              onPressed:
-                                                  searchQuestions, // Call the search function
-                                            ),
-                                          ],
-                                        )
-                                      : null,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                                onTap: _openFilterModal,
-                                child: Image.asset(
-                                  'assets/images/icons/filter.png',
-                                  fit: BoxFit.cover,
-                                )),
-                          ],
-                        ),
-                      ),
+            body: SizedBox.expand(
+                child: SingleChildScrollView(
+              child: FocusScope(
+                child: Container(
+                  decoration: const BoxDecoration(color: kColorWhite),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const HeaderWidget(
+                            role: true, isLogoutBtn: false, backIcon: false),
 
-                      //tag list
-                      if (selectedCategories.isNotEmpty)
+                        Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: SizedBox(
+                                width: vww(context, 100),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      searchQuestion.toString(),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Onset',
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ))),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: vMin(context, 4),
+                              right: vMin(context, 4),
+                              top: vMin(context, 0)),
+                          child: Text(
+                            exploreQuestionCategory.toString(),
+                            textAlign: TextAlign.left,
+                            softWrap: true,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Onset-Regular',
+                              color: kColorSecondary,
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: EdgeInsets.only(
                               left: vMin(context, 4),
                               right: vMin(context, 4),
                               top: vMin(context, 2)),
-                          child: Wrap(
-                            spacing: 6.0, // Horizontal space between tags
-                            runSpacing:
-                                0.0, // Reduced vertical space between rows
-                            children: selectedCategories.map((category) {
-                              return Chip(
-                                label: Text(
-                                  category,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                backgroundColor: kColorWhite,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  side: const BorderSide(color: kColorPrimary),
-                                ),
-                                deleteIcon: const Icon(
-                                  Icons.close,
-                                  size: 15,
-                                  color: kColorPrimary,
-                                ),
-                                onDeleted: () {
-                                  setState(() {
-                                    selectedCategories.remove(category);
-                                  });
-                                },
-                              );
-                            }).toList(),
+                          child: Text(
+                            "${questions.length} Questions",
+                            textAlign: TextAlign.left,
+                            softWrap: true,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'Onset-Regular',
+                              color: kColorThird,
+                            ),
                           ),
                         ),
-                      //question list
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: vMin(context, 4),
-                          right: vMin(context, 4),
-                          top: vMin(context, 2),
-                        ),
-                        child: Column(
-                          children: [
-                            isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : questions.isNotEmpty
-                                    ? HomeDataWidget(
-                                        questions: questions
-                                            .cast<Map<String, dynamic>>(),
-                                      )
-                                    : Padding(
-                                        padding: EdgeInsets.only(
-                                          left: vMin(context, 4),
-                                          right: vMin(context, 4),
-                                          top: vMin(context, 2),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              height: vMin(context, 35),
-                                            ),
-                                            Align(
-                                              alignment: Alignment.center,
-                                              child: Image.asset(
-                                                  "assets/images/icons/search-2.png"),
-                                            ),
-                                            SizedBox(
-                                              height: vMin(context, 5),
-                                            ),
-                                            const Text(
-                                              "No questions found.",
-                                              textAlign: TextAlign.left,
-                                              softWrap: true,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorSecondary,
+
+                        // ✅ Search Bar
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: vMin(context, 4)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                width: vw(context, 38),
+                                height: vh(context, 5),
+                                child: TextField(
+                                  controller: _searchValue,
+                                  keyboardType: TextInputType.name,
+                                  autocorrect: false,
+                                  cursorColor: kColorPrimary,
+                                  onChanged: (value) {
+                                    setState(
+                                        () {}); // Trigger UI update when text changes
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: search.toString(),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    enabledBorder: kEnableSearchBorder,
+                                    focusedBorder: kFocusSearchBorder,
+                                    hintStyle: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontFamily: 'Onset-Regular',
+                                      color: kColorLightGrey,
+                                    ),
+                                    filled: false,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    counterText: '',
+                                    suffixIcon: _searchValue.text
+                                            .isNotEmpty // Show icons only when text exists
+                                        ? Row(
+                                            mainAxisSize: MainAxisSize
+                                                .min, // Adjusts to content size
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.close,
+                                                    color: kColorPrimary),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _searchValue.clear();
+                                                    getData();
+                                                    // Clear the text field
+                                                  });
+                                                },
                                               ),
-                                            ),
-                                          ],
-                                        )),
-                          ],
+                                              IconButton(
+                                                icon: const Icon(Icons.send,
+                                                    color: kColorPrimary),
+                                                onPressed:
+                                                    searchQuestions, // Call the search function
+                                              ),
+                                            ],
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                  onTap: _openFilterModal,
+                                  child: Image.asset(
+                                    'assets/images/icons/filter.png',
+                                    fit: BoxFit.cover,
+                                  )),
+                            ],
+                          ),
                         ),
-                      ),
-                    ]),
+
+                        // ✅ Filter Bar (Answered, Unanswered, Resolved, Unresolved)
+                        FilterBarWidget(
+                          selectedFilter: selectedFilter,
+                          onFilterSelected: (String? filter) {
+                            setState(() {
+                              selectedFilter = filter;
+                            });
+                          },
+                        ),
+
+                        // ✅ Category Filter Chips
+                        if (selectedCategories.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: vMin(context, 4)),
+                            child: Wrap(
+                              spacing: 6.0,
+                              runSpacing: 6.0,
+                              children: selectedCategories.map((category) {
+                                return Chip(
+                                  label: Text(category,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: kColorSecondary)),
+                                  backgroundColor: kColorWhite,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    side:
+                                        const BorderSide(color: kColorPrimary),
+                                  ),
+                                  onDeleted: () {
+                                    setState(() {
+                                      selectedCategories.remove(category);
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+                        // ✅ Questions List
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: vMin(context, 4)),
+                          child: isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : filteredQuestions.isNotEmpty
+                                  ? HomeDataWidget(questions: filteredQuestions)
+                                  : const Center(
+                                      child: Text("No questions found.",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: kColorSecondary))),
+                        ),
+                      ]),
+                ),
               ),
-            ),
-          )),
-          bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)),
-    ),),);
+            )),
+            bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)),
+      ),
+    );
   }
 }
