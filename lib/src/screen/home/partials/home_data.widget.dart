@@ -491,6 +491,17 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                                   fontSize: 14,
                                 ),
                               ),
+                              const Spacer(),
+                              isSolved
+                                  ? const Text(
+                                      "corrected answer",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: kColorPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()
                             ],
                           ),
                           SizedBox(
@@ -504,10 +515,42 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                               color: kColorSecondary,
                             ),
                           ),
+                          SizedBox(height: vMin(context, 1.5)),
                         ],
                       ),
                     ),
                     SizedBox(height: vMin(context, 1)), // Reduced space below
+                  ],
+                  SizedBox(height: vMin(context, 1)),
+
+                  if (question['tip_amount'] != null &&
+                      question['tip_amount'].toString().trim().isNotEmpty) ...[
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: vw(context, 1),
+                        ),
+                        const Text(
+                          "Tip Amount : ",
+                          style: TextStyle(
+                            fontSize: 14,
+                            // fontWeight: FontWeight.bold,
+                            color: kColorBlack,
+                          ),
+                        ),
+                        SizedBox(
+                          width: vw(context, 1),
+                        ),
+                        Text(
+                          "\$${question['tip_amount']}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: kColorPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
 
                   // Answer Input Field (Only Visible When Chat Icon is Clicked)

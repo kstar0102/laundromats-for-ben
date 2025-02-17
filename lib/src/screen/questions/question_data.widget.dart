@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
@@ -26,6 +28,7 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
   Set<int> answerInputVisible = {}; // Tracks visible answer input fields
   Map<int, TextEditingController> answerControllers =
       {}; // Stores text controllers
+  bool isSening = false;
 
   final logger = Logger();
   bool initialized = false;
@@ -321,6 +324,38 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
     );
   }
 
+  void _markAsSolved(int answerId, bool status, int questionId) async {
+    setState(() {
+      isSening = true;
+    });
+
+    final authService = AuthService();
+    bool success = await authService.updateSolvedStatus(
+      answerId: answerId,
+      status: status,
+    );
+
+    setState(() {
+      if (success) {
+        for (var question in widget.questions) {
+          if (question["question_id"] == questionId) {
+            for (var answer in question["answers"] ?? []) {
+              if (answer["answer_id"] == answerId) {
+                answer["solved_state"] = status ? "Solved" : "";
+              }
+            }
+            question["solved_state"] = status ? "Solved" : "";
+          }
+        }
+        isSening = false;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to update solved status.")),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -328,12 +363,19 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
         final aiAnswer = (question["answers"] ?? []).firstWhere(
             (answer) => answer["isWho"] == "AI",
             orElse: () => null);
+
         bool isSolved = question["solved_state"] == "Solved" ||
             (question["answers"] as List<dynamic>?)!
                 .any((answer) => answer["solved_state"] == "Solved");
 
         bool onlyUserAnswers = (question["answers"] as List<dynamic>?)
                 ?.any((answer) => answer["isWho"] == "user") ??
+            false;
+
+        bool aiAnswerSolved = (question["answers"] as List<dynamic>?)?.any(
+                (answer) =>
+                    answer["isWho"] == "AI" &&
+                    answer["solved_state"] == "Solved") ??
             false;
 
         return Container(
@@ -490,6 +532,17 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                                   fontSize: 14,
                                 ),
                               ),
+                              const Spacer(),
+                              aiAnswerSolved
+                                  ? const Text(
+                                      "corrected answer",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: kColorPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()
                             ],
                           ),
                           SizedBox(
@@ -504,72 +557,90 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                             ),
                           ),
 
-                          // ✅ Correct & Incorrect Buttons (Bottom Right in Row)
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.end, // Align to right
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle Correct Answer action
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kColorWhite,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: vMin(context, 1.2),
-                                      vertical: vMin(
-                                          context, 0.6)), // Smaller padding
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                    side: const BorderSide(
-                                        color: kColorPrimary,
-                                        width: 0.5), // Border
-                                  ),
-                                  minimumSize: Size(vMin(context, 18),
-                                      vMin(context, 3.5)), // Smaller size
-                                ),
-                                child: const Text(
-                                  "Correct",
+                          if (aiAnswerSolved && isSolved) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "If Wrong",
                                   style: TextStyle(
-                                    color: kColorBlack,
-                                    fontSize: 11,
+                                    fontFamily: 'Onset-Regular',
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold,
+                                    color: kColorSecondary,
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                  width: vMin(
-                                      context, 1.5)), // Space between buttons
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Handle Incorrect Answer action
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kColorWhite,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: vMin(context, 1.2),
-                                      vertical: vMin(
-                                          context, 0.6)), // Smaller padding
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                    side: const BorderSide(
-                                        color: Colors.red,
-                                        width: 0.5), // Red border
+                                SizedBox(width: vw(context, 2)),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    _markAsSolved(aiAnswer["answer_id"], false,
+                                        question['question_id']);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kColorWhite,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: vMin(context, 1.2),
+                                        vertical: vMin(context, 0.6)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      side: const BorderSide(
+                                          color: Colors.red, width: 0.5),
+                                    ),
+                                    minimumSize: Size(
+                                        vMin(context, 18), vMin(context, 3.5)),
                                   ),
-                                  minimumSize: Size(vMin(context, 18),
-                                      vMin(context, 3.5)), // Smaller size
-                                ),
-                                child: const Text(
-                                  "Incorrect",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
+                                  child: const Text(
+                                    "Incorrect",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ] else if (!isSolved && !aiAnswerSolved) ...[
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.end, // Align to right
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    _markAsSolved(aiAnswer["answer_id"], true,
+                                        question['question_id']);
+                                    isSolved = true;
+                                    aiAnswerSolved = true;
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kColorWhite,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: vMin(context, 2),
+                                        vertical: vMin(
+                                            context, 0.6)), // Smaller padding
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      side: const BorderSide(
+                                          color: kColorPrimary,
+                                          width: 0.5), // Border
+                                    ),
+                                    minimumSize: Size(vMin(context, 18),
+                                        vMin(context, 3.5)), // Smaller size
+                                  ),
+                                  child: const Text(
+                                    "Correct Answer",
+                                    style: TextStyle(
+                                      color: kColorBlack,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: vMin(context, 1.5)),
+                              ],
+                            )
+                          ],
+                          SizedBox(height: vMin(context, 1)),
                         ],
                       ),
                     ),
@@ -661,12 +732,15 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                       children: (question["answers"] is List)
                           ? (question["answers"] as List<dynamic>)
                               .where((answer) =>
-                                  answer["isWho"] != "AI") // Exclude AI
+                                  answer["isWho"] != "AI") // Exclude AI Answers
                               .map(
-                                (answer) => Container(
+                              (answer) {
+                                bool isCorrectedAnswer =
+                                    answer["solved_state"] == "Solved";
+
+                                return Container(
                                   margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          vMin(context, 1.5)), // Reduce margin
+                                      vertical: vMin(context, 1.5)),
                                   padding: EdgeInsets.all(vMin(context, 2)),
                                   decoration: BoxDecoration(
                                     color: kColorWhite,
@@ -693,8 +767,7 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                                             ),
                                           ),
                                           const Spacer(),
-                                          if (answer["solved_state"] ==
-                                              "Solved")
+                                          if (isCorrectedAnswer)
                                             const Text(
                                               "Corrected Answer",
                                               style: TextStyle(
@@ -727,89 +800,107 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                                         ),
                                       ),
 
-                                      SizedBox(
-                                          height: vMin(
-                                              context, 1.5)), // Reduce spacing
+                                      SizedBox(height: vMin(context, 1.5)),
 
-                                      // ✅ Correct & Incorrect Buttons (Bottom Right)
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .end, // Align to right
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              // Handle Correct Answer action
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: kColorWhite,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      vMin(context, 1.2),
-                                                  vertical: vMin(context,
-                                                      0.6)), // Smaller padding
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                side: const BorderSide(
-                                                    color: kColorPrimary,
-                                                    width: 0.5), // Border
+                                      if (!isCorrectedAnswer && !isSolved) ...[
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment
+                                              .end, // Align to right
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                _markAsSolved(
+                                                    answer["answer_id"],
+                                                    true,
+                                                    question['question_id']);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: kColorWhite,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        vMin(context, 1.2),
+                                                    vertical: vMin(context,
+                                                        0.6)), // Smaller padding
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  side: const BorderSide(
+                                                      color: kColorPrimary,
+                                                      width: 0.5), // Border
+                                                ),
+                                                minimumSize: Size(
+                                                    vMin(context, 18),
+                                                    vMin(context,
+                                                        3.5)), // Smaller size
                                               ),
-                                              minimumSize: Size(
-                                                  vMin(context, 18),
-                                                  vMin(context,
-                                                      3.5)), // Smaller size
+                                              child: const Text(
+                                                "Correct Answer",
+                                                style: TextStyle(
+                                                  color: kColorBlack,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                             ),
-                                            child: const Text(
-                                              "Correct",
+                                            SizedBox(width: vMin(context, 1.5)),
+                                          ],
+                                        )
+                                      ] else if (isSolved &&
+                                          isCorrectedAnswer) ...[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            const Text(
+                                              "If Wrong",
                                               style: TextStyle(
+                                                fontSize: 12,
                                                 color: kColorBlack,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                              width: vMin(context,
-                                                  1.5)), // Space between buttons
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              // Handle Incorrect Answer action
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: kColorWhite,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      vMin(context, 1.2),
-                                                  vertical: vMin(context,
-                                                      0.6)), // Smaller padding
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                side: const BorderSide(
-                                                    color: Colors.red,
-                                                    width: 0.5), // Red border
+                                            SizedBox(width: vMin(context, 1.5)),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                _markAsSolved(
+                                                    answer["answer_id"],
+                                                    false,
+                                                    question['question_id']);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: kColorWhite,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        vMin(context, 1.2),
+                                                    vertical:
+                                                        vMin(context, 0.6)),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  side: const BorderSide(
+                                                      color: Colors.red,
+                                                      width: 0.5),
+                                                ),
+                                                minimumSize: Size(
+                                                    vMin(context, 18),
+                                                    vMin(context, 3.5)),
                                               ),
-                                              minimumSize: Size(
-                                                  vMin(context, 18),
-                                                  vMin(context,
-                                                      3.5)), // Smaller size
-                                            ),
-                                            child: const Text(
-                                              "Incorrect",
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
+                                              child: const Text(
+                                                "Incorrect",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ],
+                                        )
+                                      ],
                                     ],
                                   ),
-                                ),
-                              )
-                              .toList()
+                                );
+                              },
+                            ).toList()
                           : [],
                     ),
                   ],
@@ -927,6 +1018,30 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                       ),
                     ],
                   ),
+                  if (isSening)
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Container(
+                        color:
+                            // ignore: deprecated_member_use
+                            Colors.black
+                                // ignore: deprecated_member_use
+                                .withOpacity(0.3), // Semi-transparent overlay
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text(
+                                'Updating image to server...',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

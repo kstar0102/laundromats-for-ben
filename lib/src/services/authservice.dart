@@ -18,6 +18,36 @@ class AuthService {
   final String baseUrl = 'http://146.190.117.4:5000/api';
   static const String uploadUrl = 'http://146.190.117.4:5000/image/upload';
 
+  Future<bool> updateSolvedStatus(
+      {required int answerId, required bool status}) async {
+    final Uri url = Uri.parse("$baseUrl/question/updateSolvedStatus");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "answerId": answerId,
+          "status": status,
+        }),
+      );
+
+      final responseData = jsonDecode(response.body);
+      String message = responseData['message'] ?? "Unknown response";
+
+      if (response.statusCode == 200 && message.toLowerCase() == "updated") {
+        logger.i("✅ Solved status updated successfully");
+        return true;
+      } else {
+        logger.e("❌ Failed to update solved status: $message");
+        return false;
+      }
+    } catch (e) {
+      logger.e("❌ Error updating solved status: $e");
+      return false;
+    }
+  }
+
   Future<bool> checkUserExistence(String email) async {
     final Uri url = Uri.parse("$baseUrl/users/googlecheck");
 
@@ -232,6 +262,7 @@ class AuthService {
     required String year,
     required String category,
     required String tags,
+    required String tip,
     String? uploadedImageUrl, // Nullable
     String? uploadedFileUrl, // Nullable
   }) async {
@@ -247,9 +278,12 @@ class AuthService {
       "year": year,
       "category": category,
       "tags": tags,
+      "tip_amount": tip,
       "image": "",
       "file": ""
     };
+
+    logger.i(requestBody);
 
     // Only include file/image if they are not null
     if (uploadedImageUrl != null) requestBody["image"] = uploadedImageUrl;

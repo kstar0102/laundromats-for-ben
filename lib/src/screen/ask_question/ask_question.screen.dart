@@ -36,6 +36,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
   final _brandValue = TextEditingController();
   final _serialNumberValue = TextEditingController();
   final _poundValue = TextEditingController();
+  final _tipValue = TextEditingController();
   final _yearValue = TextEditingController();
   final _categoryValue = TextEditingController();
   String? uploadedImageUrl;
@@ -401,6 +402,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
         year: _yearValue.text,
         category: _categoryValue.text,
         tags: selectedTagsAsString,
+        tip: _tipValue.text,
         uploadedImageUrl: uploadedImageUrl, // Can be null
         uploadedFileUrl: uploadedFileUrl, // Can be null
       );
@@ -481,719 +483,648 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
         },
         // ignore: deprecated_member_use
         child: WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-          backgroundColor: kColorWhite,
-          resizeToAvoidBottomInset: true,
-          appBar: PreferredSize(
-            preferredSize:
-                const Size.fromHeight(0.0), // Adjust the height as needed
-            child: AppBar(
+          onWillPop: _onWillPop,
+          child: Scaffold(
               backgroundColor: kColorWhite,
-              elevation: 0, // Removes shadow for a flat UI
-              automaticallyImplyLeading:
-                  false, // Hides back button if unnecessary
-            ),
-          ),
-          body: SizedBox.expand(
-              child: SingleChildScrollView(
-            child: FocusScope(
-              child: Container(
-                decoration: const BoxDecoration(color: kColorWhite),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const HeaderWidget(
-                          role: true, isLogoutBtn: false, backIcon: false),
-                      Padding(
-                          padding: EdgeInsets.all(vMin(context, 4)),
-                          child: SizedBox(
-                            width: vww(context, 100),
-                            child: Text(
-                              askYourQuestion.toString(),
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Onset',
-                                color: kColorSecondary,
-                              ),
-                            ),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header with Icon and Text
-                            Row(
-                              children: [
-                                Text(
-                                  question.toString(),
+              resizeToAvoidBottomInset: true,
+              appBar: PreferredSize(
+                preferredSize:
+                    const Size.fromHeight(0.0), // Adjust the height as needed
+                child: AppBar(
+                  backgroundColor: kColorWhite,
+                  elevation: 0, // Removes shadow for a flat UI
+                  automaticallyImplyLeading:
+                      false, // Hides back button if unnecessary
+                ),
+              ),
+              body: SizedBox.expand(
+                  child: SingleChildScrollView(
+                child: FocusScope(
+                  child: Container(
+                    decoration: const BoxDecoration(color: kColorWhite),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const HeaderWidget(
+                              role: true, isLogoutBtn: false, backIcon: false),
+                          Padding(
+                              padding: EdgeInsets.all(vMin(context, 4)),
+                              child: SizedBox(
+                                width: vww(context, 100),
+                                child: Text(
+                                  askYourQuestion.toString(),
+                                  textAlign: TextAlign.left,
                                   style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontFamily: 'Onset',
                                     color: kColorSecondary,
                                   ),
                                 ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            TextField(
-                              maxLines: 3,
-                              controller: _questionValue,
-                              decoration: InputDecoration(
-                                hintText: typeQuestionHere.toString(),
-                                hintStyle: const TextStyle(
-                                  color: kColorLightGrey,
-                                  fontSize: 14,
-                                  fontFamily: 'Onset-Regular',
-                                ),
-                                contentPadding: const EdgeInsets.all(12.0),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(
-                                      color: kColorInputBorder),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(
-                                      color: kColorInputBorder, width: 1.0),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(
-                                      color: kColorInputBorder),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header with Icon and Text
-                            Row(
+                              )),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  brand.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _brandValue,
-                                keyboardType: TextInputType.name,
-                                autocorrect: false,
-                                cursorColor: Colors.grey,
-                                decoration: InputDecoration(
-                                  hintText: typeBrandHere.toString(),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableBorder,
-                                  focusedBorder: kFocusBorder,
-                                  hintStyle: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorLightGrey),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  counterText: '',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  serialNumber.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _serialNumberValue,
-                                keyboardType: TextInputType.number,
-                                autocorrect: false,
-                                cursorColor: Colors.grey,
-                                decoration: InputDecoration(
-                                  hintText: typeSerialNumberHere.toString(),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableBorder,
-                                  focusedBorder: kFocusBorder,
-                                  hintStyle: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorLightGrey),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  counterText: '',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  pounds.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _poundValue,
-                                keyboardType: TextInputType.text,
-                                autocorrect: false,
-                                cursorColor: Colors.grey,
-                                decoration: InputDecoration(
-                                  hintText: typePoundsHere.toString(),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableBorder,
-                                  focusedBorder: kFocusBorder,
-                                  hintStyle: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorLightGrey),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  counterText: '',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  chooseYear.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _yearValue,
-                                keyboardType:
-                                    TextInputType.none, // Disable keyboard
-                                autocorrect: false,
-                                cursorColor: Colors.grey,
-                                readOnly:
-                                    true, // Make the TextField non-editable
-                                onTap: () async {
-                                  final selectedYear =
-                                      await _showYearPicker(context);
-                                  if (selectedYear != null) {
-                                    setState(() {
-                                      _yearValue.text = selectedYear;
-                                    });
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  hintText: 'Choose Year',
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableBorder,
-                                  focusedBorder: kFocusBorder,
-                                  hintStyle: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Onset-Regular',
-                                    color: kColorLightGrey,
-                                  ),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 10),
-                                  counterText: '',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  chooseCategory.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                const Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Text Field
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 5),
-                              child: TextField(
-                                controller: _categoryValue,
-                                keyboardType:
-                                    TextInputType.none, // Disable keyboard
-                                autocorrect: false,
-                                cursorColor: Colors.grey,
-                                readOnly: true, // Prevent direct editing
-                                onTap: () async {
-                                  final selectedCategory =
-                                      await _showCategoryPicker(context);
-                                  if (selectedCategory != null) {
-                                    setState(() {
-                                      _categoryValue.text = selectedCategory;
-                                    });
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  hintText: 'Choose Category',
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.always,
-                                  enabledBorder: kEnableBorder,
-                                  focusedBorder: kFocusBorder,
-                                  hintStyle: TextStyle(
-                                    fontSize: 14.0,
-                                    fontFamily: 'Onset-Regular',
-                                    color: kColorLightGrey,
-                                  ),
-                                  filled: false,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 10),
-                                  counterText: '',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header with Text
-                            const Row(
-                              children: [
-                                Text(
-                                  "Tags",
-                                  style: TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                Text(
-                                  " *",
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // GestureDetector Container for Tag Selection
-                            GestureDetector(
-                              onTap:
-                                  _showTagDropdown, // Function to open dropdown for tag selection
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical:
-                                        0), // Adjust padding for text alignment
-                                width: vw(context,
-                                    50), // Same width as the text field
-                                height: vh(context,
-                                    6.5), // Adjust height for better layout
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: kColorInputBorder),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .center, // Vertically center content
+                                // Header with Icon and Text
+                                Row(
                                   children: [
-                                    if (_selectedTags.isEmpty)
-                                      const Expanded(
-                                        child: Text(
-                                          "Click to select tags...", // Placeholder text
-                                          style: TextStyle(
-                                            color:
-                                                kColorLightGrey, // Light grey color for placeholder
-                                            fontSize: 15, // Adjust font size
-                                          ),
-                                        ),
+                                    Text(
+                                      question.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
                                       ),
-                                    if (_selectedTags.isNotEmpty)
-                                      Expanded(
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis
-                                              .vertical, // Allow vertical scrolling if needed
-                                          child: Wrap(
-                                            spacing:
-                                                3.0, // Adjust horizontal spacing between tags
-                                            runSpacing:
-                                                2.0, // Adjust vertical spacing between rows
-                                            children: [
-                                              // Render selected tags as Chips
-                                              for (String tag in _selectedTags)
-                                                Chip(
-                                                  label: RichText(
-                                                    text: TextSpan(
-                                                      children: [
-                                                        const TextSpan(
-                                                          text: '# ',
-                                                          style: TextStyle(
-                                                            fontSize:
-                                                                13, // Adjust font size
-                                                            color: Colors
-                                                                .green, // Green color for #
-                                                          ),
-                                                        ),
-                                                        TextSpan(
-                                                          text: tag,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize:
-                                                                12, // Adjust font size
-                                                            color: Colors
-                                                                .black, // Black color for the text
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  backgroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0), // Rounded corners
-                                                    side: const BorderSide(
-                                                        color: Colors
-                                                            .green), // Green border
-                                                  ),
-                                                  deleteIcon: const Icon(
-                                                    Icons.close,
-                                                    size:
-                                                        15, // Adjust delete icon size
-                                                    color: Colors
-                                                        .green, // Green color for delete icon
-                                                  ),
-                                                  onDeleted: () {
-                                                    setState(() {
-                                                      _selectedTags.remove(
-                                                          tag); // Remove tag on delete
-                                                    });
-                                                  },
-                                                  materialTapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap, // Reduce tap area
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                                    ),
+                                    const Text(
+                                      " *",
+                                      style: TextStyle(color: Colors.red),
+                                    ),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  uploadFile.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                TextField(
+                                  maxLines: 3,
+                                  controller: _questionValue,
+                                  decoration: InputDecoration(
+                                    hintText: typeQuestionHere.toString(),
+                                    hintStyle: const TextStyle(
+                                      color: kColorLightGrey,
+                                      fontSize: 14,
+                                      fontFamily: 'Onset-Regular',
+                                    ),
+                                    contentPadding: const EdgeInsets.all(12.0),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: const BorderSide(
+                                          color: kColorInputBorder),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: const BorderSide(
+                                          color: kColorInputBorder, width: 1.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: const BorderSide(
+                                          color: kColorInputBorder),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8.0),
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 20),
-                              child: GestureDetector(
-                                onTap: () => _pickFile(
-                                    context), // Trigger the file picker
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: kColorInputBorder, width: 1),
-                                    borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Header with Icon and Text
+                                Row(
+                                  children: [
+                                    Text(
+                                      brand.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _brandValue,
+                                    keyboardType: TextInputType.name,
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    decoration: InputDecoration(
+                                      hintText: typeBrandHere.toString(),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorLightGrey),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                      counterText: '',
+                                    ),
                                   ),
-                                  child: uploadedFileUrl != null
-                                      ? Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.file_present,
-                                              size: 40,
-                                              // ignore: deprecated_member_use
-                                              color: Colors.green.withOpacity(
-                                                  0.7), // Success color
-                                            ),
-                                            SizedBox(height: vMin(context, 2)),
-                                            const Text(
-                                              "File Uploaded Successfully!",
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      serialNumber.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _serialNumberValue,
+                                    keyboardType: TextInputType.number,
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    decoration: InputDecoration(
+                                      hintText: typeSerialNumberHere.toString(),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorLightGrey),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      pounds.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _poundValue,
+                                    keyboardType: TextInputType.text,
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    decoration: InputDecoration(
+                                      hintText: typePoundsHere.toString(),
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorLightGrey),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      chooseYear.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _yearValue,
+                                    keyboardType:
+                                        TextInputType.none, // Disable keyboard
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    readOnly:
+                                        true, // Make the TextField non-editable
+                                    onTap: () async {
+                                      final selectedYear =
+                                          await _showYearPicker(context);
+                                      if (selectedYear != null) {
+                                        setState(() {
+                                          _yearValue.text = selectedYear;
+                                        });
+                                      }
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText: 'Choose Year',
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: 'Onset-Regular',
+                                        color: kColorLightGrey,
+                                      ),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      chooseCategory.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _categoryValue,
+                                    keyboardType:
+                                        TextInputType.none, // Disable keyboard
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    readOnly: true, // Prevent direct editing
+                                    onTap: () async {
+                                      final selectedCategory =
+                                          await _showCategoryPicker(context);
+                                      if (selectedCategory != null) {
+                                        setState(() {
+                                          _categoryValue.text =
+                                              selectedCategory;
+                                        });
+                                      }
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText: 'Choose Category',
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: TextStyle(
+                                        fontSize: 14.0,
+                                        fontFamily: 'Onset-Regular',
+                                        color: kColorLightGrey,
+                                      ),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Header with Text
+                                const Row(
+                                  children: [
+                                    Text(
+                                      "Tags",
+                                      style: TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // GestureDetector Container for Tag Selection
+                                GestureDetector(
+                                  onTap:
+                                      _showTagDropdown, // Function to open dropdown for tag selection
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical:
+                                            0), // Adjust padding for text alignment
+                                    width: vw(context,
+                                        50), // Same width as the text field
+                                    height: vh(context,
+                                        6.5), // Adjust height for better layout
+                                    decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: kColorInputBorder),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center, // Vertically center content
+                                      children: [
+                                        if (_selectedTags.isEmpty)
+                                          const Expanded(
+                                            child: Text(
+                                              "Click to select tags...", // Placeholder text
                                               style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'Onset-Regular',
-                                                color: Colors.green,
+                                                color:
+                                                    kColorLightGrey, // Light grey color for placeholder
+                                                fontSize:
+                                                    15, // Adjust font size
                                               ),
                                             ),
-                                            SizedBox(height: vMin(context, 1)),
-                                            Text(
-                                              uploadedFileUrl!
-                                                  .split('/')
-                                                  .last, // Extract file name from URL
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorInputBorder,
+                                          ),
+                                        if (_selectedTags.isNotEmpty)
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis
+                                                  .vertical, // Allow vertical scrolling if needed
+                                              child: Wrap(
+                                                spacing:
+                                                    3.0, // Adjust horizontal spacing between tags
+                                                runSpacing:
+                                                    2.0, // Adjust vertical spacing between rows
+                                                children: [
+                                                  // Render selected tags as Chips
+                                                  for (String tag
+                                                      in _selectedTags)
+                                                    Chip(
+                                                      label: RichText(
+                                                        text: TextSpan(
+                                                          children: [
+                                                            const TextSpan(
+                                                              text: '# ',
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    13, // Adjust font size
+                                                                color: Colors
+                                                                    .green, // Green color for #
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: tag,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize:
+                                                                    12, // Adjust font size
+                                                                color: Colors
+                                                                    .black, // Black color for the text
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                8.0), // Rounded corners
+                                                        side: const BorderSide(
+                                                            color: Colors
+                                                                .green), // Green border
+                                                      ),
+                                                      deleteIcon: const Icon(
+                                                        Icons.close,
+                                                        size:
+                                                            15, // Adjust delete icon size
+                                                        color: Colors
+                                                            .green, // Green color for delete icon
+                                                      ),
+                                                      onDeleted: () {
+                                                        setState(() {
+                                                          _selectedTags.remove(
+                                                              tag); // Remove tag on delete
+                                                        });
+                                                      },
+                                                      materialTapTargetSize:
+                                                          MaterialTapTargetSize
+                                                              .shrinkWrap, // Reduce tap area
+                                                    ),
+                                                ],
                                               ),
-                                              overflow: TextOverflow
-                                                  .ellipsis, // Truncate long file names
-                                              maxLines: 1,
                                             ),
-                                          ],
-                                        )
-                                      : Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.file_present,
-                                              size: 40,
-                                              color:
-                                                  // ignore: deprecated_member_use
-                                                  Colors.grey.withOpacity(0.7),
-                                            ),
-                                            SizedBox(height: vMin(context, 2)),
-                                            Text(
-                                              clickUploadFile.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorInputBorder,
-                                              ),
-                                            ),
-                                            SizedBox(height: vMin(context, 1)),
-                                            Text(
-                                              pdfSize.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: 'Onset-Regular',
-                                                color: kColorInputBorder,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  uploadImage.toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: kColorSecondary,
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8.0),
-                            SizedBox(
-                              width: vw(context, 50),
-                              height: vh(context, 20),
-                              child: GestureDetector(
-                                onTap: () => _pickImage(
-                                    context), // Call the pick image function
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: kColorInputBorder, width: 1),
-                                    borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Text(
+                                      "Tip Amount",
+                                      style: TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                // Text Field
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 5),
+                                  child: TextField(
+                                    controller: _tipValue,
+                                    keyboardType: TextInputType.text,
+                                    autocorrect: false,
+                                    cursorColor: Colors.grey,
+                                    decoration: const InputDecoration(
+                                      hintText: "Type Tip amount here... ",
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      enabledBorder: kEnableBorder,
+                                      focusedBorder: kFocusBorder,
+                                      hintStyle: TextStyle(
+                                          fontSize: 14.0,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorLightGrey),
+                                      filled: false,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      counterText: '',
+                                    ),
                                   ),
-                                  child: localImageFile !=
-                                          null // Display local image if available
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: Image.file(
-                                            localImageFile!,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                            fit: BoxFit.fill,
-                                          ),
-                                        )
-                                      : uploadedImageUrl !=
-                                              null // Display uploaded image URL if available
-                                          ? ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: Image.network(
-                                                uploadedImageUrl!,
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                                fit: BoxFit.cover,
-                                                loadingBuilder: (context, child,
-                                                    loadingProgress) {
-                                                  if (loadingProgress == null) {
-                                                    return child;
-                                                  }
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                },
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  logger.e(
-                                                      'Error loading image: $error');
-                                                  return const Center(
-                                                    child: Icon(Icons.error,
-                                                        color: Colors.red),
-                                                  );
-                                                },
-                                              ),
-                                            )
-                                          : Column(
-                                              // Placeholder UI for when no image is selected
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      uploadFile.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 20),
+                                  child: GestureDetector(
+                                    onTap: () => _pickFile(
+                                        context), // Trigger the file picker
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: kColorInputBorder, width: 1),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      child: uploadedFileUrl != null
+                                          ? Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Icon(
-                                                  Icons.image,
+                                                  Icons.file_present,
                                                   size: 40,
-                                                  color: Colors.grey
+                                                  // ignore: deprecated_member_use
+                                                  color: Colors.green
                                                       // ignore: deprecated_member_use
-                                                      .withOpacity(0.7),
+                                                      .withOpacity(
+                                                          0.7), // Success color
+                                                ),
+                                                SizedBox(
+                                                    height: vMin(context, 2)),
+                                                const Text(
+                                                  "File Uploaded Successfully!",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily: 'Onset-Regular',
+                                                    color: Colors.green,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    height: vMin(context, 1)),
+                                                Text(
+                                                  uploadedFileUrl!
+                                                      .split('/')
+                                                      .last, // Extract file name from URL
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily: 'Onset-Regular',
+                                                    color: kColorInputBorder,
+                                                  ),
+                                                  overflow: TextOverflow
+                                                      .ellipsis, // Truncate long file names
+                                                  maxLines: 1,
+                                                ),
+                                              ],
+                                            )
+                                          : Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.file_present,
+                                                  size: 40,
+                                                  color:
+                                                      // ignore: deprecated_member_use
+                                                      Colors.grey
+                                                          // ignore: deprecated_member_use
+                                                          .withOpacity(0.7),
                                                 ),
                                                 SizedBox(
                                                     height: vMin(context, 2)),
                                                 Text(
-                                                  clickUploadImage.toString(),
+                                                  clickUploadFile.toString(),
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontFamily: 'Onset-Regular',
@@ -1203,7 +1134,7 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                                 SizedBox(
                                                     height: vMin(context, 1)),
                                                 Text(
-                                                  imageSize.toString(),
+                                                  pdfSize.toString(),
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     fontFamily: 'Onset-Regular',
@@ -1212,103 +1143,230 @@ class _AskQuestionScreenState extends ConsumerState<AskQuestionScreen> {
                                                 ),
                                               ],
                                             ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.all(vMin(context, 4)),
-                          child: SizedBox(
-                            width: vMin(context, 100),
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                backgroundColor:
-                                    kColorPrimary, // Green background color
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 7,
-                                    horizontal: 20), // Adjust padding
-                              ),
-                              onPressed: () {
-                                _submitQuestion(context);
-                              },
-                              child: const Text(
-                                "Ask Question",
-                                style: TextStyle(
-                                  color: Colors.white, // Text color
-                                  fontSize: 15,
-                                  fontFamily: 'Onset-Regular',
-                                ),
-                              ),
-                            ),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.all(vMin(context, 4)),
-                        child: DottedBorder(
-                          color: kColorPrimary,
-                          borderType: BorderType.RRect,
-                          radius: const Radius.circular(8.0),
-                          strokeWidth: 1,
-                          dashPattern: const [2, 2],
-                          child: Container(
-                            padding: EdgeInsets.all(vMin(context, 2)),
-                            width: double.infinity,
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: manualAt.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorSecondary,
                                     ),
                                   ),
-                                  TextSpan(
-                                    text: 'manualslib.com',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontFamily: 'Onset-Regular',
-                                      color: kColorPrimary,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () async {
-                                        final Uri url =
-                                            Uri.parse('https://manualslib.com');
-
-                                        // Try launching the URL
-                                        if (await canLaunchUrl(url)) {
-                                          await launchUrl(url,
-                                              mode: LaunchMode
-                                                  .externalApplication);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Could not open the URL.')),
-                                          );
-                                        }
-                                      },
-                                  ),
-                                ],
-                              ),
+                                )
+                              ],
                             ),
                           ),
-                        ),
-                      )
-                    ]),
-              ),
-            ),
-          )),
-          bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)),
-    ),),);
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      uploadImage.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Onset-Regular',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: kColorSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8.0),
+                                SizedBox(
+                                  width: vw(context, 50),
+                                  height: vh(context, 20),
+                                  child: GestureDetector(
+                                    onTap: () => _pickImage(
+                                        context), // Call the pick image function
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: kColorInputBorder, width: 1),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      child: localImageFile !=
+                                              null // Display local image if available
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.file(
+                                                localImageFile!,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.fill,
+                                              ),
+                                            )
+                                          : uploadedImageUrl !=
+                                                  null // Display uploaded image URL if available
+                                              ? ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                  child: Image.network(
+                                                    uploadedImageUrl!,
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    loadingBuilder: (context,
+                                                        child,
+                                                        loadingProgress) {
+                                                      if (loadingProgress ==
+                                                          null) {
+                                                        return child;
+                                                      }
+                                                      return const Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      );
+                                                    },
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      logger.e(
+                                                          'Error loading image: $error');
+                                                      return const Center(
+                                                        child: Icon(Icons.error,
+                                                            color: Colors.red),
+                                                      );
+                                                    },
+                                                  ),
+                                                )
+                                              : Column(
+                                                  // Placeholder UI for when no image is selected
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.image,
+                                                      size: 40,
+                                                      color: Colors.grey
+                                                          // ignore: deprecated_member_use
+                                                          .withOpacity(0.7),
+                                                    ),
+                                                    SizedBox(
+                                                        height:
+                                                            vMin(context, 2)),
+                                                    Text(
+                                                      clickUploadImage
+                                                          .toString(),
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontFamily:
+                                                            'Onset-Regular',
+                                                        color:
+                                                            kColorInputBorder,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        height:
+                                                            vMin(context, 1)),
+                                                    Text(
+                                                      imageSize.toString(),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily:
+                                                            'Onset-Regular',
+                                                        color:
+                                                            kColorInputBorder,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Padding(
+                              padding: EdgeInsets.all(vMin(context, 4)),
+                              child: SizedBox(
+                                width: vMin(context, 100),
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        kColorPrimary, // Green background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          8), // Rounded corners
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 7,
+                                        horizontal: 20), // Adjust padding
+                                  ),
+                                  onPressed: () {
+                                    _submitQuestion(context);
+                                  },
+                                  child: const Text(
+                                    "Ask Question",
+                                    style: TextStyle(
+                                      color: Colors.white, // Text color
+                                      fontSize: 15,
+                                      fontFamily: 'Onset-Regular',
+                                    ),
+                                  ),
+                                ),
+                              )),
+                          Padding(
+                            padding: EdgeInsets.all(vMin(context, 4)),
+                            child: DottedBorder(
+                              color: kColorPrimary,
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(8.0),
+                              strokeWidth: 1,
+                              dashPattern: const [2, 2],
+                              child: Container(
+                                padding: EdgeInsets.all(vMin(context, 2)),
+                                width: double.infinity,
+                                child: RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: manualAt.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorSecondary,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: 'manualslib.com',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'Onset-Regular',
+                                          color: kColorPrimary,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () async {
+                                            final Uri url = Uri.parse(
+                                                'https://manualslib.com');
+
+                                            // Try launching the URL
+                                            if (await canLaunchUrl(url)) {
+                                              await launchUrl(url,
+                                                  mode: LaunchMode
+                                                      .externalApplication);
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        'Could not open the URL.')),
+                                              );
+                                            }
+                                          },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ]),
+                  ),
+                ),
+              )),
+              bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex)),
+        ),
+      ),
+    );
   }
 }
