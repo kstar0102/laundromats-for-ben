@@ -471,6 +471,9 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                           left: vw(context, 2),
                           right: vw(context, 2),
                           bottom: vh(context, 0)),
+                      margin: EdgeInsets.symmetric(
+                          horizontal: vMin(context, 2),
+                          vertical: vMin(context, 1)),
                       decoration: BoxDecoration(
                         border: Border.all(color: kColorPrimary, width: 1),
                         borderRadius: BorderRadius.circular(8),
