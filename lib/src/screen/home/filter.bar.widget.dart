@@ -3,12 +3,12 @@ import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/utils/index.dart';
 
 class FilterBarWidget extends StatelessWidget {
-  final String? selectedFilter;
-  final Function(String?) onFilterSelected;
+  final Set<String> selectedFilters;
+  final Function(Set<String>) onFilterSelected;
 
   const FilterBarWidget({
     super.key,
-    required this.selectedFilter,
+    required this.selectedFilters,
     required this.onFilterSelected,
   });
 
@@ -57,15 +57,17 @@ class FilterBarWidget extends StatelessWidget {
     required IconData icon,
     required String filterKey,
   }) {
-    bool isSelected = selectedFilter == filterKey;
+    bool isSelected = selectedFilters.contains(filterKey);
 
     return GestureDetector(
       onTap: () {
+        Set<String> newFilters = Set.from(selectedFilters);
         if (isSelected) {
-          onFilterSelected(null); // Deselect if already selected
+          newFilters.remove(filterKey);
         } else {
-          onFilterSelected(filterKey); // Apply new filter
+          newFilters.add(filterKey);
         }
+        onFilterSelected(newFilters);
       },
       child: Container(
         width: vMin(context, 20), // Uniform width

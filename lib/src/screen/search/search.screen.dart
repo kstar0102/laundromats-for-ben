@@ -10,6 +10,7 @@ import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -29,11 +30,40 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   String? selectedFilter; // New filter selection
   final logger = Logger();
   bool isLoading = true;
-
+  Set<String> selectedFilters = {};
   @override
   void initState() {
     super.initState();
+    _loadFilters();
     getData();
+  }
+
+  void _saveFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+        'search_selectedCategories', selectedCategories.toList());
+    await prefs.setStringList(
+        'search_selectedFilters', selectedFilters.toList());
+  }
+
+  Future<void> _loadFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedCategories =
+          (prefs.getStringList('search_selectedCategories') ?? []).toSet();
+      selectedFilters =
+          (prefs.getStringList('search_selectedFilters') ?? []).toSet();
+    });
+  }
+
+  void _resetFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('search_selectedCategories');
+    await prefs.remove('search_selectedFilters');
+    setState(() {
+      selectedCategories.clear();
+      selectedFilters.clear();
+    });
   }
 
   Future<void> getData() async {
@@ -88,6 +118,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       setState(() {
         selectedCategories = selectedFilters;
       });
+      _saveFilters();
     }
   }
 
@@ -124,10 +155,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       bool isUnresolved = !isResolved;
 
       // ✅ Apply filters
-      if (selectedFilter == "Answered" && !hasUserAnswer) return false;
-      if (selectedFilter == "Unanswered" && !isUnanswered) return false;
-      if (selectedFilter == "Resolved" && !isResolved) return false;
-      if (selectedFilter == "Unresolved" && !isUnresolved) return false;
+      if (selectedFilters.contains("Answered") && !hasUserAnswer) return false;
+      if (selectedFilters.contains("Unanswered") && !isUnanswered) return false;
+      if (selectedFilters.contains("Resolved") && !isResolved) return false;
+      if (selectedFilters.contains("Unresolved") && !isUnresolved) return false;
 
       return true; // Pass through
     }).toList();
@@ -224,10 +255,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           padding: EdgeInsets.symmetric(
                               horizontal: vMin(context, 4)),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width: vw(context, 38),
+                                width: vw(context, 33),
                                 height: vh(context, 5),
                                 child: TextField(
                                   controller: _searchValue,
@@ -283,23 +314,34 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   ),
                                 ),
                               ),
+                              const Spacer(),
                               InkWell(
                                   onTap: _openFilterModal,
                                   child: Image.asset(
                                     'assets/images/icons/filter.png',
                                     fit: BoxFit.cover,
                                   )),
+                              IconButton(
+                                onPressed: _resetFilters,
+                                icon: const Icon(
+                                  Icons.refresh, // System Reset Icon
+                                  color: kColorPrimary,
+                                  size: 28,
+                                ),
+                                tooltip: "Reset Filters", // Tooltip on hover
+                              ),
                             ],
                           ),
                         ),
 
                         // ✅ Filter Bar (Answered, Unanswered, Resolved, Unresolved)
                         FilterBarWidget(
-                          selectedFilter: selectedFilter,
-                          onFilterSelected: (String? filter) {
+                          selectedFilters: selectedFilters,
+                          onFilterSelected: (Set<String> filters) {
                             setState(() {
-                              selectedFilter = filter;
+                              selectedFilters = filters;
                             });
+                            _saveFilters();
                           },
                         ),
 

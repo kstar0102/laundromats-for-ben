@@ -36,13 +36,45 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   int? dislikeCount;
   String? selectedFilter; // Tracks active filter
   List<dynamic> filteredQuestions = []; // Stores filtered questions
+  Set<String> selectedFilters = {}; // Initialize an empty set for filters
 
   final logger = Logger();
 
   @override
   void initState() {
     super.initState();
+    _loadFilters();
     getUserQuestions();
+  }
+
+  Future<void> _loadFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedCategories =
+          (prefs.getStringList('myqestion_selectedCategories') ?? []).toSet();
+      selectedFilters =
+          (prefs.getStringList('myqestion_selectedFilters') ?? []).toSet();
+    });
+    applyFilter();
+  }
+
+  void _saveFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+        'myqestion_selectedCategories', selectedCategories.toList());
+    await prefs.setStringList(
+        'myqestion_selectedFilters', selectedFilters.toList());
+  }
+
+  void _resetFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('myqestion_selectedCategories');
+    await prefs.remove('myqestion_selectedFilters');
+    setState(() {
+      selectedCategories.clear();
+      selectedFilters.clear();
+      applyFilter();
+    });
   }
 
   /// Fetch user questions and apply the filter
@@ -153,14 +185,21 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                 .any((answer) => answer["solved_state"] == "Solved");
         bool isUnresolved = !isResolved;
 
-        if (selectedFilter == "Answered" && !hasUserAnswer) return false;
-        if (selectedFilter == "Unanswered" && !isUnanswered) return false;
-        if (selectedFilter == "Resolved" && !isResolved) return false;
-        if (selectedFilter == "Unresolved" && !isUnresolved) return false;
+        if (selectedFilters.contains("Answered") && !hasUserAnswer) {
+          return false;
+        }
+        if (selectedFilters.contains("Unanswered") && !isUnanswered) {
+          return false;
+        }
+        if (selectedFilters.contains("Resolved") && !isResolved) return false;
+        if (selectedFilters.contains("Unresolved") && !isUnresolved) {
+          return false;
+        }
 
         return true;
       }).toList();
     });
+    _saveFilters();
   }
 
   /// Handles filter selection
@@ -176,14 +215,14 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   }
 
   void _openFilterModal() async {
-    final selectedFilters = await showDialog<Set<String>>(
+    final selectedFiltersResult = await showDialog<Set<String>>(
       context: context,
       builder: (context) => const FilterCategoryModal(),
     );
 
-    if (selectedFilters != null) {
+    if (selectedFiltersResult != null) {
       setState(() {
-        selectedCategories = selectedFilters; // ✅ Update selected categories
+        selectedCategories = selectedFiltersResult;
       });
       applyFilter();
     }
@@ -273,10 +312,10 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                 right: vMin(context, 4),
                                 top: vMin(context, 2)),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: vw(context, 38),
+                                  width: vw(context, 34),
                                   height: vh(context, 5),
                                   child: TextField(
                                     controller: _searchValue,
@@ -338,12 +377,22 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                     ),
                                   ),
                                 ),
+                                const Spacer(),
                                 InkWell(
                                     onTap: _openFilterModal,
                                     child: Image.asset(
                                       'assets/images/icons/filter.png',
                                       fit: BoxFit.cover,
                                     )),
+                                IconButton(
+                                  onPressed: _resetFilters,
+                                  icon: const Icon(
+                                    Icons.refresh, // System Reset Icon
+                                    color: kColorPrimary,
+                                    size: 28,
+                                  ),
+                                  tooltip: "Reset Filters", // Tooltip on hover
+                                ),
                               ],
                             ),
                           ),
@@ -366,10 +415,14 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                           ),
 
                           FilterBarWidget(
-                            selectedFilter: selectedFilter,
-                            onFilterSelected: onFilterSelected,
+                            selectedFilters: selectedFilters,
+                            onFilterSelected: (Set<String> filters) {
+                              setState(() {
+                                selectedFilters = filters;
+                                applyFilter(); // Ensure the filter is applied when changed
+                              });
+                            },
                           ),
-
                           if (selectedCategories.isNotEmpty)
                             Padding(
                               padding: EdgeInsets.only(

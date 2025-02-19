@@ -927,7 +927,7 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                           color: kColorSecondary,
                         ),
                       ),
-                      SizedBox(width: vMin(context, 4)),
+                      SizedBox(width: vMin(context, 2)),
                       InkWell(
                         onTap: () => handleLikeDislike(question['question_id'],
                             1, question['user']['user_id']),
@@ -951,7 +951,7 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                           color: kColorSecondary,
                         ),
                       ),
-                      SizedBox(width: vMin(context, 4)),
+                      SizedBox(width: vMin(context, 2)),
 
                       // Dislike Button
                       InkWell(
@@ -979,7 +979,9 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                       ),
                       const Spacer(),
                       SizedBox(
-                        width: vMin(context, 45),
+                        width: onlyUserAnswers
+                            ? vMin(context, 45)
+                            : vMin(context, 55),
                         child: TextButton(
                           style: TextButton.styleFrom(
                             backgroundColor:
@@ -1000,18 +1002,20 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                               Text(
                                 onlyUserAnswers
                                     ? "See all answers"
-                                    : "No answer provided",
+                                    : "No customer answers provided",
                                 style: const TextStyle(
                                   color: Colors.white, // Text color
-                                  fontSize: 13.5,
+                                  fontSize: 12,
                                   fontFamily: 'Onset-Regular',
                                 ),
                               ),
-                              Image.asset(
-                                'assets/images/icons/arrow-right.png',
-                                width: vMin(context, 5),
-                                height: vMin(context, 5),
-                              )
+                              onlyUserAnswers
+                                  ? Image.asset(
+                                      'assets/images/icons/arrow-right.png',
+                                      width: vMin(context, 5),
+                                      height: vMin(context, 5),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         ),

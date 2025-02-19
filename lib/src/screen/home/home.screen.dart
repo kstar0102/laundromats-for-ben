@@ -37,6 +37,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _loadFilters();
     getData();
   }
 
@@ -46,6 +47,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   bool allowRevert = true;
+
+  Future<void> _loadFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      selectedCategories =
+          (prefs.getStringList('Home_selectedCategories') ?? []).toSet();
+      selectedFilters =
+          (prefs.getStringList('Home_selectedFilters') ?? []).toSet();
+    });
+  }
+
+  void _saveFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+        'Home_selectedCategories', selectedCategories.toList());
+    await prefs.setStringList('Home_selectedFilters', selectedFilters.toList());
+  }
+
+  void _resetFilters() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('Home_selectedCategories');
+    await prefs.remove('Home_selectedFilters');
+    setState(() {
+      selectedCategories.clear();
+      selectedFilters.clear();
+    });
+  }
 
   Future<void> getData() async {
     final authService = AuthService();
@@ -108,6 +136,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         selectedCategories = selectedFilters;
         logger.i(selectedCategories);
       });
+      _saveFilters();
     }
   }
 
@@ -303,8 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   right: vMin(context, 4),
                                   top: vMin(context, 2)),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
                                     trendingQuestions.toString(),
@@ -317,27 +345,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       color: kColorSecondary,
                                     ),
                                   ),
+                                  const Spacer(),
                                   InkWell(
                                       onTap: _openFilterModal,
                                       child: Image.asset(
                                         'assets/images/icons/filter.png',
                                         fit: BoxFit.cover,
-                                      ))
+                                      )),
+                                  IconButton(
+                                    onPressed: _resetFilters,
+                                    icon: const Icon(
+                                      Icons.refresh, // System Reset Icon
+                                      color: kColorPrimary,
+                                      size: 28,
+                                    ),
+                                    tooltip:
+                                        "Reset Filters", // Tooltip on hover
+                                  ),
                                 ],
                               ),
                             ),
 
                             FilterBarWidget(
-                              selectedFilter: selectedFilters.isNotEmpty
-                                  ? selectedFilters.first
-                                  : null,
-                              onFilterSelected: (String? filter) {
+                              selectedFilters: selectedFilters,
+                              onFilterSelected: (Set<String> filters) {
                                 setState(() {
-                                  selectedFilters.clear();
-                                  if (filter != null) {
-                                    selectedFilters.add(filter);
-                                  }
+                                  selectedFilters = filters;
                                 });
+                                _saveFilters();
                               },
                             ),
 
