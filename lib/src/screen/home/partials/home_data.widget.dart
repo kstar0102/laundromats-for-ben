@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
+import 'package:laundromats/src/screen/home/answer.screen.dart';
 import 'package:laundromats/src/screen/home/userproflie.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
@@ -9,8 +10,10 @@ import 'package:logger/logger.dart';
 
 class HomeDataWidget extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> questions;
+  final String fromPage;
 
-  const HomeDataWidget({super.key, required this.questions});
+  const HomeDataWidget(
+      {super.key, required this.questions, required this.fromPage});
 
   @override
   ConsumerState<HomeDataWidget> createState() => _HomeDataWidgetState();
@@ -135,15 +138,16 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
     });
   }
 
-  void toggleAnswers(int? questionId) {
-    if (questionId == null) return;
-    setState(() {
-      if (expandedQuestions.contains(questionId)) {
-        expandedQuestions.remove(questionId);
-      } else {
-        expandedQuestions.add(questionId);
-      }
-    });
+  void toggleAnswers(BuildContext context, Map<String, dynamic> question) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnswerPage(
+          question: question,
+          frompage: widget.fromPage,
+        ),
+      ),
+    );
   }
 
   Future<void> handleLikeDislike(int questionId, int type, int userId) async {
@@ -721,14 +725,20 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                   // Footer (Comments, Likes, Dislikes)
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () => openAnswerInput(question["question_id"]),
-                        child: Image.asset(
-                          "assets/images/icons/chat-message.png",
-                          width: 20, // Set custom width
-                          height: 20, // Set custom height
-                          fit: BoxFit.contain, // Ensures the image fits well
-                        ),
+                      // InkWell(
+                      //   onTap: () => openAnswerInput(question["question_id"]),
+                      //   child: Image.asset(
+                      //     "assets/images/icons/chat-message.png",
+                      //     width: 20, // Set custom width
+                      //     height: 20, // Set custom height
+                      //     fit: BoxFit.contain, // Ensures the image fits well
+                      //   ),
+                      // ),
+                      Image.asset(
+                        "assets/images/icons/chat-message.png",
+                        width: 20, // Set custom width
+                        height: 20, // Set custom height
+                        fit: BoxFit.contain, // Ensures the image fits well
                       ),
                       SizedBox(height: vMin(context, 2)),
                       SizedBox(width: vMin(context, 1)),
@@ -806,8 +816,7 @@ class _HomeDataWidgetState extends ConsumerState<HomeDataWidget> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 7, horizontal: 7), // Adjust padding
                           ),
-                          onPressed: () =>
-                              toggleAnswers(question["question_id"]),
+                          onPressed: () => toggleAnswers(context, question),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

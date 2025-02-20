@@ -169,6 +169,39 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
   }
 
   /// Apply filters when a user selects a tab
+  // void applyFilter() {
+  //   setState(() {
+  //     filteredQuestions = questions
+  //         .where((q) =>
+  //             selectedCategories.isEmpty ||
+  //             selectedCategories.contains(q["category"]))
+  //         .where((q) {
+  //       bool hasUserAnswer = (q["answers"] as List<dynamic>?)
+  //               ?.any((answer) => answer["isWho"] == "user") ??
+  //           false;
+  //       bool isUnanswered = !hasUserAnswer;
+  //       bool isResolved = q["solved_state"] == "Solved" ||
+  //           (q["answers"] as List<dynamic>?)!
+  //               .any((answer) => answer["solved_state"] == "Solved");
+  //       bool isUnresolved = !isResolved;
+
+  //       if (selectedFilters.contains("Answered") && !hasUserAnswer) {
+  //         return false;
+  //       }
+  //       if (selectedFilters.contains("Unanswered") && !isUnanswered) {
+  //         return false;
+  //       }
+  //       if (selectedFilters.contains("Resolved") && !isResolved) return false;
+  //       if (selectedFilters.contains("Unresolved") && !isUnresolved) {
+  //         return false;
+  //       }
+
+  //       return true;
+  //     }).toList();
+  //   });
+  //   _saveFilters();
+  // }
+
   void applyFilter() {
     setState(() {
       filteredQuestions = questions
@@ -176,9 +209,12 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
               selectedCategories.isEmpty ||
               selectedCategories.contains(q["category"]))
           .where((q) {
-        bool hasUserAnswer = (q["answers"] as List<dynamic>?)
-                ?.any((answer) => answer["isWho"] == "user") ??
+        bool hasUserAnswer = (q["answers"] as List<dynamic>?)?.any((answer) =>
+                answer["isWho"] == "user" &&
+                answer["answer_user_id"] !=
+                    userId) ?? // ✅ Exclude if userId matches
             false;
+
         bool isUnanswered = !hasUserAnswer;
         bool isResolved = q["solved_state"] == "Solved" ||
             (q["answers"] as List<dynamic>?)!
@@ -481,7 +517,9 @@ class _QuestionScreenState extends ConsumerState<QuestionScreen> {
                                 : filteredQuestions.isNotEmpty
                                     ? QuestionDataWidget(
                                         questions: filteredQuestions
-                                            .cast<Map<String, dynamic>>())
+                                            .cast<Map<String, dynamic>>(),
+                                        userId: userId!,
+                                      )
                                     : const Center(
                                         child: Padding(
                                           padding: EdgeInsets.all(16.0),

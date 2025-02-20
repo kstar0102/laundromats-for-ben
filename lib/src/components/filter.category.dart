@@ -120,7 +120,7 @@ class _FilterCategoryModalState extends State<FilterCategoryModal> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
-                      width: vMin(context, 30),
+                      width: vMin(context, 35),
                       child: TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor:

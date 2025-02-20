@@ -70,8 +70,8 @@ class FilterBarWidget extends StatelessWidget {
         onFilterSelected(newFilters);
       },
       child: Container(
-        width: vMin(context, 20), // Uniform width
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        width: vMin(context, 22), // Uniform width
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 1),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -93,7 +93,7 @@ class FilterBarWidget extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? kColorPrimary : Colors.black,
               ),

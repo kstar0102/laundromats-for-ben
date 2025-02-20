@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/home/userproflie.screen.dart';
+import 'package:laundromats/src/screen/questions/myquestion.answer.screen.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
@@ -11,8 +12,10 @@ import 'package:logger/logger.dart';
 
 class QuestionDataWidget extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>> questions;
+  final int userId;
 
-  const QuestionDataWidget({super.key, required this.questions});
+  const QuestionDataWidget(
+      {super.key, required this.questions, required this.userId});
 
   @override
   ConsumerState<QuestionDataWidget> createState() => _QuestionDataWidgetState();
@@ -138,15 +141,13 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
     });
   }
 
-  void toggleAnswers(int? questionId) {
-    if (questionId == null) return;
-    setState(() {
-      if (expandedQuestions.contains(questionId)) {
-        expandedQuestions.remove(questionId);
-      } else {
-        expandedQuestions.add(questionId);
-      }
-    });
+  void toggleAnswers(BuildContext context, Map<String, dynamic> question) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyAnswerPage(question: question),
+      ),
+    );
   }
 
   Future<void> handleLikeDislike(int questionId, int type, int userId) async {
@@ -372,11 +373,11 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                 ?.any((answer) => answer["isWho"] == "user") ??
             false;
 
-        bool aiAnswerSolved = (question["answers"] as List<dynamic>?)?.any(
-                (answer) =>
-                    answer["isWho"] == "AI" &&
-                    answer["solved_state"] == "Solved") ??
-            false;
+        // bool aiAnswerSolved = (question["answers"] as List<dynamic>?)?.any(
+        //         (answer) =>
+        //             answer["isWho"] == "AI" &&
+        //             answer["solved_state"] == "Solved") ??
+        //     false;
 
         return Container(
           margin: EdgeInsets.only(bottom: vMin(context, 5)),
@@ -536,16 +537,16 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                                 ),
                               ),
                               const Spacer(),
-                              aiAnswerSolved
-                                  ? const Text(
-                                      "corrected answer",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: kColorPrimary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  : const SizedBox.shrink()
+                              // aiAnswerSolved
+                              //     ? const Text(
+                              //         "corrected answer",
+                              //         style: TextStyle(
+                              //           fontSize: 12,
+                              //           color: kColorPrimary,
+                              //           fontWeight: FontWeight.bold,
+                              //         ),
+                              //       )
+                              //     : const SizedBox.shrink()
                             ],
                           ),
                           SizedBox(
@@ -560,96 +561,124 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                             ),
                           ),
 
-                          if (aiAnswerSolved && isSolved) ...[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  "If Wrong",
-                                  style: TextStyle(
-                                    fontFamily: 'Onset-Regular',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: kColorSecondary,
-                                  ),
-                                ),
-                                SizedBox(width: vw(context, 2)),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    _markAsSolved(aiAnswer["answer_id"], false,
-                                        question['question_id']);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kColorWhite,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: vMin(context, 1.2),
-                                        vertical: vMin(context, 0.6)),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                      side: const BorderSide(
-                                          color: Colors.red, width: 0.5),
-                                    ),
-                                    minimumSize: Size(
-                                        vMin(context, 18), vMin(context, 3.5)),
-                                  ),
-                                  child: const Text(
-                                    "Incorrect",
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ] else if (!isSolved && !aiAnswerSolved) ...[
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.end, // Align to right
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    _markAsSolved(aiAnswer["answer_id"], true,
-                                        question['question_id']);
-                                    isSolved = true;
-                                    aiAnswerSolved = true;
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kColorWhite,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: vMin(context, 2),
-                                        vertical: vMin(
-                                            context, 0.6)), // Smaller padding
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                      side: const BorderSide(
-                                          color: kColorPrimary,
-                                          width: 0.5), // Border
-                                    ),
-                                    minimumSize: Size(vMin(context, 18),
-                                        vMin(context, 3.5)), // Smaller size
-                                  ),
-                                  child: const Text(
-                                    "Correct Answer",
-                                    style: TextStyle(
-                                      color: kColorBlack,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: vMin(context, 1.5)),
-                              ],
-                            )
-                          ],
+                          // if (aiAnswerSolved && isSolved) ...[
+                          //   Row(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     children: [
+                          //       const Text(
+                          //         "If Wrong",
+                          //         style: TextStyle(
+                          //           fontFamily: 'Onset-Regular',
+                          //           fontSize: 12,
+                          //           fontWeight: FontWeight.bold,
+                          //           color: kColorSecondary,
+                          //         ),
+                          //       ),
+                          //       SizedBox(width: vw(context, 2)),
+                          //       ElevatedButton(
+                          //         onPressed: () {
+                          //           _markAsSolved(aiAnswer["answer_id"], false,
+                          //               question['question_id']);
+                          //         },
+                          //         style: ElevatedButton.styleFrom(
+                          //           backgroundColor: kColorWhite,
+                          //           padding: EdgeInsets.symmetric(
+                          //               horizontal: vMin(context, 1.2),
+                          //               vertical: vMin(context, 0.6)),
+                          //           shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(6),
+                          //             side: const BorderSide(
+                          //                 color: Colors.red, width: 0.5),
+                          //           ),
+                          //           minimumSize: Size(
+                          //               vMin(context, 18), vMin(context, 3.5)),
+                          //         ),
+                          //         child: const Text(
+                          //           "Incorrect",
+                          //           style: TextStyle(
+                          //             color: Colors.red,
+                          //             fontSize: 11,
+                          //             fontWeight: FontWeight.bold,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ] else if (!isSolved && !aiAnswerSolved) ...[
+                          //   Row(
+                          //     mainAxisAlignment:
+                          //         MainAxisAlignment.end, // Align to right
+                          //     children: [
+                          //       ElevatedButton(
+                          //         onPressed: () {
+                          //           _markAsSolved(aiAnswer["answer_id"], true,
+                          //               question['question_id']);
+                          //           isSolved = true;
+                          //           aiAnswerSolved = true;
+                          //         },
+                          //         style: ElevatedButton.styleFrom(
+                          //           backgroundColor: kColorWhite,
+                          //           padding: EdgeInsets.symmetric(
+                          //               horizontal: vMin(context, 2),
+                          //               vertical: vMin(
+                          //                   context, 0.6)), // Smaller padding
+                          //           shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(6),
+                          //             side: const BorderSide(
+                          //                 color: kColorPrimary,
+                          //                 width: 0.5), // Border
+                          //           ),
+                          //           minimumSize: Size(vMin(context, 18),
+                          //               vMin(context, 3.5)), // Smaller size
+                          //         ),
+                          //         child: const Text(
+                          //           "Correct Answer",
+                          //           style: TextStyle(
+                          //             color: kColorBlack,
+                          //             fontSize: 11,
+                          //             fontWeight: FontWeight.bold,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //       SizedBox(width: vMin(context, 1.5)),
+                          //     ],
+                          //   )
+                          // ],
                           SizedBox(height: vMin(context, 1)),
                         ],
                       ),
                     ),
                     SizedBox(height: vMin(context, 1)), // Reduced space below
                   ],
-
+                  if (question['tip_amount'] != null &&
+                      question['tip_amount'].toString().trim().isNotEmpty) ...[
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: vw(context, 1),
+                        ),
+                        const Text(
+                          "Tip Amount : ",
+                          style: TextStyle(
+                            fontSize: 14,
+                            // fontWeight: FontWeight.bold,
+                            color: kColorBlack,
+                          ),
+                        ),
+                        SizedBox(
+                          width: vw(context, 1),
+                        ),
+                        Text(
+                          "\$${question['tip_amount']}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: kColorPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   // Answer Input Field (Only Visible When Chat Icon is Clicked)
                   if (answerInputVisible.contains(question["question_id"])) ...[
                     SizedBox(height: vMin(context, 2)),
@@ -911,19 +940,32 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                   // Footer (Comments, Likes, Dislikes)
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () => openAnswerInput(question["question_id"]),
-                        child: Image.asset(
-                          "assets/images/icons/chat-message.png",
-                          width: 20, // Set custom width
-                          height: 20, // Set custom height
-                          fit: BoxFit.contain, // Ensures the image fits well
-                        ),
+                      // InkWell(
+                      //   onTap: () => openAnswerInput(question["question_id"]),
+                      //   child: Image.asset(
+                      //     "assets/images/icons/chat-message.png",
+                      //     width: 20, // Set custom width
+                      //     height: 20, // Set custom height
+                      //     fit: BoxFit.contain, // Ensures the image fits well
+                      //   ),
+                      // ),
+                      Image.asset(
+                        "assets/images/icons/chat-message.png",
+                        width: 20, // Set custom width
+                        height: 20, // Set custom height
+                        fit: BoxFit.contain, // Ensures the image fits well
                       ),
                       SizedBox(height: vMin(context, 2)),
                       SizedBox(width: vMin(context, 1)),
                       Text(
-                        (question["answers"]?.length - 1 ?? 0).toString(),
+                        (question["answers"] != null)
+                            ? question["answers"]
+                                .where((answer) =>
+                                    answer["isWho"] != "AI" &&
+                                    answer["answer_user_id"] != widget.userId)
+                                .length
+                                .toString()
+                            : "0", // Default to 0 if `answers` is null
                         style: const TextStyle(
                           fontFamily: 'Onset-Regular',
                           fontSize: 12,
@@ -996,8 +1038,7 @@ class _QuestionDataWidgetState extends ConsumerState<QuestionDataWidget> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 7, horizontal: 7), // Adjust padding
                           ),
-                          onPressed: () =>
-                              toggleAnswers(question["question_id"]),
+                          onPressed: () => toggleAnswers(context, question),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

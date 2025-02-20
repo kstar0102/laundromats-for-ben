@@ -328,7 +328,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                             Container(
                               margin: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
+                                  horizontal: 10, vertical: 10),
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -415,7 +415,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                               fontWeight: FontWeight.bold,
                                               fontFamily: 'Onset-Regular',
                                               color: kColorSecondary,
-                                              fontSize: 16,
+                                              fontSize: 14,
                                             ),
                                           ),
                                         ],

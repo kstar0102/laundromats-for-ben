@@ -8,6 +8,7 @@ import 'package:laundromats/src/screen/home/filter.bar.widget.dart';
 import 'package:laundromats/src/screen/home/partials/home_data.widget.dart';
 import 'package:laundromats/src/services/authservice.dart';
 import 'package:laundromats/src/translate/en.dart';
+import 'package:laundromats/src/utils/global_variable.dart';
 import 'package:laundromats/src/utils/index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
@@ -92,6 +93,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           setState(() {
             userName = userData['user_name'];
             userImageUrl = userData['user_image'];
+            GlobalVariable.userName = userData['user_name'];
+            GlobalVariable.userImageUrl = userData['user_image'];
           });
         } else {
           logger.e('Failed to fetch user data: Invalid response');
@@ -352,15 +355,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         'assets/images/icons/filter.png',
                                         fit: BoxFit.cover,
                                       )),
-                                  IconButton(
+                                  SizedBox(
+                                    width: vw(context, 1),
+                                  ),
+                                  TextButton.icon(
                                     onPressed: _resetFilters,
-                                    icon: const Icon(
-                                      Icons.refresh, // System Reset Icon
-                                      color: kColorPrimary,
-                                      size: 28,
+                                    label: const Text(
+                                      "Reset",
+                                      style: TextStyle(
+                                        color: kColorPrimary,
+                                        fontSize: 14, // Adjust text size
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    tooltip:
-                                        "Reset Filters", // Tooltip on hover
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 1, vertical: 1),
+                                      minimumSize:
+                                          const Size(60, 30), // Custom padding
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            6), // Rounded corners
+                                        side: const BorderSide(
+                                            color:
+                                                kColorPrimary), // Border color
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -460,6 +480,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       : questions.isNotEmpty
                                           ? HomeDataWidget(
                                               questions: filteredQuestions,
+                                              fromPage: "Home",
                                             )
                                           : const Center(
                                               child: Padding(

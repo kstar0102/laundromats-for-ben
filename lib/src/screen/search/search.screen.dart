@@ -383,7 +383,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           child: isLoading
                               ? const Center(child: CircularProgressIndicator())
                               : filteredQuestions.isNotEmpty
-                                  ? HomeDataWidget(questions: filteredQuestions)
+                                  ? HomeDataWidget(
+                                      questions: filteredQuestions,
+                                      fromPage: "Search",
+                                    )
                                   : const Center(
                                       child: Text("No questions found.",
                                           style: TextStyle(

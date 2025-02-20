@@ -48,6 +48,36 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> updateAnswer({
+    required int answerId,
+    required String updatedAnswer,
+  }) async {
+    final url = Uri.parse('$baseUrl/question/updateAnswer');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'id': answerId, // Ensure the correct ID is passed
+          'answer': updatedAnswer,
+        }),
+      );
+
+      logger.i(response);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data; // Returns the API response message
+      } else {
+        throw Exception('Failed to update answer: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating answer: $e');
+    }
+  }
+
   Future<bool> checkUserExistence(String email) async {
     final Uri url = Uri.parse("$baseUrl/users/googlecheck");
 
@@ -401,7 +431,9 @@ class AuthService {
         }),
       );
 
-      if (response.statusCode == 200) {
+      logger.i(response);
+
+      if (response.statusCode == 201) {
         final data = json.decode(response.body);
         return data;
       } else {
