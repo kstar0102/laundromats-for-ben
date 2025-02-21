@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:laundromats/src/constants/app_styles.dart';
 import 'package:laundromats/src/screen/auth/login.auth.dart';
 import 'package:laundromats/src/screen/home/home.screen.dart';
@@ -16,6 +17,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   final logger = Logger();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -24,7 +26,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   void getData() async {
+    String? token = await _firebaseMessaging.getToken();
+    logger.i(token);
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('fcmToken', token!);
     String? myId = prefs.getString('userId');
     logger.i('user id : $myId');
 
